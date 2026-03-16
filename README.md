@@ -153,7 +153,8 @@ agent-builder/
         ├── prompt-structuring.md  # Prompt structure: delimiters, 7-block template, techniques
         ├── tabular-data.md        # Tabular data serialization: formats, size strategies, token costs
         ├── llm-as-judge.md        # LLM-as-Judge: biases, calibration, rubrics, production deployment
-        └── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
+        ├── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
+        └── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
 ```
 
 ---
