@@ -27,7 +27,8 @@ agent-builder/
         ├── frameworks.md             # 11 framework reviews, selection matrix, head-to-head comparisons
         ├── production.md             # Context engineering, tool design, evals, cost, observability, guardrails
         ├── evals.md                  # Evaluation: frameworks, benchmarks, metrics, LLM-as-judge, safety, monitoring
-        └── prompt-structuring.md     # Prompt structure: delimiters, 7-block template, techniques, output control
+        ├── prompt-structuring.md     # Prompt structure: delimiters, 7-block template, techniques, output control
+        └── tabular-data.md           # Tabular data serialization: formats, size strategies, token costs
 ```
 
 ## Activation Triggers
