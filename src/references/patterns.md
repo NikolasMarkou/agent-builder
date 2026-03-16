@@ -89,7 +89,7 @@ def route(state) -> str:
     intent = state["classified_intent"]
     return {"billing": "billing_agent", "technical": "tech_agent", "general": "faq_agent"}[intent]
 
-builder.add_conditional_edges("router", route, {"billing_agent": "billing_agent", ...})
+builder.add_conditional_edges("router", route, {"billing_agent": "billing_agent", "tech_agent": "tech_agent", "faq_agent": "faq_agent"})
 ```
 
 ### 1.5 Aggregator
@@ -97,6 +97,7 @@ builder.add_conditional_edges("router", route, {"billing_agent": "billing_agent"
 Collects outputs from multiple sources and synthesizes into a unified result. Often paired with Parallel.
 
 **When to use:** Multiple independent analyses need combining, consensus or majority-vote needed, multi-perspective synthesis.
+**When NOT to use:** Single source provides sufficient answer, real-time latency constraints make fan-out impractical.
 **Mechanism:** Fan-out -> independent processing -> fan-in -> synthesis node.
 
 ### 1.6 Network (Swarm)
@@ -138,6 +139,7 @@ How an individual agent reasons and acts internally. These are independent of to
 The default agent loop. Model reasons about the task, calls a tool, observes the result, reasons again, repeats until done.
 
 **When to use:** General-purpose agents, tool-calling tasks, any situation where interleaved reasoning and action is needed.
+**When NOT to use:** Deterministic pipelines with no decision points (use Sequential + Tool Use instead), tasks requiring upfront multi-step planning before any action (use Plan-and-Execute).
 **LangGraph:** The basic conditional edge loop between LLM node and ToolNode.
 **LangChain:** `create_agent` implements this by default.
 
@@ -146,6 +148,7 @@ The default agent loop. Model reasons about the task, calls a tool, observes the
 Agent generates output, then evaluates its own output against criteria, then revises. Separate generation and evaluation steps.
 
 **When to use:** Writing, code generation, analysis where quality varies, tasks with clear evaluation criteria.
+**When NOT to use:** No objective quality criteria exist (reflection becomes circular), latency-sensitive tasks where double LLM calls are unacceptable, tasks where first-pass output is consistently sufficient.
 **Implementation:** Two LLM calls per iteration: generate, then critique. Critique feeds back as input to next generation.
 **Key insight:** The critic prompt must be specific. "Is this good?" fails. "Does this meet criteria X, Y, Z?" works.
 
@@ -154,6 +157,7 @@ Agent generates output, then evaluates its own output against criteria, then rev
 Agent creates an explicit plan (list of steps), then executes each step, then can replan if reality diverges.
 
 **When to use:** Complex multi-step tasks, tasks requiring upfront decomposition, supervisor agents in hierarchical topologies.
+**When NOT to use:** Simple tasks completable in 1-3 tool calls (planning overhead exceeds benefit), highly dynamic environments where plans become stale before execution completes.
 **Implementation:** Planner node (structured output: list of steps) -> executor loop -> optional replanner.
 **Key risk:** Over-planning. Plans should be coarse-grained. Detailed sub-plans emerge during execution.
 
@@ -162,6 +166,7 @@ Agent creates an explicit plan (list of steps), then executes each step, then ca
 Separate generator and critic agents. Generator proposes, critic evaluates, generator revises. Loop topology with two agents.
 
 **When to use:** High-quality content generation, code review workflows, adversarial quality improvement.
+**When NOT to use:** Self-critique is sufficient (use Reflection instead — cheaper, single agent), no clear evaluation rubric for the critic, cost constraints prohibit 2x+ LLM calls per iteration.
 **Different from Reflection:** Reflection is self-critique (same agent). Generator-Critic uses separate agents/prompts, allowing specialized evaluation.
 
 ### 2.5 STORM (Iterative Research)
@@ -169,6 +174,7 @@ Separate generator and critic agents. Generator proposes, critic evaluates, gene
 Multi-phase research pattern: generate queries -> parallel search -> read sources -> synthesize -> identify gaps -> generate new queries -> repeat.
 
 **When to use:** Deep research tasks, multi-source analysis, investigative workflows.
+**When NOT to use:** Simple fact-lookup tasks (a single ReAct call suffices), time-constrained queries where iterative search is too slow, tasks with a single authoritative source.
 **Composition:** Parallel (topology) + Loop (topology) + ReAct (behavioral) + Map-Reduce (data flow).
 
 ### 2.6 Human-in-the-Loop (HITL)
@@ -176,12 +182,16 @@ Multi-phase research pattern: generate queries -> parallel search -> read source
 Agent pauses execution at defined points and waits for human approval, editing, or override.
 
 **When to use:** High-stakes actions (payments, external communications, database writes, deployments), regulatory requirements, trust-building phase.
+**When NOT to use:** Fully automated pipelines where human latency is unacceptable, low-stakes tasks where the cost of occasional errors is less than the cost of human review.
 **LangGraph:** `interrupt()` function inside any node. Resume with `Command(resume=value)`.
 **LangChain:** `HumanInTheLoopMiddleware` with `interrupt_on=[tool_names]`.
 
 ### 2.7 Tool Use
 
 Agent selects and calls tools from its available set. Not a loop pattern per se, but the mechanism by which agents take action.
+
+**When to use:** Agent needs to interact with external systems, retrieve data, or perform side effects.
+**When NOT to use:** Task is purely generative with no external data needs, all required information is already in the context window.
 
 **Design principles (from Claude Code production learnings):**
 - Minimize the action space. Every tool is a choice evaluated on every turn.
@@ -201,6 +211,7 @@ How information is transformed and routed between nodes.
 Fan out a task across N workers (map), collect results, synthesize (reduce).
 
 **When to use:** Process many items independently then aggregate (document analysis, multi-source research).
+**When NOT to use:** Items have sequential dependencies (use Sequential + Prompt Chaining), N is small enough that a single LLM call can handle all items in context.
 **LangGraph:** `Send()` for map, reducer on state key for collection, synthesis node for reduce.
 
 ### 3.2 Prompt Chaining
@@ -208,6 +219,7 @@ Fan out a task across N workers (map), collect results, synthesize (reduce).
 Output of one LLM call becomes input context for the next. Each call transforms or enriches the data.
 
 **When to use:** Sequential processing pipelines, data enrichment, multi-stage transformation.
+**When NOT to use:** All transformations can fit in a single well-structured prompt, chain length exceeds 5 steps (context bloat becomes dominant cost).
 **Key risk:** Context bloat. Each chain step adds to the context window. Compress or summarize between steps.
 
 ### 3.3 Controlled Flow
@@ -215,6 +227,7 @@ Output of one LLM call becomes input context for the next. Each call transforms 
 Explicit routing based on state values. The flow is deterministic given the state, but the state itself is determined by LLM reasoning.
 
 **When to use:** When you need predictable execution paths based on LLM classifications or evaluations.
+**When NOT to use:** Flow is always the same regardless of input (use static edges), routing decisions are too nuanced for a classification step (use Network/Swarm instead).
 **LangGraph:** Conditional edges with routing functions.
 
 ### 3.4 Swarm
@@ -222,6 +235,7 @@ Explicit routing based on state values. The flow is deterministic given the stat
 Agents dynamically hand off control to each other. No central coordinator. Each agent decides the next agent.
 
 **When to use:** Customer service routing, collaborative problem-solving, situations where the right specialist emerges during execution.
+**When NOT to use:** Clear predetermined routing exists (use Router + Controlled Flow), small number of agents where a supervisor is simpler, need strict execution ordering.
 **LangGraph:** `create_handoff_tool` + `create_swarm` from `langgraph_swarm`.
 
 ### 3.5 Subgraph / Reusable Pipeline
@@ -229,6 +243,7 @@ Agents dynamically hand off control to each other. No central coordinator. Each 
 Encapsulate a multi-node workflow as a single node in a parent graph. Context isolation between parent and child.
 
 **When to use:** Reusable processing logic shared across multiple parent graphs, context isolation needed, modular architecture.
+**When NOT to use:** Logic is used only once (inline nodes are simpler), parent and child need tight state coupling (subgraph isolation gets in the way).
 **LangGraph:** Compile a sub-graph and add it as a node in the parent graph.
 
 ```python

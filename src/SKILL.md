@@ -144,7 +144,7 @@ def get_data(query: str) -> str:
     """Fetch data from the database."""
     return "data result"
 
-llm = ChatAnthropic(model="claude-sonnet-4-6").bind_tools([get_data])
+llm = ChatAnthropic(model="claude-sonnet-4-5-20250929").bind_tools([get_data])
 
 def call_llm(state: MessagesState) -> dict:
     return {"messages": [llm.invoke(state["messages"])]}
