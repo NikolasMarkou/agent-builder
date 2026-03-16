@@ -4,6 +4,16 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-03-16
+
+### Added
+- **Text tools reference** (`references/text-tools.md`) -- cheap deterministic text tools for AI agents: three-layer search stack (exact/structural/semantic), tool-by-tool reference (ripgrep, ast-grep, jq, yq, sed, awk, sqlite3), agent-optimized search tools (Probe, grepika, grepai, mgrep, AI-grep, llm_grep), sandboxed execution (just-bash), cost math (10-50x savings), tool selection decision tree, integration patterns (MCP servers, system prompts, bash tool wrappers), and anti-patterns.
+
+### Changed
+- **SKILL.md** -- Step 4 (Build) now references `text-tools.md` for agents using text search, data filtering, or code navigation tools. Reference table updated with text-tools.md entry.
+- **README.md** -- Updated project structure to list text-tools.md.
+- **CLAUDE.md** -- Updated repository structure to list text-tools.md.
+
 ## [1.2.0] - 2026-03-16
 
 ### Added

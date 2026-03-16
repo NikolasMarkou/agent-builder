@@ -154,7 +154,8 @@ agent-builder/
         ├── tabular-data.md        # Tabular data serialization: formats, size strategies, token costs
         ├── llm-as-judge.md        # LLM-as-Judge: biases, calibration, rubrics, production deployment
         ├── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
-        └── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
+        ├── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
+        └── text-tools.md            # Text tools for agents: search stack, ripgrep, ast-grep, jq, sqlite3
 ```
 
 ---
