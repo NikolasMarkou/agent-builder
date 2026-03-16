@@ -216,9 +216,49 @@ export LANGSMITH_API_KEY=your_key
 
 Features: detailed execution traces, state transitions, evaluation datasets, prompt management, cost tracking, HIPAA/SOC 2/GDPR compliance.
 
+### Structured Logging
+
+Production agents need context-aware structured logging, not `print()` statements.
+
+**Environment-based format:**
+
+| Environment | Log Format | Log Level | Why |
+|---|---|---|---|
+| Development / Test | Console (human-readable) | DEBUG | Developer ergonomics |
+| Staging / Production | JSON (machine-parseable) | WARNING | Parseable by log aggregators |
+
+**Required context fields per log entry:** `thread_id`, `node_name`, `tool_name`, `latency_ms`, `token_count`, `error_type`. Use request-scoped context variables so these fields propagate automatically through the call stack without manual threading.
+
+**Log rotation:** Daily rotation with environment-prefixed filenames. Retain 30 days in production.
+
+### Metrics for Agents
+
+Define and expose metrics that matter for agent operations:
+
+| Metric | Type | Labels | What It Tells You |
+|---|---|---|---|
+| `http_requests_total` | Counter | method, endpoint, status | Traffic volume and error rates |
+| `http_request_duration_seconds` | Histogram | method, endpoint | Latency distribution |
+| `llm_inference_duration_seconds` | Histogram | model | Model performance (use buckets: 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0s) |
+| `llm_tokens_total` | Counter | model, direction (input/output) | Token usage for cost tracking |
+| `db_connections_active` | Gauge | — | Connection pool health |
+| `agent_task_completion_total` | Counter | status (success/failure) | Agent reliability |
+
+Expose via a `/metrics` endpoint. Scrape with Prometheus (or equivalent). See `deployment.md` for the full monitoring stack setup.
+
+### Tracing Platforms
+
+| Platform | Best For | Model |
+|---|---|---|
+| **LangSmith** | LangChain/LangGraph teams. Detailed execution traces, state transitions, eval datasets, cost tracking. HIPAA/SOC 2/GDPR. | Commercial (free tier: 5K traces) |
+| **Langfuse** | Self-hosting, data sovereignty. Trace tracking, LLM-as-judge score persistence, session grouping. | Open-source (MIT) |
+| **OpenTelemetry + OpenLLMetry** | Vendor-neutral. GenAI semantic conventions (v1.37+) with LLM-specific auto-instrumentation. | Open standard |
+| **Arize Phoenix** | Production monitoring, drift detection. | OSS + commercial |
+
 ### For Non-LangChain Stacks
 
 - OpenTelemetry integration (most frameworks support it)
+- OpenLLMetry (Traceloop) extends OTel with LLM-specific auto-instrumentation
 - Custom structured logging
 - Dedicated agent monitoring (Arize, Langfuse, etc.)
 
@@ -254,6 +294,101 @@ MCP is the universal tool standard but has security concerns:
 - Tool permission exploitation
 - Data exfiltration through tool calls
 - Always validate and sanitize MCP tool outputs
+
+---
+
+## Security Hardening
+
+### Input Sanitization
+
+Every user-facing endpoint must sanitize before processing. Defense in depth — apply multiple layers at the system boundary, before data enters the agent pipeline:
+
+| Layer | What It Does | Why |
+|---|---|---|
+| **Null byte stripping** | Remove `\x00` characters | Prevents null byte injection in downstream systems |
+| **HTML encoding** | Escape `<`, `>`, `&`, `"`, `'` | Prevents XSS if output is rendered in a browser |
+| **Script tag removal** | Strip `<script>...</script>` blocks | Defense against stored XSS |
+| **Recursive sanitization** | Apply to nested dicts, lists, strings | User input arrives in complex structures (JSON bodies) |
+
+**Key principle:** Sanitize at the boundary, not inside the pipeline. Every string from an external source (user input, tool output, webhook payload) passes through sanitization before entering the agent context.
+
+### Rate Limiting
+
+Per-endpoint rate limits prevent abuse and runaway costs.
+
+**Recommended defaults:**
+
+| Endpoint Type | Limit | Rationale |
+|---|---|---|
+| Chat (primary agent) | 30/minute | Balances usability with cost control |
+| Streaming | 20/minute | Streaming holds connections longer |
+| Authentication | 20/minute | Prevent credential stuffing |
+| Account creation | 10/hour | Prevent account spam |
+| Health checks | 60/minute | Allow frequent monitoring |
+
+**Global fallback:** 200/day, 50/hour per IP. Relax to 1000/day in dev/test.
+
+**Implementation:** Key rate limits on IP address for public endpoints. Key on authenticated user ID for post-auth endpoints. Return `429 Too Many Requests` with `Retry-After` header.
+
+### Authentication
+
+For agent APIs exposed beyond localhost, use stateless JWT authentication:
+
+- **Token creation:** Include `sub` (user ID), `iat` (issued at), `exp` (expiration). Sign with HS256 minimum.
+- **Token verification:** Validate signature, check expiration, extract user context for downstream logging.
+- **Token scope:** 30-day expiry for session tokens. Shorter (1-hour) for elevated-privilege operations.
+- **Never** store tokens in local storage if serving a web frontend — use httpOnly cookies.
+
+---
+
+## LLM Service Resilience
+
+### Model Registry with Fallback
+
+Don't hardcode a single model. Maintain a registry of initialized model clients and fall back automatically on failure:
+
+1. **Register** multiple models at startup (e.g., primary Claude Sonnet, fallback GPT-4.1, cheap fallback GPT-4.1-mini)
+2. **Circular fallback:** On failure, try the next registered model. Wrap around the list before giving up.
+3. **Separate concerns:** The registry manages model instances. The caller doesn't know which model ultimately served the request.
+
+**When to use:** Any production agent that can't afford downtime from a single provider outage.
+
+### Retry with Exponential Backoff
+
+Transient failures (rate limits, timeouts, 5xx errors) should be retried automatically:
+
+| Parameter | Recommended Value | Why |
+|---|---|---|
+| **Max attempts** | 3 | Enough for transient issues, fast enough to fail on real outages |
+| **Wait strategy** | Exponential backoff, 2–10 seconds | Avoids thundering herd on rate limits |
+| **Retry on** | Rate limit errors, timeouts, server errors (5xx) | These are transient by nature |
+| **Don't retry on** | Auth errors (401/403), bad request (400), content policy (4xx) | These won't resolve on retry |
+
+**Combined pattern:** Wrap each model call with retry logic. Wrap the retry-enabled call with the fallback loop. This gives you retry-per-model + fallback-across-models.
+
+### Database Connection Pooling
+
+For agents with persistence (checkpointing, memory, sessions), configure connection pooling:
+
+| Parameter | Recommended Value | Sizing Rule |
+|---|---|---|
+| **Pool size** | 20 | Expected concurrent agent sessions |
+| **Max overflow** | 10 | 50% of pool size for burst handling |
+| **Pool timeout** | 30 seconds | How long to wait for a connection before erroring |
+| **Connection recycle** | 1800 seconds (30 min) | Prevents stale connections from accumulating |
+| **Pre-ping** | Enabled | Validates connections before use, avoids stale connection errors |
+
+### Graceful Degradation
+
+Production agents should degrade gracefully, not crash:
+
+| Component Failure | Degradation Strategy |
+|---|---|
+| **Primary LLM down** | Fall back to secondary model |
+| **Database unreachable** | Serve stateless responses, queue state updates for retry |
+| **Memory/vector store down** | Continue without long-term memory, log the gap |
+| **Tracing/observability down** | Continue serving, buffer telemetry locally |
+| **Rate limit hit** | Queue requests, return estimated wait time |
 
 ---
 

@@ -109,9 +109,13 @@ Read `references/production.md` before deploying. Covers:
 - Tool design principles (minimize action space, shape to model capabilities, elicitation)
 - Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines. For LLM-as-judge implementation details, read `references/llm-as-judge.md`. For rubric design with binary decomposition, read `references/binary-evals.md`.
 - Cost modeling (token math at scale)
-- Observability (LangSmith tracing, structured logging)
+- Observability (LangSmith tracing, structured logging, Prometheus metrics, Langfuse)
 - Guardrails (input validation, output validation, tool permission scoping)
+- Security hardening (input sanitization, rate limiting, JWT authentication)
+- LLM service resilience (model registry, circular fallback, retry with exponential backoff)
 - Failure modes catalogue and mitigation
+
+For deployment — API serving, containerization, and monitoring stack — read `references/deployment.md`.
 
 ---
 
@@ -289,7 +293,8 @@ Read these as needed. Do NOT load all of them upfront.
 | `references/patterns.md` | When selecting topology, behavioral, or data flow patterns. Contains full pattern catalogue with decision criteria, implementation details, and composition rules. |
 | `references/langchain-langgraph.md` | When building with the default stack. Contains LangGraph state management, edges, streaming, memory, middleware, MCP integration, and Deep Agents. |
 | `references/frameworks.md` | When the user explicitly requests a non-default framework, or when the task clearly maps to a specialized framework. Contains per-framework implementation guidance. |
-| `references/production.md` | Before any production deployment. Contains context engineering, tool design, evaluation, cost modeling, observability, guardrails, and failure modes. |
+| `references/production.md` | Before any production deployment. Contains context engineering, tool design, evaluation, cost modeling, observability, guardrails, security hardening, LLM service resilience, and failure modes. |
+| `references/deployment.md` | When deploying an agent as a service. Contains API serving patterns (FastAPI), streaming endpoints, health checks, middleware stack, environment configuration, containerization (Docker/docker-compose), monitoring stack (Prometheus/Grafana), and long-term memory patterns. |
 | `references/evals.md` | When designing evaluation strategy for agents. Contains evaluation frameworks, benchmarks, metrics, LLM-as-judge, human evaluation, safety evaluation, production monitoring, eval pipeline architecture, and anti-patterns. |
 | `references/prompt-structuring.md` | When designing system prompts or tool descriptions for agents. Contains delimiter format selection (XML/Markdown/YAML), 7-block prompt architecture, prompting techniques (zero-shot, few-shot, CoT, chaining), output control, position bias, model-specific notes, and anti-patterns. |
 | `references/tabular-data.md` | When an agent needs to process, analyze, or reason over tabular data (spreadsheets, CSVs, database results). Contains serialization format benchmarks, size-based strategies (<50 / 50-500 / 500+ rows), format selection decision tree, token cost comparison, and model-specific notes. |

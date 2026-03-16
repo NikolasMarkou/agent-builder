@@ -462,3 +462,57 @@ evals/
 | **3. Basic automated** | 20–50 tasks, some deterministic graders | Reproducible checks |
 | **4. Systematic** | Comprehensive suites, CI/CD integration, production monitoring | Continuous quality assurance |
 | **5. Eval-driven development** | Evals define capabilities before implementation, feedback loops | Evaluation as engineering discipline |
+
+---
+
+## Core Eval Dimensions for Agents
+
+The five most common LLM-as-Judge evaluation dimensions for production agents. Use these as the starting point for your eval suite — add domain-specific dimensions as needed.
+
+For rubric design theory, scale selection, and bias mitigation, see `llm-as-judge.md` and `binary-evals.md`.
+
+### The Five Dimensions
+
+| Dimension | What It Measures | When It Matters Most |
+|---|---|---|
+| **Hallucination** | Whether the response contains fabricated facts, invented sources, or claims unsupported by the provided context | RAG agents, knowledge-base QA, any agent that retrieves and synthesizes information |
+| **Toxicity** | Whether the response contains harmful, offensive, discriminatory, or inappropriate content | All user-facing agents — non-negotiable safety baseline |
+| **Helpfulness** | Whether the response addresses the user's actual need with accurate, actionable, complete information | Task-oriented agents, customer support, advisory systems |
+| **Relevancy** | Whether the response stays on topic and avoids tangential content | Agents handling diverse queries, routed multi-agent systems |
+| **Conciseness** | Whether the response is free of unnecessary verbosity, filler, and repetition | Chat agents, voice agents, any latency-sensitive application |
+
+### Rubric Design Pattern
+
+Each dimension should follow this structure when building judge prompts:
+
+1. **Role statement** — "You are an impartial evaluation judge"
+2. **Task definition** — What specific quality to evaluate
+3. **Scoring scale** — Use 0.0–1.0 continuous (0.0 = best, 1.0 = worst) or binary pass/fail. See `binary-evals.md` for when binary is better.
+4. **Anchor descriptions** — Define what 0.0, 0.5, and 1.0 look like concretely
+5. **Input specification** — What the judge receives (user input, context, agent output)
+6. **Reasoning instruction** — "Think step by step" with explicit evaluation steps
+7. **Output format** — Structured JSON: `{"score": <float>, "reasoning": "<explanation>"}`
+
+### Selecting Dimensions
+
+Not every agent needs all five. Select based on risk profile:
+
+| Agent Type | Must Have | Should Have | Nice to Have |
+|---|---|---|---|
+| **Customer-facing chat** | Toxicity, Helpfulness | Hallucination, Relevancy | Conciseness |
+| **RAG / knowledge QA** | Hallucination, Relevancy | Helpfulness | Conciseness, Toxicity |
+| **Code generation** | Helpfulness (correctness) | — | Conciseness |
+| **Voice / realtime** | Conciseness, Helpfulness | Toxicity | Relevancy |
+| **Internal tooling** | Helpfulness | Hallucination | — |
+
+### Running Evaluations at Scale
+
+| Concern | Recommendation |
+|---|---|
+| **Judge model** | Use a model at least as capable as the agent being judged. Cross-model evaluation reduces self-preference bias. |
+| **Scoring** | Require structured output (JSON with score + reasoning). Parse programmatically. |
+| **Sampling** | Score 5–10% of production traffic, not everything. Calibrate sampling rate against your quality SLA. |
+| **Rate limits** | Add delays between judge calls (5–10s). Batch evaluations are not latency-sensitive. |
+| **Trace integration** | Push scores back to your tracing platform (LangSmith, Langfuse) for filtering and trending. |
+| **Calibration** | Validate judge agreement against 100–500 human-labeled examples. Recalibrate monthly. See LLM-as-Judge section above. |
+| **Alerting** | Set regression gates: alert if any dimension's average score degrades by >5–10% week-over-week. |

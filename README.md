@@ -93,7 +93,10 @@ Before deploying, the skill walks through:
 | **Tool Design** | Minimize action space, shape to model capabilities, progressive disclosure |
 | **Evaluation** | Frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, eval pipelines |
 | **Cost Modeling** | Token math at scale, cost reduction levers |
-| **Observability** | LangSmith tracing, structured logging, anomaly alerting |
+| **Observability** | LangSmith tracing, structured logging, Prometheus metrics, Langfuse |
+| **Security** | Input sanitization, rate limiting, JWT authentication |
+| **Resilience** | Model registry, circular fallback, retry with exponential backoff |
+| **Deployment** | API serving (FastAPI), streaming, Docker, monitoring stack |
 | **Guardrails** | Input/output validation, tool permission scoping, MCP security |
 | **Failure Modes** | 10 production failure modes with mitigations |
 
@@ -149,6 +152,7 @@ agent-builder/
         ├── langchain-langgraph.md # Default stack implementation reference
         ├── frameworks.md          # Alternative framework guidance (10 frameworks)
         ├── production.md          # Production hardening reference
+        ├── deployment.md          # Deployment: API serving, Docker, monitoring stack, memory
         ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
         ├── prompt-structuring.md  # Prompt structure: delimiters, 7-block template, techniques
         ├── tabular-data.md        # Tabular data serialization: formats, size strategies, token costs
