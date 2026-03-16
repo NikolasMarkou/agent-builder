@@ -4,6 +4,15 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-03-16
+
+### Added
+- **Evaluation reference** (`references/evals.md`) -- comprehensive evaluation guide covering frameworks (Anthropic three-grader, capability vs regression evals, Google Cloud three pillars), benchmarks (SWE-bench, WebArena, GAIA, τ-bench, Cybench, etc.), metrics (outcome, process, cost, safety), LLM-as-judge (paradigms, biases, calibration), human evaluation, safety evaluation (OWASP Top 10, red-teaming tools), production monitoring (platform comparison, OpenTelemetry), eval pipeline architecture (promptfoo, Inspect AI, DeepEval), and best practices with 10 anti-patterns.
+
+### Changed
+- **SKILL.md** -- Step 5 now references `evals.md` for comprehensive evaluation guidance; reference table updated with evals.md entry.
+- **production.md** -- Evaluation Strategy section now cross-references `evals.md` for in-depth coverage.
+
 ## [1.0.0] - 2026-03-16
 
 ### Added

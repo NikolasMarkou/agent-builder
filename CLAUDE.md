@@ -25,7 +25,8 @@ agent-builder/
         ├── patterns.md               # Pattern catalogue: topology (7), behavioral (7), data flow (5)
         ├── langchain-langgraph.md    # Default stack: LangChain v1.2.x + LangGraph v1.0.x
         ├── frameworks.md             # 11 framework reviews, selection matrix, head-to-head comparisons
-        └── production.md             # Context engineering, tool design, evals, cost, observability, guardrails
+        ├── production.md             # Context engineering, tool design, evals, cost, observability, guardrails
+        └── evals.md                  # Evaluation: frameworks, benchmarks, metrics, LLM-as-judge, safety, monitoring
 ```
 
 ## Activation Triggers
@@ -42,6 +43,7 @@ Complete spec in **src/SKILL.md**. Key sections:
 - **Framework Selection**: src/SKILL.md Step 3 table + `src/references/frameworks.md` (11 frameworks, 22 use cases)
 - **Code Templates**: src/SKILL.md "Code Templates" section (5 templates)
 - **Production Hardening**: src/SKILL.md Step 5 + `src/references/production.md`
+- **Evaluation**: src/SKILL.md Step 5 + `src/references/evals.md` (frameworks, benchmarks, metrics, tooling, anti-patterns)
 - **Default Stack**: `src/references/langchain-langgraph.md` (state, edges, streaming, memory, middleware, MCP, Deep Agents)
 
 Do not duplicate skill content here. Read src/SKILL.md directly.
@@ -104,6 +106,7 @@ Validate skill changes by testing with prompts like:
 - "Build me an agent that does X" (should trigger the full 5-step workflow)
 - "What framework should I use for Y?" (should consult framework selection matrix)
 - "Make this production-ready" (should reference production.md guidance)
+- "How should I evaluate my agent?" (should reference evals.md guidance)
 
 ## Updating Local Skill
 

@@ -91,7 +91,7 @@ Before deploying, the skill walks through:
 |---|---|
 | **Context Engineering** | Context rot, token budget, three-artefact architecture, compression strategies |
 | **Tool Design** | Minimize action space, shape to model capabilities, progressive disclosure |
-| **Evaluation** | Domain-specific evals, human-in-the-loop ramp-up, LLM-as-judge at scale |
+| **Evaluation** | Frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, eval pipelines |
 | **Cost Modeling** | Token math at scale, cost reduction levers |
 | **Observability** | LangSmith tracing, structured logging, anomaly alerting |
 | **Guardrails** | Input/output validation, tool permission scoping, MCP security |
@@ -148,7 +148,8 @@ agent-builder/
         ├── patterns.md           # Pattern catalogue (topology, behavioral, data flow)
         ├── langchain-langgraph.md # Default stack implementation reference
         ├── frameworks.md          # Alternative framework guidance (11 frameworks)
-        └── production.md          # Production hardening reference
+        ├── production.md          # Production hardening reference
+        └── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
 ```
 
 ---
