@@ -2,7 +2,7 @@
 
 Comprehensive guide to evaluating AI agents in production. Covers evaluation frameworks, benchmarks, metrics, grading methods, safety evaluation, monitoring, tooling, and building eval pipelines.
 
-For a quick evaluation checklist in the production hardening context, see the Evaluation Strategy section in `production.md`. This file is the deep-dive reference.
+For a quick evaluation checklist in the production hardening context, see the Evaluation Strategy section in `production.md`. For LLM-as-judge implementation details (biases, calibration, rubric design, production deployment), see `llm-as-judge.md`. For binary evaluation rubric design (CheckEval, boolean decomposition, scale selection), see `binary-evals.md`. This file is the deep-dive reference.
 
 ## Table of Contents
 

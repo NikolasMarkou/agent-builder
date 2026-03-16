@@ -103,7 +103,7 @@ For the default LangChain/LangGraph stack, the build order is:
 Read `references/production.md` before deploying. Covers:
 - Context engineering (context rot, token budget, three-artefact architecture)
 - Tool design principles (minimize action space, shape to model capabilities, elicitation)
-- Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines.
+- Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines. For LLM-as-judge implementation details, read `references/llm-as-judge.md`. For rubric design with binary decomposition, read `references/binary-evals.md`.
 - Cost modeling (token math at scale)
 - Observability (LangSmith tracing, structured logging)
 - Guardrails (input validation, output validation, tool permission scoping)
@@ -141,7 +141,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_anthropic import ChatAnthropic
-from langchain_core.tools import tool
+from langchain.tools import tool
 
 @tool
 def get_data(query: str) -> str:
@@ -172,7 +172,7 @@ result = graph.invoke(
 )
 ```
 
-### Template 3: Multi-Agent Supervisor (LangGraph Swarm)
+### Template 3: Multi-Agent Swarm with Handoffs (LangGraph Swarm)
 
 ```python
 from langchain.agents import create_agent
@@ -259,8 +259,9 @@ def agent_with_approval(state: MessagesState) -> dict:
 ## Key Packages (March 2026)
 
 ```bash
-pip install langchain "langchain[anthropic]"  # or [openai], [google-genai]
+pip install "langchain[anthropic]"              # or [openai], [google-genai]
 pip install langgraph
+pip install langgraph-swarm                    # multi-agent swarm/handoff patterns
 pip install deepagents                         # batteries-included layer
 pip install langchain-mcp-adapters             # MCP integration
 ```
@@ -269,6 +270,7 @@ pip install langchain-mcp-adapters             # MCP integration
 |---|---|---|
 | `langchain` | 1.2.x | Core: models, tools, agents, middleware |
 | `langgraph` | 1.0.x | Orchestration: state machines, durable execution |
+| `langgraph-swarm` | 0.1.x | Multi-agent swarm/handoff patterns |
 | `deepagents` | 0.4.x | Batteries-included: filesystem, subagents, planning |
 | `langchain-mcp-adapters` | 0.2.0 | MCP tool integration |
 

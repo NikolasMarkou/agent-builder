@@ -24,7 +24,7 @@ agent-builder/
     └── references/                   # Knowledge base documents (loaded on-demand)
         ├── patterns.md               # Pattern catalogue: topology (7), behavioral (7), data flow (5)
         ├── langchain-langgraph.md    # Default stack: LangChain v1.2.x + LangGraph v1.0.x
-        ├── frameworks.md             # 11 framework reviews, selection matrix, head-to-head comparisons
+        ├── frameworks.md             # 10 framework reviews, selection matrix, head-to-head comparisons
         ├── production.md             # Context engineering, tool design, evals, cost, observability, guardrails
         ├── evals.md                  # Evaluation: frameworks, benchmarks, metrics, LLM-as-judge, safety, monitoring
         ├── prompt-structuring.md     # Prompt structure: delimiters, 7-block template, techniques, output control
@@ -44,7 +44,7 @@ Complete spec in **src/SKILL.md**. Key sections:
 - **5-Step Workflow**: src/SKILL.md "Workflow" section (assess, patterns, framework, build, harden)
 - **Complexity Classes**: src/SKILL.md Step 1 table (Simple → Batteries-included)
 - **Pattern Selection**: src/SKILL.md Step 2 + `src/references/patterns.md` (19 patterns across 3 layers)
-- **Framework Selection**: src/SKILL.md Step 3 table + `src/references/frameworks.md` (11 frameworks, 22 use cases)
+- **Framework Selection**: src/SKILL.md Step 3 table + `src/references/frameworks.md` (10 frameworks, 18 use cases)
 - **Code Templates**: src/SKILL.md "Code Templates" section (5 templates)
 - **Production Hardening**: src/SKILL.md Step 5 + `src/references/production.md`
 - **Evaluation**: src/SKILL.md Step 5 + `src/references/evals.md` (frameworks, benchmarks, metrics, tooling, anti-patterns)

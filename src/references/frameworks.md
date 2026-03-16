@@ -388,7 +388,7 @@ print(result.sentiment)
 
 ---
 
-## Key 2025 Trends Affecting Framework Choice
+## Key Trends Affecting Framework Choice (2025-2026)
 
 1. **MCP as universal standard.** 97M monthly SDK downloads. Supported by all major frameworks. Non-negotiable for tool connectivity.
 2. **Model-driven architectures gaining ground.** Strands' success validates that modern LLMs can drive planning without rigid workflows.

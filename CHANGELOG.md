@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - **SKILL.md** -- Step 4 (Build) now references `prompt-structuring.md` for system prompt design and `tabular-data.md` for agents processing tabular data. Reference table updated with all new entries.
-- **patterns.md** -- Added "When NOT to use" sections and code examples to all patterns and frameworks.
+- **patterns.md** -- Added "When NOT to use" sections and code examples to all patterns.
 - **frameworks.md** -- Added "When NOT to choose" sections to all frameworks.
 - **Makefile** -- Extended `validate` target to check README and CLAUDE.md project structure sections against actual reference files.
 - **build.ps1** -- Extended `validate` function with same documentation drift checks.

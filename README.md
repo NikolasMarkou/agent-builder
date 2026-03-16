@@ -42,7 +42,7 @@ Map the workflow end-to-end. Determine if you actually need an agent (vs simpler
 
 | Complexity | Characteristics | Default Approach |
 |---|---|---|
-| **Simple** | Single task, few tools, no branching | `create_agent` (LangChain) |
+| **Simple** | Single task, few tools, no branching, no persistence needed | `create_agent` (LangChain) |
 | **Moderate** | Multiple tools, structured output, needs middleware | `create_agent` + middleware |
 | **Complex** | Cycles, conditional branching, durable execution, HITL | LangGraph `StateGraph` |
 | **Multi-agent** | Multiple specialized agents coordinating | LangGraph multi-agent patterns |
@@ -69,7 +69,7 @@ Default is **LangChain/LangGraph (Python)**. Override only when another framewor
 | AWS-native deployment, model-driven approach | Strands Agents |
 | Role-based team, rapid prototyping | CrewAI |
 | OpenAI-only stack, voice/realtime | OpenAI Agents SDK |
-| Azure/.NET/Java enterprise | Semantic Kernel |
+| Azure/.NET/Java enterprise | Semantic Kernel / MS Agent Framework |
 | Google Cloud native | Google ADK |
 | TypeScript/JS application | Mastra |
 | RAG-heavy, document processing | LlamaIndex |
@@ -77,7 +77,7 @@ Default is **LangChain/LangGraph (Python)**. Override only when another framewor
 | Model-agnostic, persistent memory | Agno |
 | Lightweight, open-model focus | Smolagents |
 
-The framework guide includes 22 use-case comparisons and head-to-head tables.
+The framework guide includes 18 use-case comparisons and head-to-head tables.
 
 ### Step 4: Build
 
@@ -109,7 +109,7 @@ Before deploying, the skill walks through:
 | Production-hardening an existing agent | |
 | Selecting the right patterns for a use case | |
 
-Trigger phrases: *"build me an agent"*, *"create an agent"*, *"design agent architecture"*, *"what framework should I use"*, *"make this production-ready"*
+Trigger phrases: *"build me an agent"*, *"create an agent"*, *"design agent architecture"*, *"what framework should I use"*, *"make this production-ready"*, *"scaffold an agent project"*
 
 ---
 
@@ -147,7 +147,7 @@ agent-builder/
     └── references/
         ├── patterns.md           # Pattern catalogue (topology, behavioral, data flow)
         ├── langchain-langgraph.md # Default stack implementation reference
-        ├── frameworks.md          # Alternative framework guidance (11 frameworks)
+        ├── frameworks.md          # Alternative framework guidance (10 frameworks)
         ├── production.md          # Production hardening reference
         ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
         ├── prompt-structuring.md  # Prompt structure: delimiters, 7-block template, techniques
