@@ -2,6 +2,8 @@
 
 Binary decomposition — breaking evaluation criteria into yes/no checklist questions — is the single highest-leverage change you can make to your LLM evaluation pipeline. It improves inter-evaluator agreement by +0.45, improves correlation with human judgments by +0.10, cuts evaluation time by 50%+, and produces interpretable, traceable scores.
 
+This is a deep-dive companion to `llm-as-judge.md`. Read that file first for the broader LLM-as-Judge landscape (implementation patterns, bias mitigation, calibration, judge model selection, agent evaluation, production deployment).
+
 ## Table of Contents
 
 1. [Why Binary Beats Scales](#why-binary-beats-scales)

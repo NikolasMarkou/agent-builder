@@ -496,3 +496,7 @@ The 100x cost difference between pure LLM and tiered approaches is why nobody ru
 
 **Compliance / AML:**
 - DataWalk. UBO Identification in AML: Why LLMs Fail & How Agentic AI Delivers Accuracy. https://datawalk.com/ubo-identification-why-llms-fail-how-composite-ai-delivers-accuracy/
+
+---
+
+**See also:** `text-tools.md` for deterministic text search and filtering tools useful in ER blocking layers (ripgrep for exact key matching, semantic search tools for fuzzy blocking).

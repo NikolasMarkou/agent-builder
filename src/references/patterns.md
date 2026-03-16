@@ -100,13 +100,14 @@ Collects outputs from multiple sources and synthesizes into a unified result. Of
 **When NOT to use:** Single source provides sufficient answer, real-time latency constraints make fan-out impractical.
 **Mechanism:** Fan-out -> independent processing -> fan-in -> synthesis node.
 
-### 1.6 Network (Swarm)
+### 1.6 Network
 
-Agents can communicate with any other agent. No fixed hierarchy. Each agent decides who to hand off to.
+Agents can communicate with any other agent. No fixed hierarchy -- peer-to-peer wiring where each agent can reach any other.
 
 **When to use:** Peer-to-peer collaboration, dynamic delegation, customer service with specialist routing.
 **When NOT to use:** Tasks have a clear predetermined path (use Sequential or Router).
 **Risk:** Infinite handoff loops. Always track handoff count and cap it.
+**Relationship to Swarm (3.4):** Network is the *topology* (who can talk to whom). Swarm (3.4) is the *data flow mechanism* (how control transfers via handoffs). A swarm runs on a network topology.
 
 LangGraph: Use `create_handoff_tool` + `create_swarm`.
 
@@ -232,10 +233,11 @@ Explicit routing based on state values. The flow is deterministic given the stat
 
 ### 3.4 Swarm
 
-Agents dynamically hand off control to each other. No central coordinator. Each agent decides the next agent.
+The data flow mechanism where agents dynamically hand off control to each other. Each agent decides the next agent and transfers conversational context via the handoff.
 
 **When to use:** Customer service routing, collaborative problem-solving, situations where the right specialist emerges during execution.
 **When NOT to use:** Clear predetermined routing exists (use Router + Controlled Flow), small number of agents where a supervisor is simpler, need strict execution ordering.
+**Relationship to Network (1.6):** Network (1.6) is the *topology* (peer-to-peer wiring). Swarm is the *data flow pattern* (control transfer via handoffs). A swarm requires a network topology but adds the handoff protocol that moves context between agents.
 **LangGraph:** `create_handoff_tool` + `create_swarm` from `langgraph_swarm`.
 
 ### 3.5 Subgraph / Reusable Pipeline

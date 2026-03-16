@@ -139,7 +139,7 @@ The single most impactful rubric design decision is **scale granularity**.
 | 1-5 with anchors | Acceptable | Development with well-defined anchor descriptions per level | Without anchored descriptions for every score level |
 | 1-10 or continuous | Avoid | Almost never | Always — LLMs perform poorly at fine-grained discrimination |
 
-CheckEval (Lee et al., EMNLP 2025): decomposing criteria into binary checklist questions improved inter-evaluator agreement by **+0.45** and average correlation with human judgments by **+0.10** across 12 evaluator models.
+CheckEval (Lee et al., EMNLP 2025): decomposing criteria into binary checklist questions improved inter-evaluator agreement by **+0.45** and average correlation with human judgments by **+0.10** across 12 evaluator models. For full CheckEval implementation patterns, scale selection, and prompt templates, see `binary-evals.md`.
 
 ### Anchor Description Example (1-5 Helpfulness)
 
@@ -392,6 +392,6 @@ ChatEval (ICLR 2024): multi-agent debate achieves Kendall Tau 0.57 with humans v
 
 ### Three Non-Obvious Insights
 
-1. **Binary decomposition beats sophisticated scoring**: CheckEval's simple yes/no checklist items improved agreement by +0.45 over Likert scales. The urge to use 1-10 scales for nuance actually destroys signal.
+1. **Binary decomposition beats sophisticated scoring**: CheckEval's simple yes/no checklist items improved agreement by +0.45 over Likert scales. The urge to use 1-10 scales for nuance actually destroys signal. See `binary-evals.md` for the full implementation guide.
 2. **The cheapest approach is often the best**: a panel of three diverse budget models (PoLL) outperforms a single frontier judge at 7x lower cost.
 3. **The biggest risk is not inaccuracy but false confidence**: clustered standard errors are 3x larger than naive estimates, style-over-substance bias systematically misleads, and even top models fail 25% of hard cases.

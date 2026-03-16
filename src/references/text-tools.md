@@ -407,3 +407,7 @@ def query_json(json_path: str, jq_filter: str) -> str:
 
 **Agent architecture:**
 - Mike Mason. AI Coding Agents in 2026: Coherence Through Orchestration. https://mikemason.ca/writing/ai-coding-agents-jan-2026/
+
+---
+
+**See also:** `entity-resolution.md` for how text search and filtering tools fit into entity resolution blocking layers (exact key matching, sorted neighborhood, semantic similarity).

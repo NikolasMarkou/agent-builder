@@ -487,7 +487,7 @@ Each dimension should follow this structure when building judge prompts:
 
 1. **Role statement** — "You are an impartial evaluation judge"
 2. **Task definition** — What specific quality to evaluate
-3. **Scoring scale** — Use 0.0–1.0 continuous (0.0 = best, 1.0 = worst) or binary pass/fail. See `binary-evals.md` for when binary is better.
+3. **Scoring scale** — Use 0.0–1.0 continuous (0.0 = worst, 1.0 = best) or binary pass/fail. See `binary-evals.md` for when binary is better.
 4. **Anchor descriptions** — Define what 0.0, 0.5, and 1.0 look like concretely
 5. **Input specification** — What the judge receives (user input, context, agent output)
 6. **Reasoning instruction** — "Think step by step" with explicit evaluation steps

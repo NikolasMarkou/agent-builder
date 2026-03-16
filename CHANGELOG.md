@@ -46,7 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **SKILL.md** -- core skill definition with assessment, pattern selection, framework selection, build, and production hardening workflow.
 - **Pattern catalogue** (`references/patterns.md`) -- 19 patterns across three layers: topology (7), behavioral (7), data flow (5). Includes composition rules and failure mode catalogue.
 - **Default stack reference** (`references/langchain-langgraph.md`) -- LangChain v1.2.x + LangGraph v1.0.x implementation reference covering state management, edges, persistence, streaming, memory, middleware, MCP integration, multi-agent patterns, and Deep Agents.
-- **Framework guide** (`references/frameworks.md`) -- 11 framework reviews with selection matrix (22 use cases), head-to-head comparisons, and 2025 trend analysis.
+- **Framework guide** (`references/frameworks.md`) -- 10 alternative framework reviews with selection matrix (18 use cases), head-to-head comparisons, and 2025-2026 trend analysis.
 - **Production hardening** (`references/production.md`) -- context engineering, tool design principles, evaluation strategy, cost modeling, observability, guardrails, failure modes, and deployment checklist.
 - **5 code templates** -- simple agent, ReAct with persistence, multi-agent supervisor, parallel fan-out/fan-in, human-in-the-loop with interrupt.
 - **Build system** -- Makefile (Unix/Linux/macOS) and build.ps1 (Windows PowerShell) for packaging and validation.
