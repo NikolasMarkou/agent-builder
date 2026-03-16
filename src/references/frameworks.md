@@ -166,7 +166,7 @@ response = agent.run("Find the latest AI agent frameworks")
 
 ---
 
-## Semantic Kernel
+## Semantic Kernel / Microsoft Agent Framework
 
 **Architecture:** Orchestration-first with enterprise focus. Plugin-based architecture.
 **License:** MIT | **Stars:** ~27K | **Language:** C#, Python, Java
