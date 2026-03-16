@@ -1,0 +1,275 @@
+# Alternative Frameworks Reference
+
+Use this reference when the default LangChain/LangGraph stack is not the best fit. Each section covers when to choose the framework, architecture, and implementation patterns.
+
+## Table of Contents
+
+1. [Framework Selection Matrix](#framework-selection-matrix)
+2. [CrewAI](#crewai)
+3. [Strands Agents (AWS)](#strands-agents)
+4. [OpenAI Agents SDK](#openai-agents-sdk)
+5. [Google ADK](#google-adk)
+6. [Semantic Kernel / Microsoft Agent Framework](#semantic-kernel)
+7. [LlamaIndex](#llamaindex)
+8. [Mastra](#mastra)
+9. [Agno](#agno)
+10. [Smolagents](#smolagents)
+11. [DSPy](#dspy)
+12. [Head-to-Head Comparisons](#head-to-head)
+
+---
+
+## Framework Selection Matrix
+
+| Use Case | Best Choice | Runner-up |
+|---|---|---|
+| Simple chatbots | LangChain, OpenAI Agents SDK | Strands |
+| Complex multi-agent systems | LangGraph | Strands Graph, CrewAI |
+| RAG pipelines | LlamaIndex | Haystack, LangChain |
+| Document processing | LlamaIndex (LlamaParse) | Haystack |
+| Data analysis agents | LangGraph | Strands |
+| Code generation agents | OpenAI Agents SDK, Smolagents | Strands |
+| Research agents | LangGraph, AutoGen | Smolagents |
+| AWS-native production | Strands Agents | LangGraph |
+| Azure/Microsoft production | Microsoft Agent Framework | Semantic Kernel |
+| Google Cloud production | Google ADK | LangGraph |
+| TypeScript/JS apps | Mastra | Vercel AI SDK |
+| .NET/Java enterprise | Semantic Kernel | Google ADK (Java) |
+| Open/local model workflows | Smolagents, Agno | Strands (Ollama) |
+| Prompt optimization | DSPy | (unique niche) |
+| Persistent agent memory | Letta (MemGPT) | Agno (learning=True) |
+| Voice/realtime agents | OpenAI Agents SDK, Strands BidiAgent | Google ADK |
+| Serverless deployment | Strands (Lambda) | LangGraph Platform |
+| Rapid prototyping | Strands, Agno, OpenAI SDK | CrewAI |
+
+---
+
+## CrewAI
+
+**Architecture:** Role-based multi-agent. Define agents with roles/goals/backstories, assemble into crews with processes.
+**License:** MIT | **Stars:** ~44K | **Language:** Python
+**Best for:** Rapid team-of-agents prototyping, sequential/hierarchical role-based workflows.
+
+**Core concepts:**
+- **Agent**: role + goal + backstory + tools + LLM
+- **Task**: description + expected_output + assigned agent
+- **Crew**: collection of agents + tasks + process (sequential, hierarchical, or consensual)
+- **Flow**: multi-crew orchestration with state management
+
+**When to choose over LangGraph:**
+- Team-based metaphor maps naturally to the problem
+- Speed of prototyping matters more than fine-grained control
+- Workflow is sequential or hierarchical with clear role assignments
+
+**When NOT to choose:**
+- Need explicit cycles, custom state machines, durable checkpointing
+- Need fine-grained control over every state transition
+- Complex conditional branching beyond sequential/hierarchical
+
+**Memory:** 4 types (short-term, long-term, entity, contextual).
+**Enterprise:** CrewAI AMP (managed platform).
+
+---
+
+## Strands Agents
+
+**Architecture:** Model-driven / minimalist. Agent = prompt + tools + model. LLM drives all planning and tool selection.
+**License:** Apache 2.0 | **Stars:** ~3K+ | **Language:** Python, TS
+**Best for:** AWS-native deployment, minimal boilerplate, model-driven approach.
+
+**Core concepts:**
+- Agent defined with system prompt + tools list
+- No graph, no state machine. The LLM decides what to do.
+- Tools are Python functions with type hints
+- Built-in: 20+ tools, native MCP support, AWS Bedrock integration
+
+**When to choose over LangGraph:**
+- AWS deployment (Lambda, Fargate, EKS, AgentCore)
+- Model-driven approach (trust the LLM to plan)
+- Minimal framework overhead wanted
+- Rapid time-to-production (days vs months per AWS internal experience)
+
+**When NOT to choose:**
+- Need explicit state machines with checkpointing
+- Need fine-grained control over execution flow
+- Complex conditional branching required
+
+**Multi-agent:** Swarm pattern, graph-based orchestration (Strands Graph).
+**Memory:** Pluggable (Mem0, custom providers).
+**Production:** AWS AgentCore for managed deployment.
+
+---
+
+## OpenAI Agents SDK
+
+**Architecture:** Model-driven / minimalist. Agent = instructions + tools + model.
+**License:** MIT | **Stars:** ~19K | **Language:** Python, TS
+**Best for:** OpenAI-centric stacks, built-in tracing, voice/realtime agents.
+
+**Core concepts:**
+- Agent: name + instructions + tools + model
+- Runner: executes agent loop
+- Handoffs: transfer control between agents
+- Guardrails: input/output validation
+
+**When to choose over LangGraph:**
+- All-OpenAI stack
+- Need built-in voice/realtime support
+- Simple multi-agent with handoffs
+- Want minimal framework surface area
+
+**When NOT to choose:**
+- Need model agnosticism (OpenAI-centric by design)
+- Need durable execution with checkpointing
+- Complex state management beyond messages
+
+**Multi-agent:** Handoff tools between agents. Swarm pattern.
+**Enterprise:** OpenAI Enterprise platform.
+
+---
+
+## Google ADK
+
+**Architecture:** Multi-agent with hierarchical delegation. Agent = instructions + tools + sub-agents.
+**License:** Apache 2.0 | **Stars:** ~10K+ | **Language:** Python, TS, Java
+**Best for:** Google Cloud native, multi-language enterprise, Vertex AI integration.
+
+**Core concepts:**
+- Agent: name + model + instructions + tools + sub_agents
+- Hierarchical delegation: parent delegates to children automatically
+- Built-in: Google Search, code execution, RAG via Vertex AI
+- Session/memory management via Session Service
+
+**When to choose over LangGraph:**
+- Google Cloud deployment (Agentspace, Vertex AI)
+- Multi-language need (Python, TS, Java)
+- Hierarchical agent delegation is the natural fit
+
+**Key insight from Google's architecture:** Context is a "compiled view over a richer stateful system." This aligns with the context engineering principle of keeping context small and truth central.
+
+---
+
+## Semantic Kernel
+
+**Architecture:** Orchestration-first with enterprise focus. Plugin-based architecture.
+**License:** MIT | **Stars:** ~27K | **Language:** C#, Python, Java
+**Best for:** .NET/Java enterprise, Azure-native, SOC 2/HIPAA compliance.
+
+**Note:** Microsoft is merging AutoGen + Semantic Kernel into unified Microsoft Agent Framework (GA Q1 2026). Target this for new Microsoft-ecosystem projects.
+
+**Core concepts:**
+- Kernel: central orchestrator
+- Plugins: collections of functions (tools)
+- Planners: automatic step generation
+- Memory: semantic memory with vector stores
+
+**When to choose:** Azure ecosystem, C#/.NET team, Java enterprise, compliance requirements.
+
+---
+
+## LlamaIndex
+
+**Architecture:** RAG-first, extended into agents.
+**License:** MIT | **Stars:** ~46K | **Language:** Python, TS
+**Best for:** RAG pipelines, document processing, complex retrieval.
+
+**Core concepts:**
+- Index: data structure over documents
+- Query Engine: retrieval + synthesis
+- Agent: LLM + tools (including query engines as tools)
+- LlamaParse: advanced document parsing
+
+**When to choose over LangChain for RAG:**
+- Complex document processing (tables, images, PDFs)
+- Need advanced retrieval (recursive, hybrid, agentic RAG)
+- LlamaParse for difficult document formats
+
+**Can combine with LangGraph:** Use LlamaIndex for retrieval, LangGraph for orchestration.
+
+---
+
+## Mastra
+
+**Architecture:** TypeScript-native agent framework with workflows, RAG, memory.
+**License:** MIT-like | **Stars:** ~25K | **Language:** TypeScript
+**Best for:** TypeScript/JS teams, Next.js integration, Replit users.
+
+**Core concepts:**
+- Agent: instructions + tools + model
+- Workflow: step-based with branching and parallel
+- RAG: built-in vector store integration
+- Memory: conversation + semantic
+
+**When to choose:** TypeScript team, JS-first stack, need full-stack framework in one language.
+
+---
+
+## Agno
+
+**Architecture:** Model-driven, model-agnostic with built-in toolkits.
+**License:** Apache 2.0 | **Stars:** ~37K | **Language:** Python
+**Best for:** Model-agnostic deployments, persistent learning memory, many built-in tools.
+
+**Key differentiator:** `learning=True` enables self-editing persistent memory that improves over time.
+**When to choose:** Need true model agnosticism + persistent learning + many pre-built tools.
+
+---
+
+## Smolagents
+
+**Architecture:** Model-driven, minimalist, open-model focused.
+**License:** Apache 2.0 | **Stars:** ~25K | **Language:** Python
+**Best for:** Research, open/local models, HuggingFace ecosystem.
+
+**Key differentiator:** Code-first tool execution (model writes Python, framework executes it).
+**When to choose:** Research/experimentation, open-model focus, HuggingFace integration.
+
+---
+
+## DSPy
+
+**Architecture:** Optimization-first. Replace manual prompts with compiled signatures.
+**License:** MIT | **Stars:** ~29K | **Language:** Python
+**Best for:** Prompt optimization, systematic prompt engineering replacement.
+
+**Core concepts:**
+- Signature: input/output specification (not a prompt)
+- Module: composable computation unit
+- Optimizer: automatically finds best prompts/examples
+- Teleprompter: specific optimization strategy
+
+**When to choose:** Manually tweaking prompts, need systematic optimization (66% -> 87% on RAG benchmarks).
+**Not a replacement for orchestration frameworks.** Complements them by optimizing LLM calls within agents.
+
+---
+
+## Head-to-Head
+
+### LangGraph vs CrewAI
+- **LangGraph**: Explicit control, cycles, durable execution, checkpointing, production state management.
+- **CrewAI**: Rapid development, role-based teams, sequential/hierarchical processes.
+
+### LangGraph vs Strands
+- **LangGraph**: Explicit graph definitions, fine-grained state transitions, complex workflow logic.
+- **Strands**: Model-driven, minimal boilerplate, AWS deployment. Days vs months time-to-production.
+
+### LangChain vs LlamaIndex
+- **LangChain**: Broadest integration ecosystem, general-purpose.
+- **LlamaIndex**: RAG-heavy, complex document processing. Many teams use both.
+
+### OpenAI SDK vs Strands
+- **OpenAI SDK**: OpenAI-centric, minimal deployment needs.
+- **Strands**: Multi-model, AWS-native, production deployment to Lambda/Fargate/EKS.
+
+### Mastra vs Vercel AI SDK
+- **Mastra**: Complete framework (agents, workflows, RAG, memory).
+- **Vercel AI SDK**: Streaming-first UI with React/Next.js (2.8M vs 220K weekly downloads). Many use both.
+
+---
+
+## Key 2025 Trends Affecting Framework Choice
+
+1. **MCP as universal standard.** 97M monthly SDK downloads. Supported by all major frameworks. Non-negotiable for tool connectivity.
+2. **Model-driven architectures gaining ground.** Strands' success validates that modern LLMs can drive planning without rigid workflows.
+3. **Open-closed model gap closing.** Performance difference reduced from 8% to 1.7%. True model agnosticism is practical.
+4. **Framework consolidation.** Microsoft merged AutoGen + Semantic Kernel. LangChain ceded orchestration to LangGraph. New entrants target specific developer communities.
