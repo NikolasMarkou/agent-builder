@@ -85,6 +85,16 @@ validate:
 	done
 	@# Verify SKILL.md has frontmatter delimiters
 	@head -1 $(SKILL_FILE) | grep -q "^---" || (echo "ERROR: SKILL.md missing frontmatter opening ---" && exit 1)
+	@# Verify README.md project structure lists all reference files
+	@echo "Checking README.md lists all reference files..."
+	@for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+		grep -q "$$ref" README.md || (echo "ERROR: README.md project structure missing $$ref" && exit 1); \
+	done
+	@# Verify CLAUDE.md repository structure lists all reference files
+	@echo "Checking CLAUDE.md lists all reference files..."
+	@for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+		grep -q "$$ref" CLAUDE.md || (echo "ERROR: CLAUDE.md repository structure missing $$ref" && exit 1); \
+	done
 	@echo "Validation passed!"
 
 # Clean build artifacts

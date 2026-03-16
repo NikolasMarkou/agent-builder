@@ -83,6 +83,10 @@ Override the default only when:
 
 Read the appropriate reference file for your selected framework, then implement.
 
+For system prompt and tool description design, read `references/prompt-structuring.md` -- covers delimiter format selection, prompt architecture, and model-specific guidance.
+
+If the agent processes tabular data (spreadsheets, CSVs, database results), read `references/tabular-data.md` -- covers serialization format selection, size-based strategies, and token cost tradeoffs.
+
 For the default LangChain/LangGraph stack, the build order is:
 
 1. **Define State** - TypedDict or Pydantic model with reducers for accumulated fields

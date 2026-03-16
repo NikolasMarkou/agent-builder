@@ -161,6 +161,32 @@ function Invoke-Validate {
         $errors += "ERROR: src/references/ directory not found"
     }
 
+    # Verify README.md lists all reference files
+    Write-Host "Checking README.md lists all reference files..."
+    if (Test-Path "src/references") {
+        $readmeContent = Get-Content "README.md" -Raw -ErrorAction SilentlyContinue
+        if ($readmeContent) {
+            Get-ChildItem "src/references/*.md" | ForEach-Object {
+                if ($readmeContent -notmatch [regex]::Escape($_.Name)) {
+                    $errors += "ERROR: README.md project structure missing $($_.Name)"
+                }
+            }
+        }
+    }
+
+    # Verify CLAUDE.md lists all reference files
+    Write-Host "Checking CLAUDE.md lists all reference files..."
+    if (Test-Path "src/references") {
+        $claudeContent = Get-Content "CLAUDE.md" -Raw -ErrorAction SilentlyContinue
+        if ($claudeContent) {
+            Get-ChildItem "src/references/*.md" | ForEach-Object {
+                if ($claudeContent -notmatch [regex]::Escape($_.Name)) {
+                    $errors += "ERROR: CLAUDE.md repository structure missing $($_.Name)"
+                }
+            }
+        }
+    }
+
     if ($errors.Count -gt 0) {
         $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1

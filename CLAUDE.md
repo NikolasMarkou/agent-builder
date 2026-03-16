@@ -101,6 +101,8 @@ make help                    # Show available targets
 - [ ] `.\build.ps1 validate` passes (or `make validate`)
 - [ ] src/SKILL.md has `name:` and `description:` in YAML frontmatter
 - [ ] All cross-references in src/SKILL.md point to existing files in `src/references/`
+- [ ] README.md project structure lists all files in `src/references/`
+- [ ] CLAUDE.md repository structure lists all files in `src/references/`
 - [ ] Framework selection table in SKILL.md matches frameworks covered in `src/references/frameworks.md`
 - [ ] Code examples use current API versions (LangChain 1.2.x, LangGraph 1.0.x)
 

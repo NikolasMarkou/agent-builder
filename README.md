@@ -1,7 +1,7 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.1.0-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.2.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**
@@ -149,7 +149,11 @@ agent-builder/
         ├── langchain-langgraph.md # Default stack implementation reference
         ├── frameworks.md          # Alternative framework guidance (11 frameworks)
         ├── production.md          # Production hardening reference
-        └── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
+        ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
+        ├── prompt-structuring.md  # Prompt structure: delimiters, 7-block template, techniques
+        ├── tabular-data.md        # Tabular data serialization: formats, size strategies, token costs
+        ├── llm-as-judge.md        # LLM-as-Judge: biases, calibration, rubrics, production deployment
+        └── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
 ```
 
 ---

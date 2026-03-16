@@ -4,6 +4,22 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-03-16
+
+### Added
+- **Prompt structuring reference** (`references/prompt-structuring.md`) -- delimiter format selection (XML/Markdown/YAML), 7-block prompt architecture, prompting techniques (zero-shot, few-shot, CoT, chaining, meta, self-consistency), output control, position bias, model-specific notes, and anti-patterns.
+- **Tabular data reference** (`references/tabular-data.md`) -- serialization format benchmarks (ImprovingAgents, TOON), size-based strategies (<50 / 50-500 / 500+ rows), format selection decision tree, token cost comparison, and model-specific notes.
+- **LLM-as-Judge reference** (`references/llm-as-judge.md`) -- implementation patterns (pointwise/pairwise/reference-guided), 12 documented biases and mitigations, calibration process, rubric design (binary > Likert), judge model selection (PoLL panels), statistical rigor, agent trajectory evaluation, production deployment pipelines, and 6 evaluation frameworks.
+- **Binary evaluation rules reference** (`references/binary-evals.md`) -- the case for binary decomposition over Likert scales, CheckEval framework, Google's Adaptive Precise Boolean approach, 4 implementation patterns, scale selection decision tree, prompt templates, composite scoring, and calibration with classification metrics.
+
+### Changed
+- **SKILL.md** -- Step 4 (Build) now references `prompt-structuring.md` for system prompt design and `tabular-data.md` for agents processing tabular data. Reference table updated with all new entries.
+- **patterns.md** -- Added "When NOT to use" sections and code examples to all patterns and frameworks.
+- **frameworks.md** -- Added "When NOT to choose" sections to all frameworks.
+- **Makefile** -- Extended `validate` target to check README and CLAUDE.md project structure sections against actual reference files.
+- **build.ps1** -- Extended `validate` function with same documentation drift checks.
+- **README.md** -- Updated project structure to list all reference files.
+
 ## [1.1.0] - 2026-03-16
 
 ### Added
