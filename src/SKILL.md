@@ -99,7 +99,7 @@ For the default LangChain/LangGraph stack, the build order is:
 Read `references/production.md` before deploying. Covers:
 - Context engineering (context rot, token budget, three-artefact architecture)
 - Tool design principles (minimize action space, shape to model capabilities, elicitation)
-- Evaluation strategy (domain-specific evals, not generic benchmarks)
+- Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines.
 - Cost modeling (token math at scale)
 - Observability (LangSmith tracing, structured logging)
 - Guardrails (input validation, output validation, tool permission scoping)
@@ -280,3 +280,4 @@ Read these as needed. Do NOT load all of them upfront.
 | `references/langchain-langgraph.md` | When building with the default stack. Contains LangGraph state management, edges, streaming, memory, middleware, MCP integration, and Deep Agents. |
 | `references/frameworks.md` | When the user explicitly requests a non-default framework, or when the task clearly maps to a specialized framework. Contains per-framework implementation guidance. |
 | `references/production.md` | Before any production deployment. Contains context engineering, tool design, evaluation, cost modeling, observability, guardrails, and failure modes. |
+| `references/evals.md` | When designing evaluation strategy for agents. Contains evaluation frameworks, benchmarks, metrics, LLM-as-judge, human evaluation, safety evaluation, production monitoring, eval pipeline architecture, and anti-patterns. |

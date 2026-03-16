@@ -129,6 +129,8 @@ Every tool call should emit structured telemetry: tool name, input hash, output 
 
 ## Evaluation Strategy
 
+> **For comprehensive evaluation guidance** — frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring tooling, and building eval pipelines — read `evals.md`. This section provides a quick production-context summary.
+
 ### The Employee Analogy (McKinsey)
 
 "Onboarding agents is more like hiring a new employee versus deploying software."
