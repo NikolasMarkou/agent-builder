@@ -11,6 +11,23 @@ Build production-grade AI agents from requirements. Default stack: Python + Lang
 
 Follow these steps in order. Do not skip the assessment phase.
 
+**Decision State Block (DSB):** After completing each step, emit a DSB summarizing all decisions made so far. The DSB is your running state -- it prevents context loss between steps and ensures later steps respect earlier decisions. Format:
+
+```
+[DECISION STATE]
+Complexity: {Simple | Moderate | Complex | Multi-agent | Batteries-included}
+Needs agent: {yes | no -- if no, stop and recommend simpler approach}
+Data requirements: {tabular | entity-resolution | text-search | none}
+Deployment: {api-service | batch | embedded | none | TBD}
+Production hardening: {yes | no | later}
+Patterns: {topology} + {behavioral} + {data_flow} (after Step 2)
+Framework: {name} (after Step 3)
+References loaded: {list} (cumulative)
+[/DECISION STATE]
+```
+
+**Tier routing:** Simple agents skip Steps 2-3 (go directly to Step 4 with Template 1). Moderate and above run all steps.
+
 ### Step 1: Assess Requirements
 
 Before writing code, determine:
@@ -32,6 +49,17 @@ Before writing code, determine:
 | **Complex** | Cycles, conditional branching, durable execution, human-in-the-loop, state persistence | LangGraph `StateGraph` |
 | **Multi-agent** | Multiple specialized agents coordinating, handoffs, parallel work | LangGraph multi-agent patterns |
 | **Batteries-included** | Complex tasks + filesystem + subagents + task planning + long-term memory | `create_deep_agent` (Deep Agents) |
+
+4. **Requirements checklist** -- answer these explicitly to determine which references are needed later:
+   - Does the agent process tabular data (spreadsheets, CSVs, database results)? If yes: `references/tabular-data.md` needed at Step 4.
+   - Does the agent need entity resolution (matching/deduplication across sources, AML/KYC, knowledge graphs)? If yes: `references/entity-resolution.md` needed at Step 4.
+   - Does the agent use text search, data filtering, or code navigation? If yes: `references/text-tools.md` needed at Step 4.
+   - Will the agent be deployed as a service? If yes: `references/deployment.md` needed at Step 5.
+   - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
+
+**Emit DSB after Step 1.** Then apply tier routing:
+- **Simple** complexity: skip to Step 4 (use Template 1: `create_agent`). Emit DSB with `Patterns: N/A`, `Framework: LangChain (default)`.
+- **Moderate and above**: continue to Step 2.
 
 ### Step 2: Select Patterns
 
@@ -60,6 +88,8 @@ Quick selection:
 | Flexible peer-to-peer collaboration | Network | ReAct + Handoffs | Swarm |
 | High-stakes with human approval | Any + HITL gates | Any + HITL | Any |
 
+**Emit DSB after Step 2** with selected patterns filled in.
+
 ### Step 3: Select Framework
 
 Default is **LangChain/LangGraph (Python)**. Read `references/langchain-langgraph.md` for implementation patterns.
@@ -79,17 +109,32 @@ Override the default only when:
 | Model-agnostic, persistent memory | Agno | `references/frameworks.md` |
 | Lightweight, open-model focus | Smolagents | `references/frameworks.md` |
 
+**Cross-validation gate:** Before proceeding, verify that the selected framework supports the patterns chosen in Step 2.
+
+| Pattern | LangGraph | CrewAI | Strands | OpenAI SDK | Google ADK | Mastra |
+|---|---|---|---|---|---|---|
+| Parallel (fan-out/fan-in) | Full | No | Partial | No | Partial | Partial |
+| Sequential | Full | Full | Full | No | Full | Full |
+| Loop (conditional cycle) | Full | No | Full | No | Partial | Partial |
+| Router | Full | No | Full | Partial | Full | Full |
+| Network / Swarm | Full | No | No | Full | Partial | No |
+| Hierarchical | Full | Full | Full | No | Partial | No |
+| HITL (interrupt/resume) | Full | No | No | No | No | No |
+
+If the framework does not support a selected pattern, either change the framework or change the pattern. Do not proceed with a mismatch. For frameworks not in this table, check `references/frameworks.md` for capability details.
+
+**Emit DSB after Step 3** with framework filled in.
+
 ### Step 4: Build
 
-Read the appropriate reference file for your selected framework, then implement.
+Read the appropriate reference file for your selected framework (from DSB), then implement. Load all references flagged in the DSB `References loaded` and `Data requirements` fields.
 
 For system prompt and tool description design, read `references/prompt-structuring.md` -- covers delimiter format selection, prompt architecture, and model-specific guidance.
 
-If the agent processes tabular data (spreadsheets, CSVs, database results), read `references/tabular-data.md` -- covers serialization format selection, size-based strategies, and token cost tradeoffs.
-
-If the agent needs entity resolution (matching records across sources, deduplication, knowledge graph maintenance, or operating in domains like AML/KYC, healthcare, or e-commerce), read `references/entity-resolution.md` -- covers the blocking + matching + clustering pipeline, tiered matching (deterministic → similarity → LLM), multi-agent ER architectures, ER as an agent tool, domain-specific patterns, cost analysis, and evaluation benchmarks.
-
-If the agent uses text search, data filtering, or code navigation tools, read `references/text-tools.md` -- covers the three-layer search stack (exact → structural → semantic), tool-by-tool reference (ripgrep, ast-grep, jq, sqlite3, etc.), agent-optimized search tools (Probe, grepika, mgrep), cost math, integration patterns (MCP, tool wrappers), and anti-patterns.
+Load these based on DSB data requirements (identified in Step 1 checklist):
+- **Tabular data**: read `references/tabular-data.md` -- serialization format selection, size-based strategies, token cost tradeoffs.
+- **Entity resolution**: read `references/entity-resolution.md` -- blocking + matching + clustering pipeline, tiered matching, multi-agent ER, domain-specific patterns.
+- **Text search / code navigation**: read `references/text-tools.md` -- three-layer search stack, tool-by-tool reference, agent-optimized search tools, cost math.
 
 For the default LangChain/LangGraph stack, the build order is:
 
@@ -103,6 +148,12 @@ For the default LangChain/LangGraph stack, the build order is:
 8. **Add Middleware** - Retry, fallback, moderation, summarization as needed
 
 ### Step 5: Production Hardening
+
+Check the DSB: if `Production hardening: no`, skip this step. If `Deployment: api-service`, also read `references/deployment.md`.
+
+Scale hardening to complexity (from DSB):
+- **Simple/Moderate**: Focus on guardrails, cost modeling, basic observability. Skip resilience patterns and multi-agent failure modes.
+- **Complex and above**: Full hardening -- all sections below apply.
 
 Read `references/production.md` before deploying. Covers:
 - Context engineering (context rot, token budget, three-artefact architecture)
