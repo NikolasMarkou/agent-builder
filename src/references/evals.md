@@ -33,6 +33,8 @@ Three complementary frameworks have emerged as practitioner standards.
 
 **When to use:** Start every eval suite with code-based graders. Layer model-based graders for subjective criteria. Reserve human graders for calibration and edge cases.
 
+> **Design axioms: Tiered escalation + Decompose.** This cheap-first, expensive-last grading hierarchy mirrors the same architecture used in entity resolution matching (`entity-resolution.md`), search stacks (`text-tools.md`), and LLM-as-judge pipelines (`llm-as-judge.md`). Decompose scoring into binary questions for +0.45 inter-evaluator agreement (`binary-evals.md`).
+
 ### Capability vs Regression Evals
 
 | Type | Starting Pass Rate | Purpose | Graduation |

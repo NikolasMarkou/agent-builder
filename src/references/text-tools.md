@@ -12,6 +12,8 @@ Anthropic's engineering guidance: "Just-in-time context, not pre-inference RAG -
 
 ## The three-layer search stack
 
+> **Design axioms: Tiered escalation + Minimize context.** Try exact search first, structural second, semantic only when needed. Each layer up costs more but handles harder queries. The same tiered architecture applies to entity resolution matching (`entity-resolution.md`) and evaluation grading (`evals.md`).
+
 Modern agent text search has converged on three complementary layers. Each serves a different need. An agent should try layers in order: exact first, structural second, semantic only when needed. Each layer up costs more but handles harder queries.
 
 **Layer 1: Exact matching (ripgrep).** Pattern-based text search. Deterministic. Zero cost. Sub-100ms on codebases with 5000+ files. Handles regex, literal strings, file type filtering, .gitignore respect. This is the workhorse.

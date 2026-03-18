@@ -65,6 +65,8 @@ For each candidate pair:
 
 This tiered approach handles 80-90% of pairs with cheap deterministic/similarity methods, uses LLM calls only for the genuinely ambiguous cases, and reserves human review for the hardest edges. The multi-agent ER framework (Cakmak et al., 2025) achieved 94.3% accuracy with 61% fewer API calls than a monolithic LLM approach by using exactly this pattern.
 
+> **Design axioms: Tiered escalation + Decompose.** This deterministic-first, LLM-for-judgment, human-backstop architecture is the universal pattern for cost-effective agentic systems. The same structure appears in search (`text-tools.md`), evaluation grading (`evals.md`), and scale selection (`binary-evals.md`). The multi-agent decomposition (4 specialized agents > 1 monolithic LLM) demonstrates that splitting complex tasks into focused pieces improves both accuracy and cost.
+
 ### Stage 3: Clustering (transitive closure)
 
 Individual pairwise match decisions must be consolidated into entity clusters. If A matches B and B matches C, then {A, B, C} should form one cluster even if A and C were never directly compared.

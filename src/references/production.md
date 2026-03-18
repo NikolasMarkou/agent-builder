@@ -37,6 +37,8 @@ Prompt engineering is insufficient for agents operating across multi-session wor
 
 **Keep context small, truth central, and gates explicit.**
 
+> **Design axiom: Minimize context.** The 100:1 input-to-output ratio in agents means optimizing input tokens is 100x more impactful than optimizing output. Format choice alone swings accuracy 15-20pp (`tabular-data.md`). Cheap deterministic tools eliminate tokens before they reach the LLM (`text-tools.md`).
+
 ### Context vs Prompt Engineering
 
 | Dimension | Prompt Engineering | Context Engineering |
@@ -172,6 +174,8 @@ Every user edit, correction, and override is signal. Design the feedback loop fr
 ---
 
 ## Cost Modeling
+
+> **Design axiom: Model costs first.** Token costs multiply through loops, fan-out, and multi-step workflows. A 50x single-call cost difference (`text-tools.md`) becomes a 50,000x difference at scale. A 100x per-comparison difference (`entity-resolution.md`) means $150 vs $10,000 per run. Always calculate before building.
 
 ### Token Math at Scale
 

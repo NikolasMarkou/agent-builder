@@ -7,6 +7,21 @@ description: Build AI agents from requirements. Covers single-agent, multi-agent
 
 Build production-grade AI agents from requirements. Default stack: Python + LangChain v1.2.x + LangGraph v1.0.x.
 
+## Design Axioms
+
+Six principles that recur across every reference file. Apply them at every workflow step -- they are the difference between a demo and a production system. Most impactful for Moderate complexity and above.
+
+| Axiom | Rule | Violated When |
+|---|---|---|
+| **Tiered escalation** | Cheap/deterministic first, LLM only for judgment, human as backstop | You send every query through the LLM when 60% could be a DB lookup |
+| **Decompose** | Split complex tasks into simple, independent pieces | You ask an LLM to score 5 criteria in one call instead of 5 binary questions |
+| **Model costs first** | Calculate token math at expected scale before writing code | You discover at launch that your $500/mo PoC costs $847K/mo in production |
+| **Minimize context** | Send the minimum data needed; format matters (15-20pp accuracy swing) | You dump 2000-line files into context when 20 lines were relevant |
+| **Calibrate on real data** | Build evals from real failures, not synthetic examples | Your benchmarks pass but production users hit edge cases you never tested |
+| **Document failure modes** | Every pattern has known failures -- catalog and mitigate them upfront | Your loop runs forever because you didn't set a max iteration cap |
+
+These axioms flow from a single root constraint: LLM inference is expensive, slow, and non-deterministic. Designing around this constraint is what separates production agents from demos.
+
 ## Workflow
 
 Follow these steps in order. Do not skip the assessment phase.

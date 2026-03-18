@@ -311,6 +311,8 @@ START
 
 ## Failure Mode Catalogue
 
+> **Design axiom: Document failure modes.** Every topology, behavioral, and data flow pattern has known failure modes. These are not edge cases -- they are expected production behaviors. The same principle applies to evaluation anti-patterns (`evals.md`), LLM-as-judge biases (`llm-as-judge.md`), and production failure modes (`production.md`). Catalog and mitigate before deployment.
+
 | Failure Mode | Pattern Affected | Cause | Mitigation |
 |---|---|---|---|
 | Infinite loop | Loop, Network | No termination condition or unreachable quality threshold | Max iteration cap, monotonically decreasing retry budget |
