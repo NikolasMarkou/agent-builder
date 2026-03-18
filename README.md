@@ -56,10 +56,10 @@ Map the workflow end-to-end. Determine if you actually need an agent (vs simpler
 | Complexity | Characteristics | Default Approach |
 |---|---|---|
 | **Simple** | Single task, few tools, no branching, no persistence needed | `create_agent` (LangChain) |
-| **Moderate** | Multiple tools, structured output, needs middleware | `create_agent` + middleware |
-| **Complex** | Cycles, conditional branching, durable execution, HITL | LangGraph `StateGraph` |
-| **Multi-agent** | Multiple specialized agents coordinating | LangGraph multi-agent patterns |
-| **Batteries-included** | Complex tasks + filesystem + subagents + planning | `create_deep_agent` (Deep Agents) |
+| **Moderate** | Multiple tools, structured output, needs middleware (retry, moderation, fallback) | `create_agent` + middleware |
+| **Complex** | Cycles, conditional branching, durable execution, human-in-the-loop, state persistence | LangGraph `StateGraph` |
+| **Multi-agent** | Multiple specialized agents coordinating, handoffs, parallel work | LangGraph multi-agent patterns |
+| **Batteries-included** | Complex tasks + filesystem + subagents + task planning + long-term memory | `create_deep_agent` (Deep Agents) |
 
 ### Step 2: Select Patterns
 

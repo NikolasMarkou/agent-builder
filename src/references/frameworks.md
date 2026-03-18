@@ -9,7 +9,7 @@ Use this reference when the default LangChain/LangGraph stack is not the best fi
 3. [Strands Agents (AWS)](#strands-agents)
 4. [OpenAI Agents SDK](#openai-agents-sdk)
 5. [Google ADK](#google-adk)
-6. [Semantic Kernel / Microsoft Agent Framework](#semantic-kernel)
+6. [Semantic Kernel / Microsoft Agent Framework](#semantic-kernel--microsoft-agent-framework)
 7. [LlamaIndex](#llamaindex)
 8. [Mastra](#mastra)
 9. [Agno](#agno)
