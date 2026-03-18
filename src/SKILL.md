@@ -26,7 +26,7 @@ References loaded: {list} (cumulative)
 [/DECISION STATE]
 ```
 
-**Tier routing:** Simple agents skip Steps 2-3 (go directly to Step 4 with Template 1). Moderate and above run all steps.
+**Tier routing:** Simple agents skip Steps 2-3 (go directly to Step 4 with `create_agent`). Moderate and above run all steps.
 
 ### Step 1: Assess Requirements
 
@@ -58,7 +58,7 @@ Before writing code, determine:
    - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
 
 **Emit DSB after Step 1.** Then apply tier routing:
-- **Simple** complexity: skip to Step 4 (use Template 1: `create_agent`). Emit DSB with `Patterns: N/A`, `Framework: LangChain (default)`.
+- **Simple** complexity: skip to Step 4 (use `create_agent` — see `references/langchain-langgraph.md`). Emit DSB with `Patterns: N/A`, `Framework: LangChain (default)`.
 - **Moderate and above**: continue to Step 2.
 
 ### Step 2: Select Patterns
@@ -172,184 +172,10 @@ For deployment — API serving, containerization, and monitoring stack — read 
 
 ## Code Templates
 
-### Template 1: Simple Agent (create_agent)
-
-```python
-from langchain.agents import create_agent
-from langchain.tools import tool
-
-@tool
-def search(query: str) -> str:
-    """Search the web for information."""
-    # Implementation here
-    return f"Results for: {query}"
-
-agent = create_agent(
-    model="claude-sonnet-4-5-20250929",  # or "openai:gpt-4.1", "google_genai:gemini-2.5-flash"
-    tools=[search],
-    system_prompt="You are a helpful assistant.",
-)
-
-result = agent.invoke({"messages": [{"role": "user", "content": "Find X"}]})
-```
-
-### Template 2: ReAct Agent with Persistence (LangGraph)
-
-```python
-from langgraph.graph import StateGraph, MessagesState, START, END
-from langgraph.prebuilt import ToolNode
-from langgraph.checkpoint.memory import InMemorySaver
-from langchain_anthropic import ChatAnthropic
-from langchain.tools import tool
-
-@tool
-def get_data(query: str) -> str:
-    """Fetch data from the database."""
-    return "data result"
-
-llm = ChatAnthropic(model="claude-sonnet-4-5-20250929").bind_tools([get_data])
-
-def call_llm(state: MessagesState) -> dict:
-    return {"messages": [llm.invoke(state["messages"])]}
-
-def should_call_tools(state: MessagesState) -> str:
-    if state["messages"][-1].tool_calls:
-        return "tools"
-    return END
-
-builder = StateGraph(MessagesState)
-builder.add_node("llm", call_llm)
-builder.add_node("tools", ToolNode([get_data]))
-builder.add_edge(START, "llm")
-builder.add_conditional_edges("llm", should_call_tools)
-builder.add_edge("tools", "llm")
-
-graph = builder.compile(checkpointer=InMemorySaver())
-result = graph.invoke(
-    {"messages": [{"role": "user", "content": "Get the latest data"}]},
-    {"configurable": {"thread_id": "session-1"}},
-)
-```
-
-### Template 3: Multi-Agent Swarm with Handoffs (LangGraph Swarm)
-
-```python
-from langchain.agents import create_agent
-from langgraph_swarm import create_handoff_tool, create_swarm
-from langgraph.checkpoint.memory import InMemorySaver
-
-researcher = create_agent(
-    model="claude-sonnet-4-5-20250929",
-    tools=[search_tool, create_handoff_tool(agent_name="Writer", description="Hand off when research is complete")],
-    name="Researcher",
-    system_prompt="You research topics thoroughly, then hand off to the Writer.",
-)
-
-writer = create_agent(
-    model="claude-sonnet-4-5-20250929",
-    tools=[create_handoff_tool(agent_name="Researcher", description="Get more research if needed")],
-    name="Writer",
-    system_prompt="You write reports based on research provided.",
-)
-
-swarm = create_swarm([researcher, writer], default_active_agent="Researcher")
-app = swarm.compile(checkpointer=InMemorySaver())
-
-result = app.invoke(
-    {"messages": [{"role": "user", "content": "Write a report on X"}]},
-    {"configurable": {"thread_id": "report-1"}},
-)
-```
-
-### Template 4: Parallel Fan-Out/Fan-In (LangGraph)
-
-```python
-from langgraph.types import Send
-from langgraph.graph import StateGraph, START, END
-from typing import TypedDict, Annotated
-import operator
-
-class State(TypedDict):
-    tasks: list[str]
-    results: Annotated[list[dict], operator.add]
-    final_output: str
-
-def dispatch(state: State):
-    return [Send("worker", {"task": t, "context": ""}) for t in state["tasks"]]
-
-def worker(state: dict) -> dict:
-    result = llm.invoke(f"Complete: {state['task']}")
-    return {"results": [{"task": state["task"], "output": result.content}]}
-
-def synthesize(state: State) -> dict:
-    combined = "\n".join(f"{r['task']}: {r['output']}" for r in state["results"])
-    return {"final_output": llm.invoke(f"Synthesize:\n{combined}").content}
-
-builder = StateGraph(State)
-builder.add_node("worker", worker)
-builder.add_node("synthesize", synthesize)
-builder.add_conditional_edges(START, dispatch, ["worker"])
-builder.add_edge("worker", "synthesize")
-builder.add_edge("synthesize", END)
-```
-
-### Template 5: Human-in-the-Loop with Interrupt
-
-```python
-from langgraph.types import interrupt, Command
-
-def agent_with_approval(state: MessagesState) -> dict:
-    response = llm.invoke(state["messages"])
-    if response.tool_calls:
-        approval = interrupt({
-            "message": "Approve this action?",
-            "tool": response.tool_calls[0],
-        })
-        if approval != "yes":
-            return {"messages": [{"role": "assistant", "content": "Cancelled."}]}
-    return {"messages": [response]}
-
-# Resume after human approval:
-# graph.invoke(Command(resume="yes"), config)
-```
-
----
-
-## Key Packages (March 2026)
-
-```bash
-pip install "langchain[anthropic]"              # or [openai], [google-genai]
-pip install langgraph
-pip install langgraph-swarm                    # multi-agent swarm/handoff patterns
-pip install deepagents                         # batteries-included layer
-pip install langchain-mcp-adapters             # MCP integration
-```
-
-| Package | Version | Purpose |
-|---|---|---|
-| `langchain` | 1.2.x | Core: models, tools, agents, middleware |
-| `langgraph` | 1.0.x | Orchestration: state machines, durable execution |
-| `langgraph-swarm` | 0.1.x | Multi-agent swarm/handoff patterns |
-| `deepagents` | 0.4.x | Batteries-included: filesystem, subagents, planning |
-| `langchain-mcp-adapters` | 0.2.0 | MCP tool integration |
+Read `references/langchain-langgraph.md` for ready-to-use code templates covering: simple agent (`create_agent`), ReAct with persistence (`StateGraph` + checkpointer), multi-agent swarm with handoffs (`create_swarm`), parallel fan-out/fan-in (`Send`), and human-in-the-loop with interrupt. For package versions and installation commands, see the Stack Architecture section in that same reference.
 
 ---
 
 ## Reference Files
 
-Read these as needed. Do NOT load all of them upfront.
-
-| File | When to Read |
-|---|---|
-| `references/patterns.md` | When selecting topology, behavioral, or data flow patterns. Contains full pattern catalogue with decision criteria, implementation details, and composition rules. |
-| `references/langchain-langgraph.md` | When building with the default stack. Contains LangGraph state management, edges, streaming, memory, middleware, MCP integration, and Deep Agents. |
-| `references/frameworks.md` | When the user explicitly requests a non-default framework, or when the task clearly maps to a specialized framework. Contains per-framework implementation guidance. |
-| `references/production.md` | Before any production deployment. Contains context engineering, tool design, evaluation, cost modeling, observability, guardrails, security hardening, LLM service resilience, and failure modes. |
-| `references/deployment.md` | When deploying an agent as a service. Contains API serving patterns (FastAPI), streaming endpoints, health checks, middleware stack, environment configuration, containerization (Docker/docker-compose), monitoring stack (Prometheus/Grafana), and long-term memory patterns. |
-| `references/evals.md` | When designing evaluation strategy for agents. Contains evaluation frameworks, benchmarks, metrics, LLM-as-judge, human evaluation, safety evaluation, production monitoring, eval pipeline architecture, and anti-patterns. |
-| `references/prompt-structuring.md` | When designing system prompts or tool descriptions for agents. Contains delimiter format selection (XML/Markdown/YAML), 7-block prompt architecture, prompting techniques (zero-shot, few-shot, CoT, chaining), output control, position bias, model-specific notes, and anti-patterns. |
-| `references/tabular-data.md` | When an agent needs to process, analyze, or reason over tabular data (spreadsheets, CSVs, database results). Contains serialization format benchmarks, size-based strategies (<50 / 50-500 / 500+ rows), format selection decision tree, token cost comparison, and model-specific notes. |
-| `references/llm-as-judge.md` | When implementing LLM-based evaluation of agent outputs. Contains implementation patterns (pointwise/pairwise/reference-guided), 12 documented biases and mitigations, calibration process, rubric design (binary > Likert), judge model selection (PoLL panels), statistical rigor, agent trajectory evaluation, production deployment pipelines, and 6 evaluation frameworks. |
-| `references/binary-evals.md` | When designing evaluation rubrics for LLM-as-judge. Contains the case for binary decomposition over Likert scales, CheckEval framework, Google's Adaptive Precise Boolean approach, 4 implementation patterns (direct classification, QAG, multi-criterion checklist, normalized scoring), scale selection decision tree, prompt templates, composite scoring, and calibration with classification metrics. |
-| `references/entity-resolution.md` | When the agent needs to match, deduplicate, or link records across sources (RAG over multiple documents, knowledge graph construction, customer data, compliance/AML). Contains the canonical blocking + matching + clustering pipeline, tiered matching architecture (deterministic → similarity → LLM), multi-agent ER patterns (4-agent and KARMA), ER as an agent tool (MCP/function calling), domain-specific patterns (AML/KYC, healthcare, e-commerce, KG), cost analysis, evaluation benchmarks, and implementation checklist. |
-| `references/text-tools.md` | When designing agent tool sets for text search, data filtering, or code navigation. Contains the three-layer search stack (exact/structural/semantic), tool-by-tool reference (ripgrep, ast-grep, jq, yq, sed, awk, sqlite3), agent-optimized search tools (Probe, grepika, grepai, mgrep, AI-grep, llm_grep), cost math, tool selection decision tree, integration patterns (MCP servers, system prompts, bash wrappers), and anti-patterns. |
+Read these as needed -- each workflow step above specifies which references to load. Do NOT load all of them upfront.
