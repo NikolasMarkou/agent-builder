@@ -4,6 +4,23 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.0] - 2026-03-18
+
+### Added
+- **Deployment reference** (`references/deployment.md`) -- API serving patterns (FastAPI), streaming responses, health checks, middleware stack, environment configuration, containerization (Docker), monitoring stack, and long-term memory guidance.
+- **Design axioms** -- 6 principles (tiered escalation, decompose, model costs first, minimize context, calibrate on real data, document failure modes) added to SKILL.md with cross-domain callouts in reference files.
+- **Decision State Blocks (DSBs)** -- structured state tracking emitted after each workflow step, preventing context loss between steps and ensuring later steps respect earlier decisions.
+- **Requirements checklist** -- Step 1 now includes explicit checklist for identifying data requirements and which references to load.
+- **Pattern-framework cross-validation gate** -- Step 3 now verifies selected framework supports patterns chosen in Step 2 before proceeding.
+- **Tier routing** -- Simple agents skip Steps 2-3, going directly to Step 4 with `create_agent`.
+
+### Changed
+- **SKILL.md** -- trimmed from 355 to 182 lines by removing duplicated content and moving implementation details to reference files. Added FSM-style workflow interventions for structural reliability.
+- **production.md** -- extended with security hardening (input sanitization, rate limiting, authentication), LLM service resilience (model registry with fallback, retry with backoff, connection pooling, graceful degradation), and enhanced observability (structured logging, metrics definitions, tracing platform comparison).
+- **evals.md** -- extended with core eval dimensions for agents (hallucination, toxicity, helpfulness, relevancy, conciseness), rubric design patterns, dimension selection by agent type, and operational guidance for running evaluations at scale.
+- **README.md** -- updated to reflect design axioms, DSBs, cross-validation gate, and deployment reference.
+- Cross-references and documentation inconsistencies fixed across the repository.
+
 ## [1.3.0] - 2026-03-16
 
 ### Added

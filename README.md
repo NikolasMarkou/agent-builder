@@ -1,14 +1,14 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.3.0-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.4.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**
 
 A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that guides you through building production-grade AI agents from requirements. It assesses complexity, selects the right patterns and framework, generates working code, and hardens it for production -- so you don't ship a demo that falls apart at scale.
 
-The problem it solves: you ask an AI to "build me an agent" and get a generic ReAct loop with no persistence, no error handling, and no thought given to whether an agent was even the right choice. Agent Builder applies a structured 5-step workflow: assess requirements, select patterns across three layers, pick the right framework, build with real code templates, and apply production hardening before deployment.
+The problem it solves: you ask an AI to "build me an agent" and get a generic ReAct loop with no persistence, no error handling, and no thought given to whether an agent was even the right choice. Agent Builder applies a structured 5-step workflow with Decision State Blocks tracking every decision: assess requirements, select patterns across three layers, pick the right framework, build with real code templates, and apply production hardening before deployment. Six design axioms -- tiered escalation, decomposition, cost modeling, context minimization, real-data calibration, and failure mode documentation -- are enforced at every step.
 
 ---
 
@@ -34,11 +34,24 @@ Then ask Claude to build an agent -- or just say: **"build me an agent that does
 
 ## How It Works
 
-Five steps. Every decision grounded in requirements, not vibes. The right pattern, the right framework, the right level of complexity.
+Five steps, six design axioms, and Decision State Blocks that track every decision across steps. Every choice grounded in requirements, not vibes. The right pattern, the right framework, the right level of complexity.
+
+### Design Axioms
+
+Six principles enforced at every workflow step:
+
+| Axiom | Rule |
+|---|---|
+| **Tiered escalation** | Cheap/deterministic first, LLM only for judgment, human as backstop |
+| **Decompose** | Split complex tasks into simple, independent pieces |
+| **Model costs first** | Calculate token math at expected scale before writing code |
+| **Minimize context** | Send the minimum data needed; format matters (15-20pp accuracy swing) |
+| **Calibrate on real data** | Build evals from real failures, not synthetic examples |
+| **Document failure modes** | Every pattern has known failures -- catalog and mitigate them upfront |
 
 ### Step 1: Assess Requirements
 
-Map the workflow end-to-end. Determine if you actually need an agent (vs simpler automation). Classify complexity:
+Map the workflow end-to-end. Determine if you actually need an agent (vs simpler automation). Classify complexity. A Decision State Block (DSB) is emitted after each step, tracking all decisions and preventing context loss.
 
 | Complexity | Characteristics | Default Approach |
 |---|---|---|
@@ -77,7 +90,7 @@ Default is **LangChain/LangGraph (Python)**. Override only when another framewor
 | Model-agnostic, persistent memory | Agno |
 | Lightweight, open-model focus | Smolagents |
 
-The framework guide includes 18 use-case comparisons and head-to-head tables.
+A cross-validation gate verifies that the selected framework supports the patterns chosen in Step 2 before proceeding. The framework guide includes 18 use-case comparisons and head-to-head tables.
 
 ### Step 4: Build
 
@@ -95,8 +108,8 @@ Before deploying, the skill walks through:
 | **Cost Modeling** | Token math at scale, cost reduction levers |
 | **Observability** | LangSmith tracing, structured logging, Prometheus metrics, Langfuse |
 | **Security** | Input sanitization, rate limiting, JWT authentication |
-| **Resilience** | Model registry, circular fallback, retry with exponential backoff |
-| **Deployment** | API serving (FastAPI), streaming, Docker, monitoring stack |
+| **Resilience** | Model registry, circular fallback, retry with exponential backoff, connection pooling |
+| **Deployment** | API serving (FastAPI), streaming, Docker, monitoring stack, long-term memory |
 | **Guardrails** | Input/output validation, tool permission scoping, MCP security |
 | **Failure Modes** | 10 production failure modes with mitigations |
 
