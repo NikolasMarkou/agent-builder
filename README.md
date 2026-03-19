@@ -94,7 +94,7 @@ A cross-validation gate verifies that the selected framework supports the patter
 
 ### Step 4: Build
 
-Working code templates for 5 common patterns: simple agent, ReAct with persistence, multi-agent supervisor (swarm), parallel fan-out/fan-in, and human-in-the-loop with interrupt. Plus full implementation reference for the default stack covering state management, edges, streaming, memory, middleware, and MCP integration.
+Working code templates for 5 common patterns: simple agent, ReAct with persistence, multi-agent swarm with handoffs, parallel fan-out/fan-in, and human-in-the-loop with interrupt. Plus full implementation reference for the default stack covering state management, edges, streaming, memory, middleware, and MCP integration.
 
 ### Step 5: Production Hardening
 

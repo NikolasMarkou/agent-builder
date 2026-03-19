@@ -65,5 +65,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Default stack reference** (`references/langchain-langgraph.md`) -- LangChain v1.2.x + LangGraph v1.0.x implementation reference covering state management, edges, persistence, streaming, memory, middleware, MCP integration, multi-agent patterns, and Deep Agents.
 - **Framework guide** (`references/frameworks.md`) -- 10 alternative framework reviews with selection matrix (18 use cases), head-to-head comparisons, and 2025-2026 trend analysis.
 - **Production hardening** (`references/production.md`) -- context engineering, tool design principles, evaluation strategy, cost modeling, observability, guardrails, failure modes, and deployment checklist.
-- **5 code templates** -- simple agent, ReAct with persistence, multi-agent supervisor, parallel fan-out/fan-in, human-in-the-loop with interrupt.
+- **5 code templates** -- simple agent, ReAct with persistence, multi-agent swarm (handoffs), parallel fan-out/fan-in, human-in-the-loop with interrupt.
 - **Build system** -- Makefile (Unix/Linux/macOS) and build.ps1 (Windows PowerShell) for packaging and validation.

@@ -49,7 +49,7 @@ Complete spec in **src/SKILL.md**. Key sections:
 - **Complexity Classes**: src/SKILL.md Step 1 table (Simple → Batteries-included)
 - **Pattern Selection**: src/SKILL.md Step 2 + `src/references/patterns.md` (19 patterns across 3 layers)
 - **Framework Selection**: src/SKILL.md Step 3 table + `src/references/frameworks.md` (10 frameworks, 18 use cases)
-- **Code Templates**: src/SKILL.md "Code Templates" section (5 templates)
+- **Code Templates**: src/SKILL.md "Code Templates" section → `src/references/langchain-langgraph.md` (5 templates)
 - **Production Hardening**: src/SKILL.md Step 5 + `src/references/production.md`
 - **Evaluation**: src/SKILL.md Step 5 + `src/references/evals.md` (frameworks, benchmarks, metrics, tooling, anti-patterns)
 - **Default Stack**: `src/references/langchain-langgraph.md` (state, edges, streaming, memory, middleware, MCP, Deep Agents)
