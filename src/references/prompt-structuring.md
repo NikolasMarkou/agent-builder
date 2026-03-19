@@ -370,6 +370,8 @@ The model will continue from where you left off, locked into JSON format. Combin
 
 ### Structured Output Enforcement
 
+For classification-specific structured output (intent detection, routing decisions), see `structured-classification.md` — covers schema design with reasoning-before-decision ordering, enum enforcement, and constrained decoding engines.
+
 Request specific formats explicitly:
 
 ```xml

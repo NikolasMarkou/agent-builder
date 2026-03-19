@@ -272,7 +272,7 @@ Expose via a `/metrics` endpoint. Scrape with Prometheus (or equivalent). See `d
 
 ### Input Validation
 
-- Classify input intent before routing to agent
+- Classify input intent before routing to agent (see `structured-classification.md` for schema design, enforcement mechanisms, and confidence thresholding)
 - Reject out-of-scope queries early (cheaper than letting the agent fail)
 - PII detection and redaction (`PIIDetectionMiddleware`)
 - Content moderation (`ContentModerationMiddleware`)

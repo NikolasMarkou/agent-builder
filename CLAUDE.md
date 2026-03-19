@@ -33,7 +33,8 @@ agent-builder/
         ├── llm-as-judge.md           # LLM-as-Judge: patterns, biases, calibration, rubrics, production deployment
         ├── binary-evals.md           # Binary evaluation rules: CheckEval, boolean rubrics, scale selection
         ├── entity-resolution.md      # Entity resolution: blocking, matching, clustering, multi-agent ER
-        └── text-tools.md             # Text tools: search stack, ripgrep, ast-grep, jq, sqlite3, cost math
+        ├── text-tools.md             # Text tools: search stack, ripgrep, ast-grep, jq, sqlite3, cost math
+        └── structured-classification.md # Structured classification: intent detection, routing, constrained decoding
 ```
 
 ## Activation Triggers
