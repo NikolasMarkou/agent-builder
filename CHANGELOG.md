@@ -4,6 +4,12 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.1] - 2026-03-19
+
+### Fixed
+- **Template naming** -- corrected "multi-agent supervisor" to "multi-agent swarm (handoffs)" in README.md and CHANGELOG.md to match the actual `create_swarm` implementation.
+- **Code template pointer** -- clarified in CLAUDE.md that code templates live in `references/langchain-langgraph.md`, not in SKILL.md itself.
+
 ## [1.4.0] - 2026-03-18
 
 ### Added
