@@ -35,6 +35,7 @@ agent-builder/
         ├── entity-resolution.md      # Entity resolution: blocking, matching, clustering, multi-agent ER
         ├── text-tools.md             # Text tools: search stack, ripgrep, ast-grep, jq, sqlite3, cost math
         ├── retrieval.md              # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
+        ├── embeddings.md             # Embedding model selection, evaluation protocols, efficiency trade-offs
         └── structured-classification.md # Structured classification: intent detection, routing, constrained decoding
 ```
 

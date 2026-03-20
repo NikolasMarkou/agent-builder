@@ -123,7 +123,7 @@ Bi-encoders encode queries and documents independently, then retrieve via approx
 
 **When NOT to use:** Exact numeric/identifier matching. Rare proper nouns not in training data. Out-of-domain corpora with poor embedding coverage.
 
-**Key insight:** Fine-tuned embeddings on your specific corpus shrink the BM25 advantage. Domain-fine-tuned dense models on keyword-heavy corpora can match hybrid performance — but fine-tuning requires labeled data and effort.
+**Key insight:** Fine-tuned embeddings on your specific corpus shrink the BM25 advantage. Domain-fine-tuned dense models on keyword-heavy corpora can match hybrid performance — but fine-tuning requires labeled data and effort. For detailed guidance on selecting, evaluating, and benchmarking embedding models, see `embeddings.md`.
 
 ---
 
@@ -529,4 +529,4 @@ Is the system agentic (multi-step reasoning)?
 
 ---
 
-**See also:** `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability.
+**See also:** `embeddings.md` for embedding model selection, evaluation protocols, and efficiency trade-offs (MRL truncation, quantization, domain-specific models). `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability.

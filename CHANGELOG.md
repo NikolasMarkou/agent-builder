@@ -4,6 +4,12 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.7.0] - 2026-03-20
+
+### Added
+- **New reference: `embeddings.md`** -- embedding model selection and evaluation guide. Covers three-pillar evaluation framework (intrinsic, extrinsic, robustness), task-specific evaluation protocols (retrieval/RAG, classification, clustering, STS, reranking), 7-step model selection decision framework, intrinsic evaluation methods with code (cosine distribution, neighborhood consistency, isotropy), production readiness testing (throughput, quantization degradation), MRL dimension reduction and quantization pipeline tables, domain-specific model recommendations (biomedical, legal, financial, code, multilingual), benchmarks reference, model-by-task matrix, and full evaluation checklist.
+- **Cross-references to `embeddings.md`** added in `retrieval.md` (Dense Retrieval section + See Also footer), `SKILL.md` (Step 4 RAG reference loading), `README.md` and `CLAUDE.md` (repository structure).
+
 ## [1.6.1] - 2026-03-20
 
 ### Fixed
