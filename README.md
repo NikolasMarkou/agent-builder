@@ -173,6 +173,7 @@ agent-builder/
         ├── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
         ├── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
         ├── text-tools.md            # Text tools for agents: search stack, ripgrep, ast-grep, jq, sqlite3
+        ├── retrieval.md             # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
         └── structured-classification.md # Structured classification: intent detection, schema design, routing
 ```
 

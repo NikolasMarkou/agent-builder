@@ -412,4 +412,4 @@ def query_json(json_path: str, jq_filter: str) -> str:
 
 ---
 
-**See also:** `entity-resolution.md` for how text search and filtering tools fit into entity resolution blocking layers (exact key matching, sorted neighborhood, semantic similarity).
+**See also:** `entity-resolution.md` for how text search and filtering tools fit into entity resolution blocking layers (exact key matching, sorted neighborhood, semantic similarity). `retrieval.md` for retrieval-augmented generation patterns — pre-indexed semantic search over knowledge bases and document corpora. Use text-tools for dynamic code/data search (just-in-time context); use retrieval.md patterns for static knowledge bases where pre-indexing is justified.

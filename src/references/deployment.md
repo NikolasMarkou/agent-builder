@@ -249,3 +249,5 @@ For agents that need to remember across sessions — user preferences, learned f
 3. **Store asynchronously.** Don't block the response to persist memories. Fire-and-forget after the response is sent.
 4. **Scope memory to users.** Always key memory by user ID. Never cross-contaminate between users.
 5. **Use one database.** PostgreSQL + pgvector can serve as checkpointer storage, relational store, and vector store — reducing infrastructure complexity.
+
+For retrieval pipeline patterns over vector stores — hybrid search, reranking, chunking strategies, and agentic RAG architectures — see `retrieval.md`.

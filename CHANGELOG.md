@@ -4,6 +4,13 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.0] - 2026-03-20
+
+### Added
+- **Text retrieval reference** (`references/retrieval.md`) -- comprehensive guide to production retrieval for agentic AI: sparse retrieval (BM25, SPLADE), dense retrieval (bi-encoders, embedding model selection), late interaction (ColBERT), cross-encoders, hybrid search (RRF, DBSF, convex combination), pre-retrieval query transformation (HyDE, query decomposition, expansion), post-retrieval corrective loops (CRAG, Self-RAG, Adaptive RAG), GraphRAG and multi-hop retrieval, agentic RAG architectures with LangGraph code, chunking strategies, production tooling (vector DBs, frameworks), retrieval evaluation metrics, decision framework, and failure modes.
+- **SKILL.md** -- Step 1 requirements checklist now detects RAG/knowledge-base retrieval needs; Step 4 loads `references/retrieval.md` when flagged.
+- Cross-references added in `text-tools.md` (positioning code search vs. RAG), `deployment.md` (vector store retrieval patterns), `README.md`, and `CLAUDE.md`.
+
 ## [1.4.1] - 2026-03-19
 
 ### Fixed

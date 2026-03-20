@@ -69,6 +69,7 @@ Before writing code, determine:
    - Does the agent process tabular data (spreadsheets, CSVs, database results)? If yes: `references/tabular-data.md` needed at Step 4.
    - Does the agent need entity resolution (matching/deduplication across sources, AML/KYC, knowledge graphs)? If yes: `references/entity-resolution.md` needed at Step 4.
    - Does the agent use text search, data filtering, or code navigation? If yes: `references/text-tools.md` needed at Step 4.
+   - Does the agent retrieve and synthesize from a knowledge base or document corpus (RAG)? If yes: `references/retrieval.md` needed at Step 4.
    - Does the agent classify or route user input to different handlers? If yes: `references/structured-classification.md` needed at Step 4.
    - Will the agent be deployed as a service? If yes: `references/deployment.md` needed at Step 5.
    - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
@@ -151,6 +152,7 @@ Load these based on DSB data requirements (identified in Step 1 checklist):
 - **Tabular data**: read `references/tabular-data.md` -- serialization format selection, size-based strategies, token cost tradeoffs.
 - **Entity resolution**: read `references/entity-resolution.md` -- blocking + matching + clustering pipeline, tiered matching, multi-agent ER, domain-specific patterns.
 - **Text search / code navigation**: read `references/text-tools.md` -- three-layer search stack, tool-by-tool reference, agent-optimized search tools, cost math.
+- **Knowledge base retrieval (RAG)**: read `references/retrieval.md` -- sparse/dense/hybrid retrieval, reranking, query transformation, corrective loops, GraphRAG, chunking strategies, agentic RAG architectures.
 - **Intent classification / routing**: read `references/structured-classification.md` -- classifier schema design, enforcement mechanisms (prompt vs constrained decoding), confidence thresholding, handler routing, hierarchical classification for large class sets.
 
 For the default LangChain/LangGraph stack, the build order is:
