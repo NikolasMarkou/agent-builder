@@ -77,7 +77,7 @@ Provider-agnostic model initialization.
 ```python
 from langchain.chat_models import init_chat_model
 
-model = init_chat_model("openai:gpt-4.1", temperature=0)
+model = init_chat_model("openai:gpt-4o", temperature=0)
 model = init_chat_model("claude-sonnet-4-5-20250929", temperature=0.5)
 model = init_chat_model("google_genai:gemini-2.5-flash-lite")
 model = init_chat_model("ollama:llama3")
@@ -422,13 +422,13 @@ class Custom(AgentMiddleware):
 @create_middleware
 async def route_model(request, handler):
     if is_simple_query(request.messages):
-        request.model = init_chat_model("openai:gpt-4.1-mini")
+        request.model = init_chat_model("openai:gpt-4o-mini")
     return await handler(request)
 ```
 
 **Model fallback:**
 ```python
-middleware=[ModelFallbackMiddleware(fallbacks=["claude-sonnet-4-5-20250929", "openai:gpt-4.1-mini"])]
+middleware=[ModelFallbackMiddleware(fallbacks=["claude-sonnet-4-5-20250929", "openai:gpt-4o-mini"])]
 ```
 
 **Tool filtering:**

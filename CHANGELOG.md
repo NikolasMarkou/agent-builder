@@ -4,6 +4,14 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.1] - 2026-03-20
+
+### Fixed
+- **Version badge drift** -- README.md badge now matches VERSION file; added automated version badge check to both `Makefile` and `build.ps1` validate targets to prevent future drift.
+- **Cross-validation gate coverage** -- extended pattern support table in SKILL.md from 6 to all 10 frameworks (added Semantic Kernel, LlamaIndex, Agno, Smolagents) with note clarifying non-orchestration frameworks.
+- **Selection matrix footnotes** -- frameworks referenced in the selection matrix but not covered in this guide (Haystack, AutoGen, Vercel AI SDK, Letta/MemGPT) now marked with `*` and footnote with brief descriptions.
+- **Model string consistency** -- standardized OpenAI model references from `gpt-4.1`/`gpt-4.1-mini` to `gpt-4o`/`gpt-4o-mini` across `frameworks.md` and `langchain-langgraph.md`.
+
 ## [1.5.0] - 2026-03-20
 
 ### Added

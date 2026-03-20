@@ -25,22 +25,24 @@ Use this reference when the default LangChain/LangGraph stack is not the best fi
 |---|---|---|
 | Simple chatbots | LangChain, OpenAI Agents SDK | Strands |
 | Complex multi-agent systems | LangGraph | Strands Graph, CrewAI |
-| RAG pipelines | LlamaIndex | Haystack, LangChain |
-| Document processing | LlamaIndex (LlamaParse) | Haystack |
+| RAG pipelines | LlamaIndex | Haystack*, LangChain |
+| Document processing | LlamaIndex (LlamaParse) | Haystack* |
 | Data analysis agents | LangGraph | Strands |
 | Code generation agents | OpenAI Agents SDK, Smolagents | Strands |
-| Research agents | LangGraph, AutoGen | Smolagents |
+| Research agents | LangGraph, AutoGen* | Smolagents |
 | AWS-native production | Strands Agents | LangGraph |
 | Azure/Microsoft production | Microsoft Agent Framework | Semantic Kernel |
 | Google Cloud production | Google ADK | LangGraph |
-| TypeScript/JS apps | Mastra | Vercel AI SDK |
+| TypeScript/JS apps | Mastra | Vercel AI SDK* |
 | .NET/Java enterprise | Semantic Kernel | Google ADK (Java) |
 | Open/local model workflows | Smolagents, Agno | Strands (Ollama) |
 | Prompt optimization | DSPy | (unique niche) |
-| Persistent agent memory | Letta (MemGPT) | Agno (learning=True) |
+| Persistent agent memory | Letta (MemGPT)* | Agno (learning=True) |
 | Voice/realtime agents | OpenAI Agents SDK, Strands BidiAgent | Google ADK |
 | Serverless deployment | Strands (Lambda) | LangGraph Platform |
 | Rapid prototyping | Strands, Agno, OpenAI SDK | CrewAI |
+
+\* *Not covered in this guide — external documentation only. Haystack: open-source RAG/NLP pipeline framework. AutoGen: Microsoft multi-agent conversation framework. Vercel AI SDK: React/Next.js AI integration library. Letta (MemGPT): persistent-memory agent framework built on virtual context management.*
 
 ---
 
@@ -192,7 +194,7 @@ response = agent.run("Find the latest AI agent frameworks")
 using Microsoft.SemanticKernel;
 
 var kernel = Kernel.CreateBuilder()
-    .AddAzureOpenAIChatCompletion("gpt-4.1", endpoint, apiKey)
+    .AddAzureOpenAIChatCompletion("gpt-4o", endpoint, apiKey)
     .Build();
 kernel.Plugins.AddFromType<SearchPlugin>();
 
@@ -265,7 +267,7 @@ import { Agent } from "@mastra/core";
 const agent = new Agent({
   name: "researcher",
   instructions: "You are a research assistant.",
-  model: "gpt-4.1",
+  model: "gpt-4o",
   tools: [searchTool],
 });
 

@@ -187,6 +187,15 @@ function Invoke-Validate {
         }
     }
 
+    # Verify README.md version badge matches VERSION file
+    Write-Host "Checking README.md version badge..."
+    if (Test-Path "README.md") {
+        $readmeContent = Get-Content "README.md" -Raw
+        if ($readmeContent -notmatch "Skill-v$([regex]::Escape($Version))") {
+            $errors += "ERROR: README.md version badge does not match VERSION ($Version)"
+        }
+    }
+
     if ($errors.Count -gt 0) {
         $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1

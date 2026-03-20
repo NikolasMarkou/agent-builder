@@ -95,6 +95,9 @@ validate:
 	@for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
 		grep -q "$$ref" CLAUDE.md || (echo "ERROR: CLAUDE.md repository structure missing $$ref" && exit 1); \
 	done
+	@# Verify README.md version badge matches VERSION file
+	@echo "Checking README.md version badge..."
+	@grep -q "Skill-v$(VERSION)" README.md || (echo "ERROR: README.md version badge does not match VERSION ($(VERSION))" && exit 1)
 	@echo "Validation passed!"
 
 # Clean build artifacts
