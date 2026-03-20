@@ -163,7 +163,7 @@ agent = Agent(
     instruction="You are a research assistant. Search for information and summarize findings.",
     tools=[google_search],
 )
-response = agent.run("Find the latest AI agent frameworks")
+response = await agent.run_async("Find the latest AI agent frameworks")
 ```
 
 ---

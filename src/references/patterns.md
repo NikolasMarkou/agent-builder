@@ -106,7 +106,7 @@ def synthesize(state):
     analyses = "\n---\n".join(state["results"])  # collected via Annotated[list, operator.add]
     return {"summary": model.invoke(f"Synthesize these independent analyses:\n{analyses}").content}
 
-builder.add_conditional_edges(START, lambda s: [Send("analyst", {"task": t}) for t in s["tasks"]])
+builder.add_conditional_edges(START, lambda s: [Send("analyst", {"task": t}) for t in s["tasks"]], ["analyst"])
 builder.add_edge("analyst", "synthesize")
 builder.add_edge("synthesize", END)
 ```
@@ -171,7 +171,7 @@ The default agent loop. Model reasons about the task, calls a tool, observes the
 
 ```python
 # Minimal ReAct with iteration cap
-agent = create_agent(model="claude-sonnet-4-5-20250929", tools=[search, calculator], max_iterations=10)
+agent = create_agent(model="claude-sonnet-4-5-20250929", tools=[search, calculator])
 ```
 
 ### 2.2 Reflection / Self-Critique
@@ -215,10 +215,12 @@ def planner(state):
     plan = model.with_structured_output(Plan).invoke(f"Break this into steps: {state['task']}")
     return {"steps": plan.steps, "current_step": 0}
 
+executor_agent = create_agent(model="claude-sonnet-4-5-20250929", tools=[search])
+
 def executor(state):
     step = state["steps"][state["current_step"]]
-    result = agent.invoke(step)  # ReAct sub-agent executes each step
-    return {"results": [result], "current_step": state["current_step"] + 1}
+    result = executor_agent.invoke({"messages": [{"role": "user", "content": step}]})
+    return {"results": [result["messages"][-1].content], "current_step": state["current_step"] + 1}
 
 def should_continue(state) -> str:
     return "executor" if state["current_step"] < len(state["steps"]) else END
@@ -237,11 +239,13 @@ generator = create_agent(model="openai:gpt-4o", tools=[search], system_prompt="G
 critic = create_agent(model="claude-sonnet-4-5-20250929", tools=[], system_prompt="Evaluate against rubric. Reply PASS or FAIL with reasons.")
 
 def gen_node(state):
-    return {"draft": generator.invoke(state["task"] + "\nFeedback: " + state.get("critique", ""))}
+    result = generator.invoke({"messages": [{"role": "user", "content": state["task"] + "\nFeedback: " + state.get("critique", "")}]})
+    return {"draft": result["messages"][-1].content}
 
 def critic_node(state):
-    result = critic.invoke(f"Evaluate:\n{state['draft']}")
-    return {"critique": result, "approved": "PASS" in result}
+    result = critic.invoke({"messages": [{"role": "user", "content": f"Evaluate:\n{state['draft']}"}]})
+    critique = result["messages"][-1].content
+    return {"critique": critique, "approved": "PASS" in critique}
 
 builder.add_conditional_edges("critic", lambda s: END if s["approved"] else "generator")
 ```
@@ -263,8 +267,8 @@ def search_sources(state):
     return [Send("researcher", {"query": q}) for q in state["queries"]]  # parallel fan-out
 
 def identify_gaps(state):
-    gaps = model.invoke(f"What's missing from this research?\n{state['synthesis']}")
-    return {"queries": gaps, "iteration": state["iteration"] + 1}
+    gaps = model.with_structured_output(QueryList).invoke(f"What's missing from this research?\n{state['synthesis']}")
+    return {"queries": gaps.items, "iteration": state["iteration"] + 1}
 
 # Loop: generate_queries → search (parallel) → synthesize → identify_gaps → repeat or END
 builder.add_conditional_edges("gaps", lambda s: END if s["iteration"] >= 3 else "search")

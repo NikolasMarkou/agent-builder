@@ -467,7 +467,7 @@ client = MultiServerMCPClient({
     "github": {
         "transport": "streamable_http",
         "url": "https://my-github-mcp-server/mcp",
-        "headers": {"Authorization": "Bearer ..."},
+        "headers": {"Authorization": f"Bearer {os.environ['GITHUB_MCP_TOKEN']}"},
     },
 })
 
@@ -518,13 +518,16 @@ researcher = create_agent(model="openai:gpt-4o", tools=[web_search], system_prom
 writer = create_agent(model="openai:gpt-4o", tools=[], system_prompt="Write final output from research.")
 
 def plan_node(state: MessagesState):
-    return {"messages": [planner.invoke(state["messages"])]}
+    result = planner.invoke({"messages": state["messages"]})
+    return {"messages": result["messages"]}
 
 def research_node(state: MessagesState):
-    return {"messages": [researcher.invoke(state["messages"])]}
+    result = researcher.invoke({"messages": state["messages"]})
+    return {"messages": result["messages"]}
 
 def write_node(state: MessagesState):
-    return {"messages": [writer.invoke(state["messages"])]}
+    result = writer.invoke({"messages": state["messages"]})
+    return {"messages": result["messages"]}
 
 def route_after_plan(state: MessagesState) -> str:
     last = state["messages"][-1].content

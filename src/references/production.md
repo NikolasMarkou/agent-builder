@@ -361,6 +361,11 @@ class RateLimiter:
         if len(self.calls[key]) >= self.max_calls:
             return False
         self.calls[key].append(now)
+        # Evict stale keys to prevent unbounded memory growth
+        if len(self.calls) > self.max_calls * 10:
+            stale = [k for k, v in self.calls.items() if not v]
+            for k in stale:
+                del self.calls[k]
         return True
 
 # Note: this in-memory implementation is single-process only.
@@ -406,7 +411,6 @@ class ModelRegistry:
             except Exception:
                 if i == len(self.models) - 1:
                     raise
-        raise RuntimeError("All models failed")
 
 registry = ModelRegistry([
     "claude-sonnet-4-5-20250929",  # primary

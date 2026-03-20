@@ -4,6 +4,25 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.7.1] - 2026-03-20
+
+### Fixed
+- **Multi-agent node functions in langchain-langgraph.md** -- nodes now pass dict input to `create_agent().invoke()` and return messages correctly instead of wrapping result in a list (would crash `add_messages` reducer).
+- **Generator-Critic pattern in patterns.md** -- `gen_node` and `critic_node` now extract `.content` from agent invoke results instead of treating dicts as strings.
+- **STORM `identify_gaps` in patterns.md** -- uses `with_structured_output(QueryList)` to return a proper list instead of assigning an `AIMessage` to the `queries` field (would crash on fan-out iteration).
+- **Plan-and-Execute undefined `agent` in patterns.md** -- added `executor_agent` definition and corrected invoke call.
+- **Aggregator fan-out in patterns.md** -- added missing path map `["analyst"]` to `add_conditional_edges` with `Send()`.
+- **Undocumented `max_iterations` param in patterns.md** -- removed from `create_agent` call (not in API reference).
+- **Health check private attribute in deployment.md** -- replaced `checkpointer._pool.connection()` with `checkpointer.conn.cursor()`.
+- **Missing `import os` in deployment.md** -- added to memory implementation code block.
+- **RateLimiter unbounded memory in production.md** -- added stale key eviction to prevent memory growth under sustained traffic.
+- **Unreachable dead code in production.md** -- removed unreachable `raise RuntimeError("All models failed")` in `ModelRegistry`.
+- **Google ADK API in frameworks.md** -- changed `.run()` to `.run_async()` to match current ADK API.
+- **Import path inconsistency** -- standardized `entity-resolution.md` and `retrieval.md` to `from langchain.tools import tool` (matching `langchain-langgraph.md` convention).
+- **MCP credential placeholder in langchain-langgraph.md** -- replaced hardcoded `"Bearer ..."` with `os.environ['GITHUB_MCP_TOKEN']`.
+- **Makefile validation silently swallowing errors** -- all 5 `for` loops used `exit 1` inside subshells `()` which only exited the subshell; replaced with `{ }` braces and a `fail` flag so errors are never ignored.
+- **README.md version badge** -- was stuck at v1.6.1, now tracks VERSION file correctly.
+
 ## [1.7.0] - 2026-03-20
 
 ### Added

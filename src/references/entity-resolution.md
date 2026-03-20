@@ -303,7 +303,7 @@ For agents built on LangChain, LangGraph, or similar frameworks, ER should be ex
 ### Tool definition
 
 ```python
-from langchain_core.tools import tool
+from langchain.tools import tool
 
 @tool
 def resolve_entity(

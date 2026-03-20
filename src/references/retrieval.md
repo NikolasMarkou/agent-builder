@@ -182,7 +182,7 @@ Qdrant's approach. Uses distributional statistics (mean, std) to normalize befor
 ### Production Hybrid Pipeline
 
 ```python
-from langchain_core.tools import tool
+from langchain.tools import tool
 
 @tool
 def hybrid_retrieve(query: str, k: int = 5) -> list[dict]:

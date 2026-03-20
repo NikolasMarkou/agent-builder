@@ -80,21 +80,21 @@ validate:
 	@test -d src/references || (echo "ERROR: src/references/ directory not found" && exit 1)
 	@# Verify all references/ cross-references in SKILL.md resolve to actual files
 	@echo "Checking cross-references..."
-	@for ref in $$(grep -oE 'references/[a-z0-9_-]+\.md' $(SKILL_FILE) | sort -u); do \
-		test -f "src/$$ref" || (echo "ERROR: $(SKILL_FILE) references src/$$ref but file not found" && exit 1); \
-	done
+	@fail=0; for ref in $$(grep -oE 'references/[a-z0-9_-]+\.md' $(SKILL_FILE) | sort -u); do \
+		test -f "src/$$ref" || { echo "ERROR: $(SKILL_FILE) references src/$$ref but file not found"; fail=1; }; \
+	done; [ $$fail -eq 0 ]
 	@# Verify SKILL.md has frontmatter delimiters
 	@head -1 $(SKILL_FILE) | grep -q "^---" || (echo "ERROR: SKILL.md missing frontmatter opening ---" && exit 1)
 	@# Verify README.md project structure lists all reference files
 	@echo "Checking README.md lists all reference files..."
-	@for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
-		grep -q "$$ref" README.md || (echo "ERROR: README.md project structure missing $$ref" && exit 1); \
-	done
+	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+		grep -q "$$ref" README.md || { echo "ERROR: README.md project structure missing $$ref"; fail=1; }; \
+	done; [ $$fail -eq 0 ]
 	@# Verify CLAUDE.md repository structure lists all reference files
 	@echo "Checking CLAUDE.md lists all reference files..."
-	@for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
-		grep -q "$$ref" CLAUDE.md || (echo "ERROR: CLAUDE.md repository structure missing $$ref" && exit 1); \
-	done
+	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+		grep -q "$$ref" CLAUDE.md || { echo "ERROR: CLAUDE.md repository structure missing $$ref"; fail=1; }; \
+	done; [ $$fail -eq 0 ]
 	@# Verify README.md version badge matches VERSION file
 	@echo "Checking README.md version badge..."
 	@grep -q "Skill-v$(VERSION)" README.md || (echo "ERROR: README.md version badge does not match VERSION ($(VERSION))" && exit 1)
@@ -103,17 +103,17 @@ validate:
 	@if grep -rEin 'gpt-4\.1[^+]|gpt-4\.1$$|Claude-v1' src/; then echo "ERROR: Deprecated model strings found (use gpt-4o/gpt-4o-mini)" && exit 1; fi
 	@# Verify every reference file has at least one code example
 	@echo "Checking code example presence..."
-	@for ref in $$(ls src/references/*.md 2>/dev/null); do \
-		grep -q '```' $$ref || (echo "ERROR: $$ref has no code examples" && exit 1); \
-	done
+	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null); do \
+		grep -q '```' $$ref || { echo "ERROR: $$ref has no code examples"; fail=1; }; \
+	done; [ $$fail -eq 0 ]
 	@# Verify content guideline compliance (failure modes or when-not-to-use)
 	@echo "Checking content guideline compliance..."
-	@for ref in $$(ls src/references/*.md 2>/dev/null); do \
+	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null); do \
 		name=$$(basename $$ref); \
 		if ! grep -qi "when not\|failure mode\|anti-pattern\|pitfall" $$ref; then \
-			echo "ERROR: $$name missing 'When NOT to use' or failure modes section" && exit 1; \
+			echo "ERROR: $$name missing 'When NOT to use' or failure modes section"; fail=1; \
 		fi; \
-	done
+	done; [ $$fail -eq 0 ]
 	@echo "Validation passed!"
 
 # Clean build artifacts

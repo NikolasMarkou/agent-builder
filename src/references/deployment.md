@@ -178,8 +178,8 @@ async def health():
 
     # Database check
     try:
-        async with checkpointer._pool.connection() as conn:
-            await conn.execute("SELECT 1")
+        async with checkpointer.conn.cursor() as cur:
+            await cur.execute("SELECT 1")
         checks["database"] = "ok"
     except Exception:
         checks["database"] = "failed"
@@ -456,6 +456,7 @@ For agents that need to remember across sessions — user preferences, learned f
 ### Memory Implementation
 
 ```python
+import os
 from langgraph.store.memory import InMemoryStore
 from langgraph.store.postgres import PostgresStore
 
