@@ -64,7 +64,7 @@ result = agent.invoke({"messages": [{"role": "user", "content": "Find X"}]})
 ```
 
 Parameters:
-- `model`: `str` (`"openai:gpt-4.1"`, `"claude-sonnet-4-5-20250929"`) or `BaseChatModel` instance
+- `model`: `str` (`"openai:gpt-4o"`, `"claude-sonnet-4-5-20250929"`) or `BaseChatModel` instance
 - `tools`: list of `@tool` functions, `BaseTool` instances, or MCP tools
 - `system_prompt`: `str` or `SystemMessage`
 - `response_format`: type for structured output
@@ -356,7 +356,7 @@ def save_preference(key: str, value: str, runtime: ToolRuntime) -> str:
     runtime.store.put(("preferences",), key, {"value": value})
     return "Saved."
 
-agent = create_agent(model="openai:gpt-4.1", tools=[save_preference], store=store)
+agent = create_agent(model="openai:gpt-4o", tools=[save_preference], store=store)
 ```
 
 ### Summarization
@@ -433,7 +433,7 @@ middleware=[ModelFallbackMiddleware(fallbacks=["claude-sonnet-4-5-20250929", "op
 
 **Tool filtering:**
 ```python
-middleware=[LLMToolSelectorMiddleware(model="openai:gpt-4.1-mini", max_tools=3, always_include=["search"])]
+middleware=[LLMToolSelectorMiddleware(model="openai:gpt-4o-mini", max_tools=3, always_include=["search"])]
 ```
 
 ---
@@ -469,10 +469,10 @@ Features: multimodal tool content, tool interceptors for runtime context, resour
 ### Subagents (parent delegates to children)
 
 ```python
-research_agent = create_agent(model="openai:gpt-4.1", tools=[web_search], system_prompt="Research specialist.")
+research_agent = create_agent(model="openai:gpt-4o", tools=[web_search], system_prompt="Research specialist.")
 
 main_agent = create_agent(
-    model="openai:gpt-4.1",
+    model="openai:gpt-4o",
     tools=[research_agent.as_tool(name="researcher", description="Research any topic")],
 )
 ```

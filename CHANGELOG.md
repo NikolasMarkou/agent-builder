@@ -4,13 +4,21 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.2] - 2026-03-20
+
+### Fixed
+- **Model string consistency (complete)** -- fixed remaining 5 `gpt-4.1` and 1 `gpt-4.1-mini` instances in `langchain-langgraph.md` → `gpt-4o`/`gpt-4o-mini`. Fixed stale `claude-sonnet-4-20250514` in `structured-classification.md` → `claude-sonnet-4-5-20250929`.
+- **deployment.md code examples** -- added FastAPI skeleton, SSE streaming endpoint, health check endpoint, Dockerfile, docker-compose.yml, Prometheus configuration, metrics exposition, and memory implementation. File was previously 100% prose with zero working code.
+- **Validation pipeline extended** -- `Makefile` and `build.ps1` validate targets now check: deprecated model strings (`gpt-4.1`), code example presence per reference file, and content guideline compliance (failure modes / "When NOT to use" sections).
+- **CHANGELOG v1.5.1 accuracy** -- corrected v1.5.1 entry to reflect that model string fix was partial, not complete.
+
 ## [1.5.1] - 2026-03-20
 
 ### Fixed
 - **Version badge drift** -- README.md badge now matches VERSION file; added automated version badge check to both `Makefile` and `build.ps1` validate targets to prevent future drift.
 - **Cross-validation gate coverage** -- extended pattern support table in SKILL.md from 6 to all 10 frameworks (added Semantic Kernel, LlamaIndex, Agno, Smolagents) with note clarifying non-orchestration frameworks.
 - **Selection matrix footnotes** -- frameworks referenced in the selection matrix but not covered in this guide (Haystack, AutoGen, Vercel AI SDK, Letta/MemGPT) now marked with `*` and footnote with brief descriptions.
-- **Model string consistency** -- standardized OpenAI model references from `gpt-4.1`/`gpt-4.1-mini` to `gpt-4o`/`gpt-4o-mini` across `frameworks.md` and `langchain-langgraph.md`.
+- **Model string consistency** -- partially standardized OpenAI model references in `frameworks.md`; `langchain-langgraph.md` instances were missed (fixed in v1.5.2).
 
 ## [1.5.0] - 2026-03-20
 

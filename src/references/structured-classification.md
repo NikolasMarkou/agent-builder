@@ -199,7 +199,7 @@ class ClassificationResult(BaseModel):
 
 def classify_intent(user_message: str) -> ClassificationResult:
     return client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=512,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}],

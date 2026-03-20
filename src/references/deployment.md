@@ -24,6 +24,56 @@ An agent service is an async web server wrapping a compiled graph. The server ma
 - **Request validation:** Validate all incoming data with schemas before it reaches the agent.
 - **Error handling:** Global exception handler catches unhandled errors. Never expose stack traces to clients.
 
+### Minimal FastAPI Skeleton
+
+```python
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from langchain.agents import create_agent
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+graph = None
+checkpointer = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global graph, checkpointer
+    checkpointer = AsyncPostgresSaver.from_conn_string(os.environ["DATABASE_URL"])
+    await checkpointer.setup()
+    graph = create_agent(
+        model="claude-sonnet-4-5-20250929",
+        tools=[...],  # your tools here
+        checkpointer=checkpointer,
+    )
+    yield
+    # cleanup resources
+
+app = FastAPI(title="Agent Service", lifespan=lifespan)
+
+class ChatRequest(BaseModel):
+    message: str
+    thread_id: str
+
+class ChatResponse(BaseModel):
+    response: str
+    thread_id: str
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(req: ChatRequest):
+    try:
+        result = await graph.ainvoke(
+            {"messages": [{"role": "user", "content": req.message}]},
+            config={"configurable": {"thread_id": req.thread_id}},
+        )
+        return ChatResponse(
+            response=result["messages"][-1].content,
+            thread_id=req.thread_id,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Agent invocation failed")
+```
+
 ### Key Design Decisions
 
 | Decision | Recommendation | Why |
@@ -58,6 +108,38 @@ For agents that need to deliver tokens in real-time (chat UIs, voice application
 | **Values** | Full state snapshot after each graph node completes | Dashboards — see the full picture at each step |
 | **Updates** | State diff per node (only what changed) | Debugging — minimal data, shows exactly what each node did |
 
+### SSE Streaming Endpoint
+
+```python
+import json
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+
+class StreamRequest(BaseModel):
+    message: str
+    thread_id: str
+
+@app.post("/chat/stream")
+async def chat_stream(req: StreamRequest):
+    async def event_generator():
+        async for event, chunk in graph.astream(
+            {"messages": [{"role": "user", "content": req.message}]},
+            config={"configurable": {"thread_id": req.thread_id}},
+            stream_mode="messages",
+        ):
+            if hasattr(chunk, "content") and chunk.content:
+                data = json.dumps({"content": chunk.content, "type": event})
+                yield f"data: {data}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"},
+    )
+```
+
 ### Design Considerations
 
 - Use SSE (`text/event-stream`) over WebSockets for agent streaming — simpler, HTTP-native, sufficient for server-to-client
@@ -79,6 +161,41 @@ Every agent service needs a health endpoint that load balancers and orchestrator
 | **Cache/Redis** | Ping | If used for rate limiting or session storage |
 | **LLM provider** | Reachability | Optional — adds latency, and provider status is external |
 | **Vector store** | Connectivity | If memory/RAG is critical to functionality |
+
+### Health Check Endpoint
+
+```python
+import asyncio
+from fastapi import FastAPI
+
+@app.get("/health")
+async def health():
+    checks = {}
+    status = "healthy"
+
+    # Database check
+    try:
+        async with checkpointer._pool.connection() as conn:
+            await conn.execute("SELECT 1")
+        checks["database"] = "ok"
+    except Exception:
+        checks["database"] = "failed"
+        status = "unhealthy"
+
+    # Optional: vector store check
+    # try:
+    #     await vector_store.ping()
+    #     checks["vector_store"] = "ok"
+    # except Exception:
+    #     checks["vector_store"] = "failed"
+    #     status = "degraded"
+
+    code = 200 if status == "healthy" else 503
+    return JSONResponse(
+        status_code=code,
+        content={"status": status, "checks": checks},
+    )
+```
 
 ### Rules
 
@@ -176,6 +293,77 @@ A production agent deployment has three layers:
 | **Restart policy** | `unless-stopped` for the agent service — auto-recover from transient failures |
 | **Dependency ordering** | Agent service starts only after database passes health check |
 
+### Dockerfile
+
+```dockerfile
+FROM python:3.12-slim AS base
+
+WORKDIR /app
+
+# Dependency layer (cached unless requirements change)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Application layer
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--loop", "uvloop"]
+```
+
+### docker-compose.yml
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://agent:agent@db:5432/agent
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent
+      POSTGRES_DB: agent
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+```
+
 ### Minimal Service Composition
 
 | Service | Image | Ports | Depends On |
@@ -196,6 +384,35 @@ A production agent deployment has three layers:
 | **Prometheus** | Collects metrics from the `/metrics` endpoint on the agent service | 15 seconds |
 | **Grafana** | Visualizes metrics, hosts dashboards, sends alerts | — |
 | **cAdvisor** (optional) | Container-level CPU, memory, network metrics | 15 seconds |
+
+### Prometheus Configuration
+
+```yaml
+# prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "agent-service"
+    static_configs:
+      - targets: ["app:8000"]
+```
+
+### Metrics Exposition
+
+```python
+from prometheus_client import Counter, Histogram, Gauge, make_asgi_app
+
+REQUEST_COUNT = Counter("http_requests_total", "Total requests", ["method", "path", "status"])
+REQUEST_DURATION = Histogram("http_request_duration_seconds", "Request duration", ["method", "path"])
+LLM_DURATION = Histogram("llm_inference_duration_seconds", "LLM call duration", ["model"])
+LLM_TOKENS = Counter("llm_tokens_total", "Tokens consumed", ["model", "direction"])
+DB_CONNECTIONS = Gauge("db_connections_active", "Active DB connections")
+
+# Mount metrics endpoint
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
+```
 
 ### Recommended Dashboards
 
@@ -241,6 +458,33 @@ For agents that need to remember across sessions — user preferences, learned f
 | **Graph store** (built-in) | Cross-session key-value memory | Persists across sessions, but no semantic search |
 | **Vector store** (pgvector, Pinecone, etc.) | Semantic memory — retrieve by meaning, not key | Requires embeddings, more infrastructure |
 | **Dedicated memory service** (mem0, Zep, etc.) | Full memory lifecycle — auto-extract, store, retrieve, forget | Higher-level abstraction, external dependency |
+
+### Memory Implementation
+
+```python
+from langgraph.store.memory import InMemoryStore
+from langgraph.store.postgres import PostgresStore
+
+# Development: in-memory store
+store = InMemoryStore()
+
+# Production: persistent store
+store = PostgresStore.from_conn_string(os.environ["DATABASE_URL"])
+
+# Store a user preference
+await store.aput(("user", user_id, "preferences"), "theme", {"value": "dark"})
+
+# Retrieve before invocation
+prefs = await store.aget(("user", user_id, "preferences"), "theme")
+
+# Wire store into agent
+agent = create_agent(
+    model="claude-sonnet-4-5-20250929",
+    tools=[...],
+    store=store,
+    checkpointer=checkpointer,  # separate: conversation state
+)
+```
 
 ### Design Principles
 

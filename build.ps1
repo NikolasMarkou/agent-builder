@@ -196,6 +196,33 @@ function Invoke-Validate {
         }
     }
 
+    # Verify no deprecated model strings remain
+    Write-Host "Checking model string consistency..."
+    $deprecatedHits = Select-String -Path "src/references/*.md", "src/SKILL.md" -Pattern '(model="|"openai:)gpt-4\.1' -ErrorAction SilentlyContinue
+    if ($deprecatedHits) {
+        foreach ($hit in $deprecatedHits) {
+            $errors += "ERROR: Deprecated gpt-4.1 model string in $($hit.Filename):$($hit.LineNumber)"
+        }
+    }
+
+    # Verify every reference file has at least one code example
+    Write-Host "Checking code example presence..."
+    Get-ChildItem "src/references/*.md" | ForEach-Object {
+        $refContent = Get-Content $_.FullName -Raw
+        if ($refContent -notmatch '```') {
+            $errors += "ERROR: $($_.Name) has no code examples"
+        }
+    }
+
+    # Verify content guideline compliance (failure modes or when-not-to-use)
+    Write-Host "Checking content guideline compliance..."
+    Get-ChildItem "src/references/*.md" | ForEach-Object {
+        $refContent = Get-Content $_.FullName -Raw
+        if ($refContent -notmatch '(?i)(when not|failure mode|anti-pattern|pitfall)') {
+            Write-Host "WARNING: $($_.Name) may be missing 'When NOT to use' or failure modes section" -ForegroundColor Yellow
+        }
+    }
+
     if ($errors.Count -gt 0) {
         $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1
