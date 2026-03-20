@@ -75,6 +75,11 @@ Before writing code, determine:
    - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
 
 **Emit DSB after Step 1.** Then apply tier routing:
+- **Needs agent: no**: Recommend the appropriate non-agent approach:
+  - *Rule-based*: if/else logic, lookup tables, regex, database queries. No LLM needed.
+  - *Single LLM call*: `model.invoke()` with structured output for one-shot classification, extraction, or generation. No tools, no loops.
+  - *LLM + structured output*: `model.with_structured_output(Schema)` for reliable extraction or routing without agent overhead.
+  - Stop here. Do not proceed to Step 2.
 - **Simple** complexity: skip to Step 4 (use `create_agent` — see `references/langchain-langgraph.md`). Emit DSB with `Patterns: N/A`, `Framework: LangChain (default)`.
 - **Moderate and above**: continue to Step 2.
 
@@ -186,6 +191,13 @@ Read `references/production.md` before deploying. Covers:
 - Failure modes catalogue and mitigation
 
 For deployment — API serving, containerization, and monitoring stack — read `references/deployment.md`.
+
+**Iteration:** If Step 4 or 5 reveals the selected pattern or framework cannot support a requirement, backtrack:
+- **Pattern mismatch** (Step 4 fails): return to Step 2, select alternative pattern, re-run cross-validation gate.
+- **Framework limitation** (Step 4 fails): return to Step 3, select alternative framework, re-run cross-validation gate.
+- **Production gap** (Step 5 fails): add middleware/infrastructure rather than changing architecture. Only backtrack to Step 2 if the fundamental pattern is wrong.
+
+Update the DSB with each revision. The DSB's `Patterns` and `Framework` fields are mutable until code is shipped.
 
 ---
 

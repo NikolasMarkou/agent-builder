@@ -98,9 +98,9 @@ validate:
 	@# Verify README.md version badge matches VERSION file
 	@echo "Checking README.md version badge..."
 	@grep -q "Skill-v$(VERSION)" README.md || (echo "ERROR: README.md version badge does not match VERSION ($(VERSION))" && exit 1)
-	@# Verify no deprecated model strings remain
+	@# Verify no deprecated model strings remain (code and prose)
 	@echo "Checking model string consistency..."
-	@if grep -rEn '(model="|"openai:)gpt-4\.1' src/; then echo "ERROR: Deprecated gpt-4.1 model strings found in code (use gpt-4o)" && exit 1; fi
+	@if grep -rEin 'gpt-4\.1[^+]|gpt-4\.1$$|Claude-v1' src/; then echo "ERROR: Deprecated model strings found (use gpt-4o/gpt-4o-mini)" && exit 1; fi
 	@# Verify every reference file has at least one code example
 	@echo "Checking code example presence..."
 	@for ref in $$(ls src/references/*.md 2>/dev/null); do \
@@ -111,7 +111,7 @@ validate:
 	@for ref in $$(ls src/references/*.md 2>/dev/null); do \
 		name=$$(basename $$ref); \
 		if ! grep -qi "when not\|failure mode\|anti-pattern\|pitfall" $$ref; then \
-			echo "WARNING: $$name may be missing 'When NOT to use' or failure modes section"; \
+			echo "ERROR: $$name missing 'When NOT to use' or failure modes section" && exit 1; \
 		fi; \
 	done
 	@echo "Validation passed!"

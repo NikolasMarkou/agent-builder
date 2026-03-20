@@ -22,7 +22,7 @@ Three dominant formats for structuring prompts. Each has trade-offs depending on
 
 ### XML Tags
 
-XML is the only structured format explicitly recommended by all three major providers (Anthropic, Google, OpenAI). Claude was specifically trained on XML-tagged prompts, making it the strongest format for that model family. OpenAI's GPT-4.1 guide also confirms improved adherence to XML-structured information.
+XML is the only structured format explicitly recommended by all three major providers (Anthropic, Google, OpenAI). Claude was specifically trained on XML-tagged prompts, making it the strongest format for that model family. OpenAI's GPT-4.1+ prompt guide also confirms improved adherence to XML-structured information.
 
 **Why XML works well:**
 
@@ -81,7 +81,7 @@ Respond in a JSON object with keys: top_region, q4_trend, anomalies.
 
 Markdown is the native format for OpenAI models. GPT system prompts have historically been markdown-based. Highly readable and familiar to most developers.
 
-**OpenAI's recommended prompt skeleton (GPT-4.1 guide):**
+**OpenAI's recommended prompt skeleton (GPT-4.1+ prompt guide):**
 
 ```markdown
 # Role and Objective

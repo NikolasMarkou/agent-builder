@@ -495,3 +495,16 @@ agent = create_agent(
 5. **Use one database.** PostgreSQL + pgvector can serve as checkpointer storage, relational store, and vector store — reducing infrastructure complexity.
 
 For retrieval pipeline patterns over vector stores — hybrid search, reranking, chunking strategies, and agentic RAG architectures — see `retrieval.md`.
+
+---
+
+## Failure Modes
+
+| Failure | Cause | Mitigation |
+|---|---|---|
+| **Silent health check pass** | Health endpoint returns 200 but agent can't reach LLM | Include LLM connectivity in health check (with timeout + caching) |
+| **Container OOM** | Agent context grows unbounded in memory | Set container memory limits, use SummarizationMiddleware, stream responses |
+| **Stale connections** | DB pool hands out dead connections after idle period | Enable pre-ping, set connection recycle interval |
+| **SSE disconnect** | Client drops mid-stream, server keeps generating | Set response timeouts, handle `GeneratorExit` in stream generator |
+| **Config drift** | Env vars differ between staging and production | Validate all required settings at startup, fail fast on missing values |
+| **Memory cross-contamination** | Long-term memory not keyed by user ID | Always scope store operations to user namespace |

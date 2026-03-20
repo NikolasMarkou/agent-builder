@@ -4,6 +4,25 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.0] - 2026-03-20
+
+### Added
+- **Code examples for behavioral patterns** -- `patterns.md` code coverage raised from 26% to 79%: added runnable examples for ReAct (2.1), Reflection (2.2), Plan-and-Execute (2.3), Generator-Critic (2.4), STORM (2.5), HITL (2.6), Aggregator (1.5), and Hierarchical (1.7).
+- **Code examples for production.md** -- added structured logging (JSON formatter with contextvars), rate limiter, model registry with 3-model fallback chain, and context management (SummarizationMiddleware + truncation helper). File previously had zero code blocks.
+- **Failure modes and cost guidelines for langchain-langgraph.md** -- 7 failure modes with mitigations, per-pattern cost profiles with budget rules.
+- **Failure modes for deployment.md** -- 6 deployment-specific failure modes with mitigations.
+- **Deep Agents expansion** -- task planning section with middleware config (MemoryMiddleware, HumanInTheLoopMiddleware), sandbox options, when-to-use/when-NOT-to-use guidance.
+- **"No agent needed" workflow path** -- SKILL.md Step 1 now provides 3 concrete non-agent alternatives (rule-based, single LLM call, structured output) instead of dead-ending.
+- **Workflow iteration guidance** -- SKILL.md now explains how to backtrack from Step 4/5 to Step 2/3 when patterns or frameworks don't fit.
+- **Custom multi-agent StateGraph example** -- complete planner→researcher→writer example in `langchain-langgraph.md`.
+
+### Fixed
+- **LangGraph Core example complete** -- Template 2 (ReAct with persistence) now defines all functions (`agent_node`, `tool_node`, `route`) with proper imports. Previously was a skeleton with undefined references.
+- **Remaining deprecated model strings** -- fixed 9 instances across 5 files: `prompt-structuring.md` (GPT-4.1→GPT-4.1+), `tabular-data.md` (GPT-4.1-nano→GPT-4o-mini, GPT-4.1+→GPT-4o), `entity-resolution.md` (GPT-4.1→GPT-4o ×2), `production.md` (GPT-4.1/GPT-4.1-mini→GPT-4o/GPT-4o-mini), `llm-as-judge.md` (Claude-v1→earlier Claude models).
+- **Validation pipeline broadened** -- model string regex now catches prose references (not just code context). Content guideline compliance promoted from WARNING to ERROR.
+- **Undefined `is_simple_query`** -- replaced with inline logic in `langchain-langgraph.md` middleware routing example.
+- **entity-resolution.md** -- renamed "LLMs struggle with" to "When NOT to use LLMs for ER" for content guideline compliance.
+
 ## [1.5.2] - 2026-03-20
 
 ### Fixed

@@ -78,7 +78,7 @@ By simply swapping which response appears first in a pairwise comparison, Vicuna
 
 ### Verbosity Bias
 
-Inflates scores by approximately **15%** for longer responses regardless of substantive quality. GPT-3.5 and Claude-v1 both show clear verbosity preference; GPT-4 is less susceptible.
+Inflates scores by approximately **15%** for longer responses regardless of substantive quality. GPT-3.5 and earlier Claude models both show clear verbosity preference; GPT-4+ is less susceptible.
 
 **Mitigation:** Explicitly instruct the judge to penalize padding, add a separate "conciseness" scoring dimension, use length-normalized scoring.
 

@@ -23,7 +23,7 @@ LLMs process text sequentially, token by token. Tables are inherently two-dimens
 
 ## 2. Serialization Formats Ranked
 
-Benchmark data from ImprovingAgents (Sep 2025, GPT-4.1-nano, 1000 records, 1000 questions):
+Benchmark data from ImprovingAgents (Sep 2025, GPT-4o-mini, 1000 records, 1000 questions):
 
 | Format | Accuracy | Tokens (1K records) | Notes |
 |---|---|---|---|
@@ -355,7 +355,7 @@ Is the data < 50 rows?
 
 ### GPT (OpenAI)
 - HTML tables and markdown tables perform well due to web training data.
-- GPT-4.1+ follows literal instructions well. Explicitly state "use only the data provided" to prevent hallucination.
+- GPT-4o follows literal instructions well. Explicitly state "use only the data provided" to prevent hallucination.
 - For structured extraction, request JSON output format.
 
 ### General

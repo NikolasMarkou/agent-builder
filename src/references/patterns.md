@@ -101,6 +101,16 @@ Collects outputs from multiple sources and synthesizes into a unified result. Of
 **When NOT to use:** Single source provides sufficient answer, real-time latency constraints make fan-out impractical.
 **Mechanism:** Fan-out -> independent processing -> fan-in -> synthesis node.
 
+```python
+def synthesize(state):
+    analyses = "\n---\n".join(state["results"])  # collected via Annotated[list, operator.add]
+    return {"summary": model.invoke(f"Synthesize these independent analyses:\n{analyses}").content}
+
+builder.add_conditional_edges(START, lambda s: [Send("analyst", {"task": t}) for t in s["tasks"]])
+builder.add_edge("analyst", "synthesize")
+builder.add_edge("synthesize", END)
+```
+
 ### 1.6 Network
 
 Agents can communicate with any other agent. No fixed hierarchy -- peer-to-peer wiring where each agent can reach any other.
@@ -130,6 +140,20 @@ Supervisor decomposes goals and delegates to workers. Workers report back. Super
 **When NOT to use:** Task is simple enough for a single agent, overhead of supervisor reasoning exceeds the benefit.
 **Architecture:** Supervisor = Plan-and-Execute behavioral pattern. Workers = ReAct or Tool Use.
 
+```python
+researcher = create_agent(model="openai:gpt-4o", tools=[web_search], system_prompt="Research specialist.")
+coder = create_agent(model="openai:gpt-4o", tools=[run_code], system_prompt="Code specialist.")
+
+supervisor = create_agent(
+    model="claude-sonnet-4-5-20250929",
+    tools=[
+        researcher.as_tool(name="researcher", description="Research any topic"),
+        coder.as_tool(name="coder", description="Write and run code"),
+    ],
+    system_prompt="You are a supervisor. Delegate tasks to specialists.",
+)
+```
+
 ---
 
 ## Layer 2: Behavioral Patterns
@@ -145,6 +169,11 @@ The default agent loop. Model reasons about the task, calls a tool, observes the
 **LangGraph:** The basic conditional edge loop between LLM node and ToolNode.
 **LangChain:** `create_agent` implements this by default.
 
+```python
+# Minimal ReAct with iteration cap
+agent = create_agent(model="claude-sonnet-4-5-20250929", tools=[search, calculator], max_iterations=10)
+```
+
 ### 2.2 Reflection / Self-Critique
 
 Agent generates output, then evaluates its own output against criteria, then revises. Separate generation and evaluation steps.
@@ -153,6 +182,19 @@ Agent generates output, then evaluates its own output against criteria, then rev
 **When NOT to use:** No objective quality criteria exist (reflection becomes circular), latency-sensitive tasks where double LLM calls are unacceptable, tasks where first-pass output is consistently sufficient.
 **Implementation:** Two LLM calls per iteration: generate, then critique. Critique feeds back as input to next generation.
 **Key insight:** The critic prompt must be specific. "Is this good?" fails. "Does this meet criteria X, Y, Z?" works.
+
+```python
+def generate(state):
+    result = model.invoke(f"Write a response. Previous feedback: {state.get('feedback', 'none')}")
+    return {"draft": result.content, "iteration": state.get("iteration", 0) + 1}
+
+def critique(state):
+    feedback = model.invoke(f"Critique this draft against criteria [X, Y, Z]:\n{state['draft']}")
+    score = 1.0 if "PASS" in feedback.content else 0.0
+    return {"feedback": feedback.content, "score": score}
+
+builder.add_conditional_edges("critique", lambda s: END if s["score"] >= 0.8 or s["iteration"] >= 3 else "generate")
+```
 
 ### 2.3 Plan-and-Execute
 
@@ -163,6 +205,25 @@ Agent creates an explicit plan (list of steps), then executes each step, then ca
 **Implementation:** Planner node (structured output: list of steps) -> executor loop -> optional replanner.
 **Key risk:** Over-planning. Plans should be coarse-grained. Detailed sub-plans emerge during execution.
 
+```python
+from pydantic import BaseModel
+
+class Plan(BaseModel):
+    steps: list[str]
+
+def planner(state):
+    plan = model.with_structured_output(Plan).invoke(f"Break this into steps: {state['task']}")
+    return {"steps": plan.steps, "current_step": 0}
+
+def executor(state):
+    step = state["steps"][state["current_step"]]
+    result = agent.invoke(step)  # ReAct sub-agent executes each step
+    return {"results": [result], "current_step": state["current_step"] + 1}
+
+def should_continue(state) -> str:
+    return "executor" if state["current_step"] < len(state["steps"]) else END
+```
+
 ### 2.4 Generator-Critic
 
 Separate generator and critic agents. Generator proposes, critic evaluates, generator revises. Loop topology with two agents.
@@ -170,6 +231,20 @@ Separate generator and critic agents. Generator proposes, critic evaluates, gene
 **When to use:** High-quality content generation, code review workflows, adversarial quality improvement.
 **When NOT to use:** Self-critique is sufficient (use Reflection instead — cheaper, single agent), no clear evaluation rubric for the critic, cost constraints prohibit 2x+ LLM calls per iteration.
 **Different from Reflection:** Reflection is self-critique (same agent). Generator-Critic uses separate agents/prompts, allowing specialized evaluation.
+
+```python
+generator = create_agent(model="openai:gpt-4o", tools=[search], system_prompt="Generate detailed responses.")
+critic = create_agent(model="claude-sonnet-4-5-20250929", tools=[], system_prompt="Evaluate against rubric. Reply PASS or FAIL with reasons.")
+
+def gen_node(state):
+    return {"draft": generator.invoke(state["task"] + "\nFeedback: " + state.get("critique", ""))}
+
+def critic_node(state):
+    result = critic.invoke(f"Evaluate:\n{state['draft']}")
+    return {"critique": result, "approved": "PASS" in result}
+
+builder.add_conditional_edges("critic", lambda s: END if s["approved"] else "generator")
+```
 
 ### 2.5 STORM (Iterative Research)
 
@@ -179,6 +254,22 @@ Multi-phase research pattern: generate queries -> parallel search -> read source
 **When NOT to use:** Simple fact-lookup tasks (a single ReAct call suffices), time-constrained queries where iterative search is too slow, tasks with a single authoritative source.
 **Composition:** Parallel (topology) + Loop (topology) + ReAct (behavioral) + Map-Reduce (data flow).
 
+```python
+def generate_queries(state):
+    queries = model.with_structured_output(QueryList).invoke(f"Generate search queries for: {state['topic']}")
+    return {"queries": queries.items}
+
+def search_sources(state):
+    return [Send("researcher", {"query": q}) for q in state["queries"]]  # parallel fan-out
+
+def identify_gaps(state):
+    gaps = model.invoke(f"What's missing from this research?\n{state['synthesis']}")
+    return {"queries": gaps, "iteration": state["iteration"] + 1}
+
+# Loop: generate_queries → search (parallel) → synthesize → identify_gaps → repeat or END
+builder.add_conditional_edges("gaps", lambda s: END if s["iteration"] >= 3 else "search")
+```
+
 ### 2.6 Human-in-the-Loop (HITL)
 
 Agent pauses execution at defined points and waits for human approval, editing, or override.
@@ -187,6 +278,18 @@ Agent pauses execution at defined points and waits for human approval, editing, 
 **When NOT to use:** Fully automated pipelines where human latency is unacceptable, low-stakes tasks where the cost of occasional errors is less than the cost of human review.
 **LangGraph:** `interrupt()` function inside any node. Resume with `Command(resume=value)`.
 **LangChain:** `HumanInTheLoopMiddleware` with `interrupt_on=[tool_names]`.
+
+```python
+from langgraph.types import interrupt, Command
+
+def payment_node(state):
+    approval = interrupt({"action": "send_payment", "amount": state["amount"], "to": state["recipient"]})
+    if approval == "approve":
+        return {"payment_sent": True}
+    return {"payment_sent": False, "reason": approval}
+
+# Resume: graph.invoke(Command(resume="approve"), config)
+```
 
 ### 2.7 Tool Use
 

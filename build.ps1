@@ -196,12 +196,12 @@ function Invoke-Validate {
         }
     }
 
-    # Verify no deprecated model strings remain
+    # Verify no deprecated model strings remain (code and prose)
     Write-Host "Checking model string consistency..."
-    $deprecatedHits = Select-String -Path "src/references/*.md", "src/SKILL.md" -Pattern '(model="|"openai:)gpt-4\.1' -ErrorAction SilentlyContinue
+    $deprecatedHits = Select-String -Path "src/references/*.md", "src/SKILL.md" -Pattern 'gpt-4\.1[^+]|gpt-4\.1$|Claude-v1' -ErrorAction SilentlyContinue
     if ($deprecatedHits) {
         foreach ($hit in $deprecatedHits) {
-            $errors += "ERROR: Deprecated gpt-4.1 model string in $($hit.Filename):$($hit.LineNumber)"
+            $errors += "ERROR: Deprecated model string in $($hit.Filename):$($hit.LineNumber): $($hit.Line.Trim())"
         }
     }
 
@@ -219,7 +219,7 @@ function Invoke-Validate {
     Get-ChildItem "src/references/*.md" | ForEach-Object {
         $refContent = Get-Content $_.FullName -Raw
         if ($refContent -notmatch '(?i)(when not|failure mode|anti-pattern|pitfall)') {
-            Write-Host "WARNING: $($_.Name) may be missing 'When NOT to use' or failure modes section" -ForegroundColor Yellow
+            $errors += "ERROR: $($_.Name) missing 'When NOT to use' or failure modes section"
         }
     }
 

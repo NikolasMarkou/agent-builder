@@ -148,13 +148,27 @@ LangGraph models workflows as directed graphs: State + Nodes + Edges.
 - **Edges**: static (always go to next) or conditional (route based on state)
 
 ```python
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph, MessagesState, START, END
+from langgraph.prebuilt import ToolNode
+from langchain.chat_models import init_chat_model
 
-builder = StateGraph(State)
+model = init_chat_model("claude-sonnet-4-5-20250929")
+tools = [search]  # your @tool-decorated functions
+tool_node = ToolNode(tools)
+
+def agent_node(state: MessagesState):
+    return {"messages": [model.bind_tools(tools).invoke(state["messages"])]}
+
+def route(state: MessagesState) -> str:
+    if state["messages"][-1].tool_calls:
+        return "tools"
+    return END
+
+builder = StateGraph(MessagesState)
 builder.add_node("agent", agent_node)
 builder.add_node("tools", tool_node)
 builder.add_edge(START, "agent")
-builder.add_conditional_edges("agent", route, {"tools": "tools", "end": END})
+builder.add_conditional_edges("agent", route, {"tools": "tools", END: END})
 builder.add_edge("tools", "agent")  # cycle
 
 graph = builder.compile()
@@ -421,7 +435,8 @@ class Custom(AgentMiddleware):
 ```python
 @create_middleware
 async def route_model(request, handler):
-    if is_simple_query(request.messages):
+    last_msg = request.messages[-1].content if request.messages else ""
+    if len(last_msg) < 200 and not any(kw in last_msg for kw in ["analyze", "compare", "plan"]):
         request.model = init_chat_model("openai:gpt-4o-mini")
     return await handler(request)
 ```
@@ -495,6 +510,38 @@ app = swarm.compile(checkpointer=InMemorySaver())
 
 Build a `StateGraph` where each node is an agent call. Use conditional edges for routing between agents. Use `Send()` for parallel agent execution.
 
+```python
+from langgraph.graph import StateGraph, MessagesState, START, END
+
+planner = create_agent(model="openai:gpt-4o", tools=[], system_prompt="Break tasks into steps.")
+researcher = create_agent(model="openai:gpt-4o", tools=[web_search], system_prompt="Research specialist.")
+writer = create_agent(model="openai:gpt-4o", tools=[], system_prompt="Write final output from research.")
+
+def plan_node(state: MessagesState):
+    return {"messages": [planner.invoke(state["messages"])]}
+
+def research_node(state: MessagesState):
+    return {"messages": [researcher.invoke(state["messages"])]}
+
+def write_node(state: MessagesState):
+    return {"messages": [writer.invoke(state["messages"])]}
+
+def route_after_plan(state: MessagesState) -> str:
+    last = state["messages"][-1].content
+    return "researcher" if "RESEARCH:" in last else "writer"
+
+builder = StateGraph(MessagesState)
+builder.add_node("planner", plan_node)
+builder.add_node("researcher", research_node)
+builder.add_node("writer", write_node)
+builder.add_edge(START, "planner")
+builder.add_conditional_edges("planner", route_after_plan)
+builder.add_edge("researcher", "writer")
+builder.add_edge("writer", END)
+
+graph = builder.compile(checkpointer=InMemorySaver())
+```
+
 ---
 
 ## Deep Agents
@@ -516,6 +563,55 @@ Default middleware: SubAgentMiddleware, SummarizationMiddleware, AnthropicPrompt
 Optional: MemoryMiddleware, SkillsMiddleware, HumanInTheLoopMiddleware.
 
 Sandbox backends: in-memory, local disk, LangGraph store, Modal, Daytona, Deno.
+
+### Task Planning and Subagents
+
+Deep Agents decompose complex tasks via `write_todos`, then spawn subagents for each step:
+
+```python
+agent = create_deep_agent(
+    model="claude-sonnet-4-5-20250929",
+    tools=[custom_tool],
+    system_prompt="You are a coding assistant.",
+    middleware=[
+        MemoryMiddleware(store=PostgresStore.from_conn_string("postgresql://...")),
+        HumanInTheLoopMiddleware(interrupt_on=["write_file", "edit_file"]),
+    ],
+    sandbox="local",  # or "modal", "daytona", "deno"
+)
+
+# Deep agents auto-manage: task decomposition, file I/O, subagent delegation,
+# context summarization, and long-term memory across sessions.
+# The agent decides when to spawn subagents based on task complexity.
+```
+
+**When to use:** Tasks requiring filesystem access, multi-step planning, or subagent coordination where building a custom `StateGraph` is overkill.
+**When NOT to use:** You need fine-grained control over agent routing, custom state schemas, or non-ReAct behavioral patterns.
+
+---
+
+## Failure Modes
+
+| Failure | Cause | Mitigation |
+|---|---|---|
+| **Infinite ReAct loop** | No exit condition or model keeps calling tools | Set `max_iterations` on `create_agent` or add iteration counter in state with conditional edge to END |
+| **Context overflow** | Long conversations or verbose tool outputs | Add `SummarizationMiddleware`, truncate tool outputs, use `keep_last_N` reducer |
+| **Checkpoint bloat** | Every state transition persisted without cleanup | Set TTL on checkpoints, use `PostgresSaver` with periodic pruning |
+| **Tool selection thrash** | Too many tools, model oscillates between them | Reduce tool count, use `LLMToolSelectorMiddleware`, progressive disclosure |
+| **Swarm ping-pong** | Agents hand off to each other indefinitely | Track handoff count in state, cap at 5-10 handoffs |
+| **Fan-out cost explosion** | `Send()` to unbounded list of workers | Cap `len(tasks)` before dispatch, add concurrency limit |
+| **Stale state on resume** | Resuming old checkpoint with outdated tool outputs | Validate state freshness on resume, re-fetch stale data |
+
+## Cost Guidelines
+
+| Pattern | Cost Profile | Budget Rule |
+|---|---|---|
+| `create_agent` (simple) | 1-3 LLM calls | Base cost × avg_tool_calls |
+| ReAct with persistence | 3-10 LLM calls per turn | Base × avg_iterations. Budget $0.05-0.50/turn with Sonnet |
+| Swarm (handoffs) | N agents × avg calls each | Budget per-agent, cap total handoffs |
+| Parallel fan-out | N workers × 1 call each + 1 synthesis | Linear in N. Cap N at 10-20 |
+| Human-in-the-loop | Same as base pattern + resume overhead | Checkpoint storage cost adds ~$0.001/checkpoint |
+| Deep Agents | Highly variable, subagent spawning multiplies | Set `max_budget` if available, monitor via LangSmith |
 
 ---
 

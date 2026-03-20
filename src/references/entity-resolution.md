@@ -47,7 +47,7 @@ For each candidate pair, determine: same entity or not?
 
 2. **Learned matchers.** Fine-tuned BERT/RoBERTa classifiers trained on labeled entity pairs. Peeters et al. (2024) showed fine-tuned Llama 3.1 and GPT-4o-mini exceed zero-shot GPT-4 performance by 1-10% F1 on standard benchmarks (WDC Products, DBLP-ACM, Abt-Buy). Cost: one-time training + cheap inference.
 
-3. **LLM-as-matcher.** Zero-shot or few-shot LLM call with a binary prompt: "Do these two records refer to the same entity? Yes/No." GPT-4.1 achieves ~81% accuracy on Amazon-Google product matching. Expensive per-call but requires no training data. Best for low-volume or edge cases.
+3. **LLM-as-matcher.** Zero-shot or few-shot LLM call with a binary prompt: "Do these two records refer to the same entity? Yes/No." GPT-4o achieves ~81% accuracy on Amazon-Google product matching. Expensive per-call but requires no training data. Best for low-volume or edge cases.
 
 **The practical pattern: tiered matching.**
 
@@ -129,7 +129,7 @@ Each agent uses specialized prompts and domain knowledge. The conflict resolutio
 
 **Edge case triage.** Replacing the human-in-the-loop for low-confidence matches that fall in the gray zone between automatic match and automatic non-match. Guardrails: require the LLM to justify each pairwise connection in natural language.
 
-### LLMs struggle with
+### When NOT to use LLMs for ER
 
 **Scale.** Pairwise LLM comparisons are O(n^2) in the naive case. Even with blocking, a dataset of 100K records might produce 1M candidate pairs. At $0.01/comparison, that's $10K per run. Deterministic/learned matchers handle this at negligible cost.
 
@@ -430,7 +430,7 @@ Neo4j's LLM Knowledge Graph Builder handles this with entity extraction from doc
 | Fine-tuned classifier | ~$0.0001 | <10ms | 80-90% F1 |
 | GPT-4o-mini | ~$0.001 | ~500ms | 75-85% F1 |
 | GPT-4o | ~$0.01 | ~1s | 80-85% F1 |
-| GPT-4.1 | ~$0.02 | ~2s | ~81% accuracy |
+| GPT-4o | ~$0.02 | ~2s | ~81% accuracy |
 | Human review | ~$0.50-2.00 | minutes | ~90-95% |
 
 ### Cost at scale

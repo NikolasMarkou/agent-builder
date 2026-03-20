@@ -86,6 +86,24 @@ Any number absent from the Canonical Numbers Sheet is `NON-CANONICAL` and cannot
 - **Tool output compression**: Truncate verbose tool results to essential data
 - **Semantic deduplication**: Remove redundant information across messages
 
+```python
+from langchain.agents import create_agent
+from langchain.agents.middleware import SummarizationMiddleware, ContextEditingMiddleware
+
+# Auto-summarize when context exceeds model window
+agent = create_agent(
+    model="claude-sonnet-4-5-20250929",
+    tools=[...],
+    middleware=[SummarizationMiddleware()],  # triggers on ContextOverflowError
+)
+
+# Or: manual tool output truncation in a custom node
+def truncate_tool_output(output: str, max_chars: int = 2000) -> str:
+    if len(output) <= max_chars:
+        return output
+    return output[:max_chars] + f"\n... truncated ({len(output)} chars total)"
+```
+
 ---
 
 ## Tool Design Principles
@@ -233,6 +251,29 @@ Production agents need context-aware structured logging, not `print()` statement
 
 **Required context fields per log entry:** `thread_id`, `node_name`, `tool_name`, `latency_ms`, `token_count`, `error_type`. Use request-scoped context variables so these fields propagate automatically through the call stack without manual threading.
 
+```python
+import logging, json, time, contextvars
+
+thread_id_var = contextvars.ContextVar("thread_id", default="unknown")
+
+class AgentJsonFormatter(logging.Formatter):
+    def format(self, record):
+        return json.dumps({
+            "ts": record.created, "level": record.levelname,
+            "thread_id": thread_id_var.get(),
+            "node": getattr(record, "node", None),
+            "tool": getattr(record, "tool", None),
+            "latency_ms": getattr(record, "latency_ms", None),
+            "tokens": getattr(record, "tokens", None),
+            "msg": record.getMessage(),
+        })
+
+logger = logging.getLogger("agent")
+handler = logging.StreamHandler()
+handler.setFormatter(AgentJsonFormatter())
+logger.addHandler(handler)
+```
+
 **Log rotation:** Daily rotation with environment-prefixed filenames. Retain 30 days in production.
 
 ### Metrics for Agents
@@ -334,6 +375,30 @@ Per-endpoint rate limits prevent abuse and runaway costs.
 
 **Implementation:** Key rate limits on IP address for public endpoints. Key on authenticated user ID for post-auth endpoints. Return `429 Too Many Requests` with `Retry-After` header.
 
+```python
+from collections import defaultdict
+import time
+
+class RateLimiter:
+    def __init__(self, max_calls: int, period_seconds: int):
+        self.max_calls = max_calls
+        self.period = period_seconds
+        self.calls: dict[str, list[float]] = defaultdict(list)
+
+    def allow(self, key: str) -> bool:
+        now = time.monotonic()
+        self.calls[key] = [t for t in self.calls[key] if now - t < self.period]
+        if len(self.calls[key]) >= self.max_calls:
+            return False
+        self.calls[key].append(now)
+        return True
+
+# Usage in FastAPI:
+# limiter = RateLimiter(max_calls=30, period_seconds=60)
+# if not limiter.allow(request.client.host):
+#     raise HTTPException(429, headers={"Retry-After": "60"})
+```
+
 ### Authentication
 
 For agent APIs exposed beyond localhost, use stateless JWT authentication:
@@ -351,9 +416,32 @@ For agent APIs exposed beyond localhost, use stateless JWT authentication:
 
 Don't hardcode a single model. Maintain a registry of initialized model clients and fall back automatically on failure:
 
-1. **Register** multiple models at startup (e.g., primary Claude Sonnet, fallback GPT-4.1, cheap fallback GPT-4.1-mini)
+1. **Register** multiple models at startup (e.g., primary Claude Sonnet, fallback GPT-4o, cheap fallback GPT-4o-mini)
 2. **Circular fallback:** On failure, try the next registered model. Wrap around the list before giving up.
 3. **Separate concerns:** The registry manages model instances. The caller doesn't know which model ultimately served the request.
+
+```python
+from langchain.chat_models import init_chat_model
+
+class ModelRegistry:
+    def __init__(self, model_ids: list[str]):
+        self.models = [init_chat_model(m) for m in model_ids]
+
+    def invoke(self, messages, **kwargs):
+        for i, model in enumerate(self.models):
+            try:
+                return model.invoke(messages, **kwargs)
+            except Exception:
+                if i == len(self.models) - 1:
+                    raise
+        raise RuntimeError("All models failed")
+
+registry = ModelRegistry([
+    "claude-sonnet-4-5-20250929",  # primary
+    "openai:gpt-4o",               # fallback
+    "openai:gpt-4o-mini",          # cheap fallback
+])
+```
 
 **When to use:** Any production agent that can't afford downtime from a single provider outage.
 
