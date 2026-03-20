@@ -55,7 +55,7 @@ def search(query: str) -> str:
     return f"Results for: {query}"
 
 agent = create_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[search],
     system_prompt="You are a helpful assistant.",
 )
@@ -64,7 +64,7 @@ result = agent.invoke({"messages": [{"role": "user", "content": "Find X"}]})
 ```
 
 Parameters:
-- `model`: `str` (`"openai:gpt-4o"`, `"claude-sonnet-4-5-20250929"`) or `BaseChatModel` instance
+- `model`: `str` (`"openai:gpt-4o"`, `"claude-sonnet-4-6-20250514"`) or `BaseChatModel` instance
 - `tools`: list of `@tool` functions, `BaseTool` instances, or MCP tools
 - `system_prompt`: `str` or `SystemMessage`
 - `response_format`: type for structured output
@@ -78,7 +78,7 @@ Provider-agnostic model initialization.
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o", temperature=0)
-model = init_chat_model("claude-sonnet-4-5-20250929", temperature=0.5)
+model = init_chat_model("claude-sonnet-4-6-20250514", temperature=0.5)
 model = init_chat_model("google_genai:gemini-2.5-flash-lite")
 model = init_chat_model("ollama:llama3")
 ```
@@ -115,7 +115,7 @@ class Analysis:
     confidence: float
     summary: str
 
-agent = create_agent(model="claude-sonnet-4-5-20250929", tools=[...], response_format=Analysis)
+agent = create_agent(model="claude-sonnet-4-6-20250514", tools=[...], response_format=Analysis)
 result = agent.invoke({"messages": [...]})
 structured = result["structured_response"]  # Analysis instance
 
@@ -152,7 +152,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain.chat_models import init_chat_model
 
-model = init_chat_model("claude-sonnet-4-5-20250929")
+model = init_chat_model("claude-sonnet-4-6-20250514")
 tools = [search]  # your @tool-decorated functions
 tool_node = ToolNode(tools)
 
@@ -379,7 +379,7 @@ agent = create_agent(model="openai:gpt-4o", tools=[save_preference], store=store
 from langchain.agents.middleware import SummarizationMiddleware
 
 agent = create_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[...],
     middleware=[SummarizationMiddleware()],
 )
@@ -443,7 +443,7 @@ async def route_model(request, handler):
 
 **Model fallback:**
 ```python
-middleware=[ModelFallbackMiddleware(fallbacks=["claude-sonnet-4-5-20250929", "openai:gpt-4o-mini"])]
+middleware=[ModelFallbackMiddleware(fallbacks=["claude-sonnet-4-6-20250514", "openai:gpt-4o-mini"])]
 ```
 
 **Tool filtering:**
@@ -472,7 +472,7 @@ client = MultiServerMCPClient({
 })
 
 tools = await client.get_tools()
-agent = create_agent(model="claude-sonnet-4-5-20250929", tools=tools)
+agent = create_agent(model="claude-sonnet-4-6-20250514", tools=tools)
 ```
 
 Features: multimodal tool content, tool interceptors for runtime context, resources/prompts loading, elicitation, progress notifications.
@@ -555,7 +555,7 @@ Batteries-included layer. Same ReAct loop with built-in filesystem, task plannin
 from deepagents import create_deep_agent
 
 agent = create_deep_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[custom_tool],
     system_prompt="You are a coding assistant.",
 )
@@ -573,7 +573,7 @@ Deep Agents decompose complex tasks via `write_todos`, then spawn subagents for 
 
 ```python
 agent = create_deep_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[custom_tool],
     system_prompt="You are a coding assistant.",
     middleware=[

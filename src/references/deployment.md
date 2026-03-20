@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
     checkpointer = AsyncPostgresSaver.from_conn_string(os.environ["DATABASE_URL"])
     await checkpointer.setup()
     graph = create_agent(
-        model="claude-sonnet-4-5-20250929",
+        model="claude-sonnet-4-6-20250514",
         tools=[...],  # your tools here
         checkpointer=checkpointer,
     )
@@ -474,7 +474,7 @@ prefs = await store.aget(("user", user_id, "preferences"), "theme")
 
 # Wire store into agent
 agent = create_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[...],
     store=store,
     checkpointer=checkpointer,  # separate: conversation state

@@ -145,6 +145,15 @@ function Invoke-Validate {
         if ($content -notmatch "^---") {
             $errors += "ERROR: SKILL.md missing frontmatter opening ---"
         }
+        # Verify SKILL.md has closing frontmatter delimiter
+        $lines = (Get-Content "src/SKILL.md")
+        $closingFound = $false
+        for ($i = 1; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -match "^---") { $closingFound = $true; break }
+        }
+        if (-not $closingFound) {
+            $errors += "ERROR: SKILL.md missing frontmatter closing ---"
+        }
 
         # Verify all references/ cross-references resolve to actual files
         Write-Host "Checking cross-references..."
@@ -240,6 +249,11 @@ function Invoke-PackageTar {
 
     $tarFile = Join-Path (Resolve-Path $DistDir) "$SkillName-v$Version.tar.gz"
     $sourcePath = Join-Path $BuildDir $SkillName
+
+    if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
+        Write-Host "ERROR: tar command not found. Install tar or use 'package' (zip) instead." -ForegroundColor Red
+        exit 1
+    }
 
     tar -czvf $tarFile -C $BuildDir $SkillName
     if ($LASTEXITCODE -ne 0) {

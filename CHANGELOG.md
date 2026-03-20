@@ -4,6 +4,15 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.7.2] - 2026-03-20
+
+### Fixed
+- **DSPy missing from cross-validation gate table in SKILL.md** -- added DSPy column to the pattern support matrix and included DSPy in the non-orchestration framework caveat alongside LlamaIndex, Agno, and Smolagents.
+- **Stale model strings across 7 reference files** -- updated all 22 occurrences of `claude-sonnet-4-5-20250929` to `claude-sonnet-4-6-20250514` in langchain-langgraph.md, patterns.md, deployment.md, frameworks.md, production.md, evals.md, and structured-classification.md.
+- **Fragile Makefile reference extraction** -- replaced `ls | xargs -I{} basename {}` with `$(notdir $(REFERENCE_FILES))` using the existing Make variable; eliminates silent failure on empty directories.
+- **Missing frontmatter closing delimiter validation** -- both Makefile and build.ps1 now validate the closing `---` in SKILL.md frontmatter, not just the opening.
+- **Missing tar availability check in build.ps1** -- `package-tar` now checks for `tar` before attempting to create the tarball, with a clear error message suggesting the zip alternative.
+
 ## [1.7.1] - 2026-03-20
 
 ### Fixed

@@ -85,14 +85,15 @@ validate:
 	done; [ $$fail -eq 0 ]
 	@# Verify SKILL.md has frontmatter delimiters
 	@head -1 $(SKILL_FILE) | grep -q "^---" || (echo "ERROR: SKILL.md missing frontmatter opening ---" && exit 1)
+	@awk 'NR>1 && /^---/{found=1; exit} END{if(!found){print "ERROR: SKILL.md missing frontmatter closing ---"; exit 1}}' $(SKILL_FILE)
 	@# Verify README.md project structure lists all reference files
 	@echo "Checking README.md lists all reference files..."
-	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+	@fail=0; for ref in $(notdir $(REFERENCE_FILES)); do \
 		grep -q "$$ref" README.md || { echo "ERROR: README.md project structure missing $$ref"; fail=1; }; \
 	done; [ $$fail -eq 0 ]
 	@# Verify CLAUDE.md repository structure lists all reference files
 	@echo "Checking CLAUDE.md lists all reference files..."
-	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null | xargs -I{} basename {}); do \
+	@fail=0; for ref in $(notdir $(REFERENCE_FILES)); do \
 		grep -q "$$ref" CLAUDE.md || { echo "ERROR: CLAUDE.md repository structure missing $$ref"; fail=1; }; \
 	done; [ $$fail -eq 0 ]
 	@# Verify README.md version badge matches VERSION file

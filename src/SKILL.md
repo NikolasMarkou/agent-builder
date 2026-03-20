@@ -133,17 +133,17 @@ Override the default only when:
 
 **Cross-validation gate:** Before proceeding, verify that the selected framework supports the patterns chosen in Step 2.
 
-| Pattern | LangGraph | CrewAI | Strands | OpenAI SDK | Google ADK | Mastra | Semantic Kernel | LlamaIndex | Agno | Smolagents |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Parallel (fan-out/fan-in) | Full | No | Partial | No | Partial | Partial | Partial | No | No | No |
-| Sequential | Full | Full | Full | No | Full | Full | Full | Full | Full | Full |
-| Loop (conditional cycle) | Full | No | Full | No | Partial | Partial | Partial | No | No | No |
-| Router | Full | No | Full | Partial | Full | Full | Full | No | Partial | No |
-| Network / Swarm | Full | No | No | Full | Partial | No | No | No | No | No |
-| Hierarchical | Full | Full | Full | No | Partial | No | Full | No | No | No |
-| HITL (interrupt/resume) | Full | No | No | No | No | No | No | No | No | No |
+| Pattern | LangGraph | CrewAI | Strands | OpenAI SDK | Google ADK | Mastra | Semantic Kernel | DSPy | LlamaIndex | Agno | Smolagents |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Parallel (fan-out/fan-in) | Full | No | Partial | No | Partial | Partial | Partial | No | No | No | No |
+| Sequential | Full | Full | Full | No | Full | Full | Full | No | Full | Full | Full |
+| Loop (conditional cycle) | Full | No | Full | No | Partial | Partial | Partial | No | No | No | No |
+| Router | Full | No | Full | Partial | Full | Full | Full | No | No | Partial | No |
+| Network / Swarm | Full | No | No | Full | Partial | No | No | No | No | No | No |
+| Hierarchical | Full | Full | Full | No | Partial | No | Full | No | No | No | No |
+| HITL (interrupt/resume) | Full | No | No | No | No | No | No | No | No | No | No |
 
-If the framework does not support a selected pattern, either change the framework or change the pattern. Do not proceed with a mismatch. Note: LlamaIndex, Agno, and Smolagents are not orchestration frameworks — they handle retrieval, model-agnostic agents, and lightweight tool use respectively. For orchestration patterns (Parallel, Loop, Network, HITL), pair them with LangGraph or another full-orchestration framework. See `references/frameworks.md` for details.
+If the framework does not support a selected pattern, either change the framework or change the pattern. Do not proceed with a mismatch. Note: DSPy, LlamaIndex, Agno, and Smolagents are not orchestration frameworks — they handle prompt optimization, retrieval, model-agnostic agents, and lightweight tool use respectively. For orchestration patterns (Parallel, Loop, Network, HITL), pair them with LangGraph or another full-orchestration framework. See `references/frameworks.md` for details.
 
 **Emit DSB after Step 3** with framework filled in.
 

@@ -334,7 +334,7 @@ DoorDash's simulation-evaluation flywheel reduced hallucinations by **90%** in s
 providers:
   - id: anthropic:claude-agent-sdk
     config:
-      model: claude-sonnet-4-5-20250929
+      model: claude-sonnet-4-6-20250514
       working_dir: ./project
 tests:
   - assert:

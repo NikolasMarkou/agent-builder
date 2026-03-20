@@ -92,7 +92,7 @@ from langchain.agents.middleware import SummarizationMiddleware, ContextEditingM
 
 # Auto-summarize when context exceeds model window
 agent = create_agent(
-    model="claude-sonnet-4-5-20250929",
+    model="claude-sonnet-4-6-20250514",
     tools=[...],
     middleware=[SummarizationMiddleware()],  # triggers on ContextOverflowError
 )
@@ -413,7 +413,7 @@ class ModelRegistry:
                     raise
 
 registry = ModelRegistry([
-    "claude-sonnet-4-5-20250929",  # primary
+    "claude-sonnet-4-6-20250514",  # primary
     "openai:gpt-4o",               # fallback
     "openai:gpt-4o-mini",          # cheap fallback
 ])
