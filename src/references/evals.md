@@ -201,26 +201,7 @@ When a multi-step workflow fails, identifying which step caused the failure is e
 
 **Agent-as-a-Judge** (Zhuge et al., 2024): Use an agent to evaluate another agent — examines the entire chain of actions, not just the final answer.
 
-### Known Biases and Mitigations
-
-| Bias | Impact | Mitigation |
-|---|---|---|
-| **Position bias** | 10–30% of comparisons flip when response order is swapped | Run twice with swapped positions, accept only consistent results |
-| **Verbosity bias** | Higher scores for longer responses regardless of quality | Explicitly instruct judges to penalize unnecessary verbosity |
-| **Self-preference** | Models rate own outputs ~10% higher (lower perplexity = higher score) | Use cross-model evaluation (different model family as judge) |
-| **Fallacy oversight** | Ignores logical errors in reasoning | Supplement with code-based checks for logical consistency |
-| **Domain weakness** | Struggles with coding, math, domain-specific expertise | Use code-based graders for these; LLM judge for subjective quality |
-
-### Calibration Requirements
-
-- **Calibration set**: 100–500 human-labeled examples. Non-negotiable.
-- **Target agreement**: Cohen's kappa ≥ 0.7 (substantial agreement)
-- **Calibration frequency**: Monthly
-- **Best technique**: **G-Eval** — auto-generate chain-of-thought evaluation steps from natural language criteria, weight scores by log-probabilities. Highest Spearman correlation with human judgments (0.514 on summarization). Available in DeepEval.
-
-### Cost Optimization
-
-LinkedIn's SAGE framework achieved κ = 0.77 through iterative calibration, then distilled a Student Judge that is **92× cheaper** while preserving alignment at κ = 0.72–0.73. Consider distillation for high-volume production scoring.
+For known biases and mitigations, calibration requirements, judge model selection, and cost optimization strategies, see `llm-as-judge.md`.
 
 ---
 

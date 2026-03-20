@@ -303,7 +303,7 @@ For agents built on LangChain, LangGraph, or similar frameworks, ER should be ex
 ### Tool definition
 
 ```python
-from langchain.tools import tool
+from langchain_core.tools import tool
 
 @tool
 def resolve_entity(
@@ -429,8 +429,7 @@ Neo4j's LLM Knowledge Graph Builder handles this with entity extraction from doc
 | Embedding similarity | ~$0.0001 | <5ms | Good for blocking |
 | Fine-tuned classifier | ~$0.0001 | <10ms | 80-90% F1 |
 | GPT-4o-mini | ~$0.001 | ~500ms | 75-85% F1 |
-| GPT-4o | ~$0.01 | ~1s | 80-85% F1 |
-| GPT-4o | ~$0.02 | ~2s | ~81% accuracy |
+| GPT-4o (simple prompt) | ~$0.01 | ~1s | 80-85% F1 |
 | Human review | ~$0.50-2.00 | minutes | ~90-95% |
 
 ### Cost at scale

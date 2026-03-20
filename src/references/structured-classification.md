@@ -171,7 +171,7 @@ class ClassificationResult(BaseModel):
 
 def classify_intent(user_message: str) -> ClassificationResult:
     response = client.beta.chat.completions.parse(
-        model="gpt-4o-2024-08-06",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_message},

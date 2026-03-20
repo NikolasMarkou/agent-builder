@@ -362,7 +362,7 @@ RobustJudge (2025): adversaries can inject instructions into responses to manipu
 
 ### TIR-Judge (2025-2026)
 
-Gives judges the ability to execute code and call tools during evaluation. An 8B-parameter TIR-Judge achieves performance comparable to Claude-Opus-4 on listwise tasks, with **4.8-9.9% improvement** over baselines on pointwise evaluation.
+Gives judges the ability to execute code and call tools during evaluation. An 8B-parameter TIR-Judge achieves performance comparable to Claude Opus on listwise tasks, with **4.8-9.9% improvement** over baselines on pointwise evaluation.
 
 ### SAGE (Feng et al., December 2025)
 

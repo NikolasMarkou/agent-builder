@@ -592,22 +592,17 @@ agent = create_deep_agent(
 
 ## Failure Modes
 
-| Failure | Cause | Mitigation |
-|---|---|---|
-| **Infinite ReAct loop** | No exit condition or model keeps calling tools | Set `max_iterations` on `create_agent` or add iteration counter in state with conditional edge to END |
-| **Context overflow** | Long conversations or verbose tool outputs | Add `SummarizationMiddleware`, truncate tool outputs, use `keep_last_N` reducer |
-| **Checkpoint bloat** | Every state transition persisted without cleanup | Set TTL on checkpoints, use `PostgresSaver` with periodic pruning |
-| **Tool selection thrash** | Too many tools, model oscillates between them | Reduce tool count, use `LLMToolSelectorMiddleware`, progressive disclosure |
-| **Swarm ping-pong** | Agents hand off to each other indefinitely | Track handoff count in state, cap at 5-10 handoffs |
-| **Fan-out cost explosion** | `Send()` to unbounded list of workers | Cap `len(tasks)` before dispatch, add concurrency limit |
-| **Stale state on resume** | Resuming old checkpoint with outdated tool outputs | Validate state freshness on resume, re-fetch stale data |
+See the Failure Mode Catalogue in `patterns.md` for the full list of pattern-level failure modes and mitigations. The most common LangGraph-specific issues:
+
+- **Checkpoint bloat**: Set TTL on checkpoints, use `PostgresSaver` with periodic pruning.
+- **Fan-out cost explosion**: Cap `len(tasks)` before `Send()` dispatch, add concurrency limit.
 
 ## Cost Guidelines
 
 | Pattern | Cost Profile | Budget Rule |
 |---|---|---|
 | `create_agent` (simple) | 1-3 LLM calls | Base cost × avg_tool_calls |
-| ReAct with persistence | 3-10 LLM calls per turn | Base × avg_iterations. Budget $0.05-0.50/turn with Sonnet |
+| ReAct with persistence | 3-10 LLM calls per turn | Base × avg_iterations. Budget $0.05-0.50/turn with Claude Sonnet |
 | Swarm (handoffs) | N agents × avg calls each | Budget per-agent, cap total handoffs |
 | Parallel fan-out | N workers × 1 call each + 1 synthesis | Linear in N. Cap N at 10-20 |
 | Human-in-the-loop | Same as base pattern + resume overhead | Checkpoint storage cost adds ~$0.001/checkpoint |

@@ -4,6 +4,27 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.1] - 2026-03-20
+
+### Fixed
+- **Missing imports in deployment.md** -- added `import os` and `from fastapi.responses import JSONResponse` to FastAPI skeleton and health check endpoint. Code examples now run as-is.
+- **Hardcoded database password in deployment.md** -- docker-compose `POSTGRES_PASSWORD: agent` replaced with `${POSTGRES_PASSWORD}` environment variable, consistent with security guidance.
+- **Deprecated import path in entity-resolution.md** -- `from langchain.tools import tool` corrected to `from langchain_core.tools import tool` (LangChain 1.2.x canonical path).
+- **Incorrect sed flag in text-tools.md** -- removed false claim that sed has a `-F` flag (that's grep/ripgrep).
+- **Duplicate conflicting GPT-4o cost row in entity-resolution.md** -- consolidated two contradictory rows into one.
+- **Stale model string in structured-classification.md** -- `gpt-4o-2024-08-06` updated to `gpt-4o`.
+- **Stale date in prompt-structuring.md** -- "as of 2025" updated to "as of early 2026".
+- **Speculative model name in binary-evals.md** -- "GPT-5-nano" corrected to "GPT-4o-mini".
+- **Inconsistent model name in llm-as-judge.md** -- "Claude-Opus-4" normalized to "Claude Opus".
+- **Stale GA timeline in frameworks.md** -- removed outdated "GA Q1 2026" from Microsoft Agent Framework entry.
+- **Vague license in frameworks.md** -- Mastra license corrected from "MIT-like" to "Elastic License 2.0 (ELv2)".
+- **Ambiguous model reference in langchain-langgraph.md** -- "with Sonnet" clarified to "with Claude Sonnet".
+- **Three-way failure modes duplication** -- consolidated failure modes into `patterns.md` as single source of truth; `langchain-langgraph.md` and `production.md` now cross-reference instead of duplicating.
+- **Metrics table duplication in deployment.md** -- replaced duplicated 6-row table with cross-reference to `production.md`.
+- **Eval content duplication in evals.md** -- replaced duplicated biases/calibration/cost sections with cross-reference to `llm-as-judge.md`.
+- **Eval content duplication in production.md** -- trimmed 40-line evaluation section to 5-line summary with cross-reference to `evals.md`.
+- **Single-process rate limiter in production.md** -- added note that in-memory implementation requires Redis for multi-worker deployments.
+
 ## [1.6.0] - 2026-03-20
 
 ### Added

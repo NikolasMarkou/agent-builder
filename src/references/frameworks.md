@@ -174,7 +174,7 @@ response = agent.run("Find the latest AI agent frameworks")
 **License:** MIT | **Stars:** ~27K | **Language:** C#, Python, Java
 **Best for:** .NET/Java enterprise, Azure-native, SOC 2/HIPAA compliance.
 
-**Note:** Microsoft is merging AutoGen + Semantic Kernel into unified Microsoft Agent Framework (GA Q1 2026). Target this for new Microsoft-ecosystem projects.
+**Note:** Microsoft is merging AutoGen + Semantic Kernel into unified Microsoft Agent Framework. Target this for new Microsoft-ecosystem projects.
 
 **Core concepts:**
 - Kernel: central orchestrator
@@ -245,7 +245,7 @@ response = agent.chat("What does the document say about X?")
 ## Mastra
 
 **Architecture:** TypeScript-native agent framework with workflows, RAG, memory.
-**License:** MIT-like | **Stars:** ~25K | **Language:** TypeScript
+**License:** Elastic License 2.0 (ELv2) | **Stars:** ~25K | **Language:** TypeScript
 **Best for:** TypeScript/JS teams, Next.js integration, Replit users.
 
 **Core concepts:**

@@ -151,43 +151,13 @@ Every tool call should emit structured telemetry: tool name, input hash, output 
 
 > **For comprehensive evaluation guidance** — frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring tooling, and building eval pipelines — read `evals.md`. This section provides a quick production-context summary.
 
-### The Employee Analogy (McKinsey)
-
-"Onboarding agents is more like hiring a new employee versus deploying software."
-
-| Software Deployment | Agent Onboarding |
-|---|---|
-| Write code, test, ship | Write job description, onboard, evaluate |
-| Passes/fails unit tests | "Does this work well for actual users?" |
-| Bug fixes are deterministic | Improvement requires prompt refinement, tool redesign, workflow restructuring |
-
-### Evaluation Hierarchy
+**Key principles for production evaluation:**
 
 1. **Domain-specific evals first.** Generic benchmarks tell you nothing about your use case. Build evaluation datasets from real user interactions.
-2. **Human-in-the-loop during ramp-up.** Start with 100% human review, gradually reduce as confidence builds. Track approval rate as a metric.
-3. **LLM-as-judge for scale.** Use a stronger model to evaluate a weaker model's outputs. Calibrate against human judgments.
-4. **A/B testing in production.** Shadow mode first (run agent, don't show output), then canary (show to small %), then full rollout.
-
-### What to Measure
-
-| Metric | What It Tells You |
-|---|---|
-| Task completion rate | Does the agent finish the job? |
-| Tool call accuracy | Does it call the right tools with the right args? |
-| Human override rate | How often do humans correct the agent? |
-| Turn count per task | Efficiency (lower is usually better) |
-| Token cost per task | Economic viability at scale |
-| Latency (p50, p95, p99) | User experience |
-| Error rate by category | Where to focus improvement |
-| User satisfaction (if applicable) | The ultimate metric |
-
-### The Learning Loop
-
-Every user edit, correction, and override is signal. Design the feedback loop from day one:
-1. Log all corrections with categorization
-2. Feed corrections back into prompt refinement and knowledge base
-3. Track correction rate over time (should decrease)
-4. Retrain/refine at regular cadence
+2. **Human-in-the-loop during ramp-up.** Start with 100% human review, gradually reduce as confidence builds.
+3. **LLM-as-judge for scale.** Calibrate against human judgments. See `llm-as-judge.md` for implementation.
+4. **A/B testing in production.** Shadow mode first, then canary, then full rollout.
+5. **The learning loop.** Every user correction is signal. Log corrections, feed back into prompts, track correction rate over time.
 
 ---
 
@@ -393,6 +363,8 @@ class RateLimiter:
         self.calls[key].append(now)
         return True
 
+# Note: this in-memory implementation is single-process only.
+# For multi-worker deployments, use Redis-based rate limiting.
 # Usage in FastAPI:
 # limiter = RateLimiter(max_calls=30, period_seconds=60)
 # if not limiter.allow(request.client.host):
@@ -486,6 +458,8 @@ Production agents should degrade gracefully, not crash:
 
 ## Production Failure Modes
 
+For pattern-level failure modes (infinite loops, context explosion, cascade errors, etc.), see the Failure Mode Catalogue in `patterns.md`. The following are organizational/process failure modes specific to production deployments:
+
 | Failure | Description | Mitigation |
 |---|---|---|
 | **Agent-Washing** | Renaming RPA as "agent." System can't handle unseen cases. | Validate with novel inputs, not just happy paths. |
@@ -493,10 +467,6 @@ Production agents should degrade gracefully, not crash:
 | **Launch and Leave** | No ongoing evaluation. Performance degrades silently. | Continuous eval pipeline, learning loop. |
 | **No Cost Model** | Token costs at scale surprise the org. | Model costs before building. Include in business case. |
 | **Wrong Pattern Selection** | Using Hierarchical when Sequential suffices. | Follow the pattern selection decision framework. |
-| **Context Explosion** | Unbounded conversation/tool output growth. | Context budget, summarization, output truncation. |
-| **Tool Selection Thrash** | Too many tools, model can't choose. | Minimize action space, progressive disclosure. |
-| **Stale State** | Checkpoints from old sessions with outdated context. | TTL on checkpoints, state validation on resume. |
-| **Cascade Error** | Bad output in step N corrupts all downstream steps. | Validation gates between steps. |
 | **Rate Limit Cascade** | Parallel agents exhaust provider rate limits. | Concurrency caps, retry with backoff. |
 
 ---

@@ -427,7 +427,7 @@ For few-shot examples, put the most representative example first. For document-g
 ### Gemini (Google)
 - Flexible with both XML and markdown.
 - Excels at managing intra-session context over long inputs.
-- No persistent memory in consumer tools as of 2025.
+- No persistent memory in consumer tools as of early 2026.
 
 ---
 

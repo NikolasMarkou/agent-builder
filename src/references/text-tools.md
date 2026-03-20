@@ -112,7 +112,7 @@ sed -n '10,20p' file.txt                        # Print lines 10-20
 sed '/^#/d' config.ini                          # Remove comment lines
 ```
 
-Note: agents (and humans) frequently generate incorrect sed syntax, especially around regex escaping. Using `-F` for fixed strings where possible, or having the LLM generate a small Python script instead, often produces more reliable results.
+Note: agents (and humans) frequently generate incorrect sed syntax, especially around regex escaping. Preferring literal strings over regex where possible, or having the LLM generate a small Python script instead, often produces more reliable results.
 
 ### awk
 

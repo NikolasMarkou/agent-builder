@@ -27,8 +27,10 @@ An agent service is an async web server wrapping a compiled graph. The server ma
 ### Minimal FastAPI Skeleton
 
 ```python
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from langchain.agents import create_agent
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -167,6 +169,7 @@ Every agent service needs a health endpoint that load balancers and orchestrator
 ```python
 import asyncio
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 @app.get("/health")
 async def health():
@@ -321,7 +324,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://agent:agent@db:5432/agent
+      - DATABASE_URL=postgresql://agent:${POSTGRES_PASSWORD}@db:5432/agent
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     depends_on:
       db:
@@ -332,7 +335,7 @@ services:
     image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: agent
-      POSTGRES_PASSWORD: agent
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: agent
     ports:
       - "5432:5432"
@@ -424,16 +427,7 @@ app.mount("/metrics", metrics_app)
 
 ### Metrics to Expose
 
-See the Metrics for Agents table in `production.md` for the full metric definitions. At minimum:
-
-| Metric | Type | Why |
-|---|---|---|
-| `http_requests_total` | Counter | Traffic volume and error rate |
-| `http_request_duration_seconds` | Histogram | Latency distribution |
-| `llm_inference_duration_seconds` | Histogram | Model performance tracking |
-| `llm_tokens_total` | Counter | Cost tracking |
-| `db_connections_active` | Gauge | Connection pool health |
-| `agent_task_completion_total` | Counter | Agent reliability |
+See the Metrics for Agents table in `production.md` for the full metric definitions and labels.
 
 ---
 
