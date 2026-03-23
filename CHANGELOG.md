@@ -4,6 +4,14 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.8.0] - 2026-03-23
+
+### Added
+- **Scenario scaffolding reference** (`references/scaffolding.md`) -- pre-composed pattern recipes for 7 common agent scenarios: deep research, customer support/triage, code generation & review, data analysis & reporting, document processing pipelines, RAG/knowledge retrieval, and autonomous task execution. Each scenario includes topology diagrams, Python state shapes with proper reducers, production guardrails, and failure modes.
+- **Composition escalation rule** in `patterns.md` -- 7-step escalation ladder (ReAct -> Sequential -> Loop -> Router -> Parallel -> Hierarchical -> Swarm/Network) for incrementally upgrading topology only when measured failures demand it.
+- **Scenario matching** in Step 1 requirements checklist -- new checklist item to identify known scenarios and load `scaffolding.md`.
+- **Scaffolding cross-references** in SKILL.md Steps 2 and 4 -- directs users to scenario-specific recipes after pattern selection and during build.
+
 ## [1.7.2] - 2026-03-20
 
 ### Fixed

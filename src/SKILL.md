@@ -71,6 +71,7 @@ Before writing code, determine:
    - Does the agent use text search, data filtering, or code navigation? If yes: `references/text-tools.md` needed at Step 4.
    - Does the agent retrieve and synthesize from a knowledge base or document corpus (RAG)? If yes: `references/retrieval.md` needed at Step 4.
    - Does the agent classify or route user input to different handlers? If yes: `references/structured-classification.md` needed at Step 4.
+   - Does the task match a known scenario (deep research, customer support, code gen, data analysis, document processing, RAG, autonomous execution)? If yes: `references/scaffolding.md` needed at Steps 2 and 4.
    - Will the agent be deployed as a service? If yes: `references/deployment.md` needed at Step 5.
    - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
 
@@ -109,6 +110,8 @@ Quick selection:
 | Team of specialists | Hierarchical | Plan-and-Execute (supervisor) + ReAct (workers) | Subgraph |
 | Flexible peer-to-peer collaboration | Network | ReAct + Handoffs | Swarm |
 | High-stakes with human approval | Any + HITL gates | Any + HITL | Any |
+
+For scenario-specific recipes with complete topology diagrams, state shapes, guardrails, and failure modes, read `references/scaffolding.md`. Covers: deep research, customer support, code generation & review, data analysis, document processing, RAG, and autonomous task execution.
 
 **Emit DSB after Step 2** with selected patterns filled in.
 
@@ -159,6 +162,7 @@ Load these based on DSB data requirements (identified in Step 1 checklist):
 - **Text search / code navigation**: read `references/text-tools.md` -- three-layer search stack, tool-by-tool reference, agent-optimized search tools, cost math.
 - **Knowledge base retrieval (RAG)**: read `references/retrieval.md` -- sparse/dense/hybrid retrieval, reranking, query transformation, corrective loops, GraphRAG, chunking strategies, agentic RAG architectures. For embedding model selection, evaluation protocols, and efficiency trade-offs, also read `references/embeddings.md`.
 - **Intent classification / routing**: read `references/structured-classification.md` -- classifier schema design, enforcement mechanisms (prompt vs constrained decoding), confidence thresholding, handler routing, hierarchical classification for large class sets.
+- **Scenario scaffolding**: read `references/scaffolding.md` -- if the task matches a known scenario (deep research, customer support, code gen, data analysis, document processing, RAG, autonomous execution), use the scenario-specific state shape, guardrails, and failure modes.
 
 For the default LangChain/LangGraph stack, the build order is:
 
