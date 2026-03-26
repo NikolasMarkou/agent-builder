@@ -347,6 +347,8 @@ result = agent.run("Find the latest AI agent frameworks")
 
 ## DSPy
 
+> **Deep-dive reference:** `references/dspy.md` covers Signatures, Modules, optimizer selection, RAG patterns, multi-agent composition, and integration with orchestration frameworks.
+
 **Architecture:** Optimization-first. Replace manual prompts with compiled signatures.
 **License:** MIT | **Stars:** ~29K | **Language:** Python
 **Best for:** Prompt optimization, systematic prompt engineering replacement.

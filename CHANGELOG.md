@@ -4,6 +4,12 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.9.0] - 2026-03-26
+
+### Added
+- **DSPy dedicated reference** (`references/dspy.md`) -- comprehensive implementation reference covering Signatures, Modules, optimizer selection (with decision tree), RAG patterns (basic, multi-hop, agentic), multi-agent composition, integration patterns with LangGraph and Strands, evaluation, observability, deployment, and pattern mapping to the agent-builder catalogue. Positioned as an optimization layer that complements orchestration frameworks.
+- **DSPy cross-references** -- SKILL.md Step 3 now points to `references/dspy.md` + `references/frameworks.md`; frameworks.md DSPy section links to the deep-dive reference.
+
 ## [1.8.0] - 2026-03-23
 
 ### Added

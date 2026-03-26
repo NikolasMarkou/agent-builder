@@ -1,7 +1,7 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.8.0-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.9.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**
@@ -165,6 +165,7 @@ agent-builder/
         ├── langchain-langgraph.md # Default stack implementation reference
         ├── frameworks.md          # Alternative framework guidance (10 frameworks)
         ├── strands.md             # Strands Agents: patterns, multi-agent, deployment, A2A
+        ├── dspy.md                # DSPy: signatures, modules, optimizers, orchestration integration
         ├── production.md          # Production hardening reference
         ├── deployment.md          # Deployment: API serving, Docker, monitoring stack, memory
         ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)

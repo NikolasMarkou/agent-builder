@@ -130,7 +130,7 @@ Override the default only when:
 | Google Cloud native | Google ADK | `references/frameworks.md` |
 | TypeScript/JS application | Mastra | `references/frameworks.md` |
 | RAG-heavy, document processing | LlamaIndex | `references/frameworks.md` |
-| Prompt optimization | DSPy | `references/frameworks.md` |
+| Prompt optimization | DSPy | `references/dspy.md` + `references/frameworks.md` |
 | Model-agnostic, persistent memory | Agno | `references/frameworks.md` |
 | Lightweight, open-model focus | Smolagents | `references/frameworks.md` |
 
