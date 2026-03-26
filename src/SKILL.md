@@ -123,7 +123,7 @@ Override the default only when:
 
 | Condition | Use Instead | Read |
 |---|---|---|
-| AWS-native deployment, model-driven approach | Strands Agents | `references/frameworks.md` |
+| AWS-native deployment, model-driven approach | Strands Agents | `references/strands.md` + `references/frameworks.md` |
 | Role-based team, rapid prototyping | CrewAI | `references/frameworks.md` |
 | OpenAI-only stack, voice/realtime | OpenAI Agents SDK | `references/frameworks.md` |
 | Azure/.NET/Java enterprise | Semantic Kernel / MS Agent Framework | `references/frameworks.md` |
@@ -138,11 +138,11 @@ Override the default only when:
 
 | Pattern | LangGraph | CrewAI | Strands | OpenAI SDK | Google ADK | Mastra | Semantic Kernel | DSPy | LlamaIndex | Agno | Smolagents |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Parallel (fan-out/fan-in) | Full | No | Partial | No | Partial | Partial | Partial | No | No | No | No |
+| Parallel (fan-out/fan-in) | Full | No | Full (Workflow) | No | Partial | Partial | Partial | No | No | No | No |
 | Sequential | Full | Full | Full | No | Full | Full | Full | No | Full | Full | Full |
-| Loop (conditional cycle) | Full | No | Full | No | Partial | Partial | Partial | No | No | No | No |
-| Router | Full | No | Full | Partial | Full | Full | Full | No | No | Partial | No |
-| Network / Swarm | Full | No | No | Full | Partial | No | No | No | No | No | No |
+| Loop (conditional cycle) | Full | No | Full (Graph) | No | Partial | Partial | Partial | No | No | No | No |
+| Router | Full | No | Full (Graph) | Partial | Full | Full | Full | No | No | Partial | No |
+| Network / Swarm | Full | No | Full (Swarm) | Full | Partial | No | No | No | No | No | No |
 | Hierarchical | Full | Full | Full | No | Partial | No | Full | No | No | No | No |
 | HITL (interrupt/resume) | Full | No | No | No | No | No | No | No | No | No | No |
 
@@ -208,6 +208,8 @@ Update the DSB with each revision. The DSB's `Patterns` and `Framework` fields a
 ## Code Templates
 
 Read `references/langchain-langgraph.md` for ready-to-use code templates covering: simple agent (`create_agent`), ReAct with persistence (`StateGraph` + checkpointer), multi-agent swarm with handoffs (`create_swarm`), parallel fan-out/fan-in (`Send`), and human-in-the-loop with interrupt. For package versions and installation commands, see the Stack Architecture section in that same reference.
+
+For Strands Agents, read `references/strands.md` for multi-agent patterns (Swarm, Graph, Workflow, Agents-as-Tools), deployment targets, A2A protocol, and migration guidance from LangGraph.
 
 ---
 

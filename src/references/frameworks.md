@@ -76,29 +76,41 @@ Use this reference when the default LangChain/LangGraph stack is not the best fi
 ## Strands Agents
 
 **Architecture:** Model-driven / minimalist. Agent = prompt + tools + model. LLM drives all planning and tool selection.
-**License:** Apache 2.0 | **Stars:** ~3K+ | **Language:** Python, TS
-**Best for:** AWS-native deployment, minimal boilerplate, model-driven approach.
+**License:** Apache 2.0 | **Stars:** ~10K+ | **Language:** Python, TS (preview)
+**Best for:** AWS-native deployment, minimal boilerplate, model-driven approach, rapid time-to-production.
 
 **Core concepts:**
-- Agent defined with system prompt + tools list
-- No graph, no state machine. The LLM decides what to do.
-- Tools are Python functions with type hints
-- Built-in: 20+ tools, native MCP support, AWS Bedrock integration
+- Agent defined with system prompt + tools list — the LLM decides what to do
+- Tools via `@tool` decorator (custom), 20+ pre-built tools, or MCP servers (first-class)
+- Model-agnostic: Bedrock, Anthropic, OpenAI, Ollama, LiteLLM, + community providers
+- Structured output via Pydantic `output_schema`
 
 **When to choose over LangGraph:**
-- AWS deployment (Lambda, Fargate, EKS, AgentCore)
-- Model-driven approach (trust the LLM to plan)
+- AWS deployment (Lambda, Fargate, EKS, AgentCore managed runtime)
+- Model-driven approach (trust the LLM to plan, no explicit graph needed)
 - Minimal framework overhead wanted
 - Rapid time-to-production (days vs months per AWS internal experience)
+- Need native MCP support (first-class, not via adapters)
+- Cross-framework agent interop needed (A2A protocol)
 
 **When NOT to choose:**
-- Need explicit state machines with checkpointing
-- Need fine-grained control over execution flow
-- Complex conditional branching required
+- Need explicit state machines with durable checkpointing
+- Need fine-grained control over every state transition
+- Need built-in HITL interrupt/resume semantics
+- Need state machine visualization for debugging complex flows
 
-**Multi-agent:** Swarm pattern, graph-based orchestration (Strands Graph).
-**Memory:** Pluggable (Mem0, custom providers).
-**Production:** AWS AgentCore for managed deployment.
+**Multi-agent (built-in):**
+- **Swarm:** Agent-driven handoffs with emergent coordination. Agents decide who handles next.
+- **Graph:** Deterministic directed graph with conditional edges. Supports DAG and cyclic topologies.
+- **Workflow:** Dependency-based task graph with automatic parallelism for independent branches.
+- **Agents as Tools:** Supervisor pattern — wrap specialist agents as `@tool` functions.
+
+**Memory:** Built-in conversational, SessionManager for persistence, community packages for Redis/Valkey.
+**Observability:** Native OpenTelemetry — traces, spans, metrics. Compatible with Langfuse, X-Ray, Datadog, Jaeger.
+**Production:** AWS AgentCore (managed serverless runtime, up to 8hr tasks), Lambda, Docker/K8s.
+**Unique:** A2A protocol for cross-framework agent interop, Agent SOPs for natural language workflows, semantic tool retrieval for 100+ tool sets.
+
+For implementation patterns and deployment guidance, read `references/strands.md`.
 
 ---
 
@@ -373,16 +385,16 @@ print(result.sentiment)
 - **CrewAI**: Rapid development, role-based teams, sequential/hierarchical processes.
 
 ### LangGraph vs Strands
-- **LangGraph**: Explicit graph definitions, fine-grained state transitions, complex workflow logic.
-- **Strands**: Model-driven, minimal boilerplate, AWS deployment. Days vs months time-to-production.
+- **LangGraph**: Explicit graph definitions, fine-grained state transitions, durable checkpointing, HITL interrupt/resume.
+- **Strands**: Model-driven, minimal boilerplate, native AWS deployment (AgentCore), built-in multi-agent (Swarm/Graph/Workflow), native MCP + A2A. Days vs months time-to-production.
 
 ### LangChain vs LlamaIndex
 - **LangChain**: Broadest integration ecosystem, general-purpose.
 - **LlamaIndex**: RAG-heavy, complex document processing. Many teams use both.
 
 ### OpenAI SDK vs Strands
-- **OpenAI SDK**: OpenAI-centric, minimal deployment needs.
-- **Strands**: Multi-model, AWS-native, production deployment to Lambda/Fargate/EKS.
+- **OpenAI SDK**: OpenAI-centric, built-in voice/realtime, minimal deployment needs.
+- **Strands**: Multi-model, AWS-native (AgentCore managed runtime), built-in multi-agent patterns, native MCP + A2A protocol.
 
 ### Mastra vs Vercel AI SDK
 - **Mastra**: Complete framework (agents, workflows, RAG, memory).

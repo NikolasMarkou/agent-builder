@@ -164,6 +164,7 @@ agent-builder/
         ├── patterns.md           # Pattern catalogue (topology, behavioral, data flow)
         ├── langchain-langgraph.md # Default stack implementation reference
         ├── frameworks.md          # Alternative framework guidance (10 frameworks)
+        ├── strands.md             # Strands Agents: patterns, multi-agent, deployment, A2A
         ├── production.md          # Production hardening reference
         ├── deployment.md          # Deployment: API serving, Docker, monitoring stack, memory
         ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)

@@ -25,6 +25,7 @@ agent-builder/
         ├── patterns.md               # Pattern catalogue: topology (7), behavioral (7), data flow (5)
         ├── langchain-langgraph.md    # Default stack: LangChain v1.2.x + LangGraph v1.0.x
         ├── frameworks.md             # 10 framework reviews, selection matrix, head-to-head comparisons
+        ├── strands.md                # Strands Agents: patterns, multi-agent, deployment, A2A protocol
         ├── production.md             # Context engineering, tool design, evals, cost, observability, guardrails, security, resilience
         ├── deployment.md             # Deployment: API serving (FastAPI), Docker, monitoring stack, long-term memory
         ├── evals.md                  # Evaluation: frameworks, benchmarks, metrics, LLM-as-judge, safety, monitoring
