@@ -4,6 +4,13 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.10.0] - 2026-03-27
+
+### Added
+- **Working memory architecture guidance** in `production.md` -- agent memory taxonomy (forms × functions × scope), explicit working memory buffer structure, Agentic Context Engineering (ACE) pattern for incremental memory accumulation, and 3 new memory failure modes (context collapse, brevity bias, memory poisoning) with mitigations.
+- **Multi-agent memory coordination patterns** in `patterns.md` -- shared, isolated, and hierarchical working memory patterns with when-to-use guidance, risks, and LangGraph implementation notes.
+- **Mem0 and A-MEM** added to framework footnotes in `frameworks.md` -- expands the external-documentation-only memory framework references alongside Letta.
+
 ## [1.9.0] - 2026-03-26
 
 ### Added

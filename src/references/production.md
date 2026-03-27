@@ -104,6 +104,81 @@ def truncate_tool_output(output: str, max_chars: int = 2000) -> str:
     return output[:max_chars] + f"\n... truncated ({len(output)} chars total)"
 ```
 
+### Agent Memory Taxonomy
+
+Memory architecture decisions require separating **what carries memory**, **why the agent needs it**, and **how long it persists**. Conflating these dimensions causes interference — working memory has different access patterns and update frequencies than factual or experiential memory.
+
+**Forms — what carries memory:**
+
+| Form | Description | Examples |
+|---|---|---|
+| **Token-level** | Explicit tokens in context | Conversation history, retrieved chunks, scratchpad |
+| **Parametric** | Implicit in model weights | World knowledge from pre-training, fine-tuned skills |
+| **Latent** | Hidden states, KV cache | Cached key-value pairs, recurrent memory states |
+
+**Functions — why agents need memory:**
+
+| Function | Description | Update Frequency |
+|---|---|---|
+| **Factual** | Stored world knowledge | Rarely (reference data) |
+| **Experiential** | Accumulated skills and insights from prior task execution | After task completion |
+| **Working** | Active context management during current task execution | Every reasoning step |
+
+**Scope — when does memory persist:**
+
+| Scope | Persistence | Storage |
+|---|---|---|
+| **In-context (short-term)** | Current session | Context window |
+| **Out-of-context (long-term)** | Cross-session | External databases (vector, graph, relational) |
+
+For implementation of each scope, see `deployment.md` § Long-Term Memory.
+
+### Working Memory Structure
+
+Working memory is the most volatile and most important part of context. Structure it explicitly rather than relying on raw token accumulation:
+
+```
+Working Memory Buffer
+├── Goal / Task Specification
+│   └── Original objective, decomposed sub-goals, success criteria
+├── Plan State
+│   └── Current step, completed steps, pending steps, plan revisions
+├── Environment State
+│   └── Tool call results, file system state, external API responses
+├── Reasoning Trace
+│   └── Chain-of-thought scratchpad, hypothesis tracking
+├── Error / Anomaly Log
+│   └── Failed tool calls, unexpected outputs, exception traces
+└── Retrieved Context
+    └── Relevant chunks pulled from long-term memory on demand
+```
+
+**Key principle:** Working memory is not passive storage — it is the substrate on which the agent's reasoning and action selection operate. Managing what enters, persists in, and exits working memory is equivalent to controlling the agent's cognitive focus.
+
+In LangGraph, map these components to explicit state keys with appropriate reducers. Use `TypedDict` state to enforce structure rather than stuffing everything into `messages`.
+
+### Agentic Context Engineering (ACE)
+
+ACE (arXiv: 2510.04618) frames agent memory as **evolving playbooks** rather than static retrieval stores. Key mechanisms:
+
+- Contexts accumulate strategies through generation, reflection, and curation
+- **Structured incremental updates** prevent context collapse (see failure modes below) — preserving detail rather than destructively summarizing
+- Works both offline (system prompt optimization) and online (per-session memory)
+- Adapts without labeled supervision, using natural execution feedback
+- Reported +10.6% improvement on agent benchmarks vs strong baselines
+
+**When to use:** Long-running agents that accumulate operational knowledge across sessions. Prefer ACE-style incremental accumulation over periodic full-context summarization.
+
+### Memory-Specific Failure Modes
+
+Beyond context rot (above), three additional memory failure modes affect production agents:
+
+| Failure Mode | Cause | Symptoms | Mitigation |
+|---|---|---|---|
+| **Context collapse** | Iterative summarization destroys fine-grained detail | Summary of a summary loses specificity critical for downstream reasoning; agent "forgets" nuances | ACE-style structured incremental updates; preserve detailed notes alongside summaries |
+| **Brevity bias** | Memory extraction favors concise generic summaries over domain-specific insights | Agent retains "user prefers dark mode" but loses "user's pipeline fails on partitioned Parquet files with nested structs" | Multi-attribute memory notes: store contextual descriptions, keywords, tags, and linked related memories — not just summaries |
+| **Memory poisoning** | Adversarial inputs or unintended data contaminate persistent memory stores | Persistent behavioral drift, privacy leakage across users, incorrect learned preferences | Memory isolation by user, write access controls, periodic memory audits, TTL on low-confidence memories |
+
 ---
 
 ## Tool Design Principles

@@ -42,7 +42,7 @@ Use this reference when the default LangChain/LangGraph stack is not the best fi
 | Serverless deployment | Strands (Lambda) | LangGraph Platform |
 | Rapid prototyping | Strands, Agno, OpenAI SDK | CrewAI |
 
-\* *Not covered in this guide — external documentation only. Haystack: open-source RAG/NLP pipeline framework. AutoGen: Microsoft multi-agent conversation framework. Vercel AI SDK: React/Next.js AI integration library. Letta (MemGPT): persistent-memory agent framework built on virtual context management.*
+\* *Not covered in this guide — external documentation only. Haystack: open-source RAG/NLP pipeline framework. AutoGen: Microsoft multi-agent conversation framework. Vercel AI SDK: React/Next.js AI integration library. Letta (MemGPT): persistent-memory agent framework built on virtual context management. Mem0: salient-fact extraction + graph-based memory for conversational AI and customer service agents. A-MEM: Zettelkasten-inspired dynamic indexing and linking for knowledge-heavy research agents.*
 
 ---
 

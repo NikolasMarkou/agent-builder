@@ -450,3 +450,21 @@ START
 | Supervisor bottleneck | Hierarchical | Supervisor makes too many LLM calls for coordination | Coarse-grained delegation, async workers |
 | Stale state | Any with persistence | Checkpoint from old session has outdated context | TTL on checkpoints, state validation on resume |
 | Tool selection thrash | ReAct with many tools | Model can't choose among 20+ tools | Reduce tool count, progressive disclosure, LLMToolSelectorMiddleware |
+
+### Memory Coordination in Multi-Agent Systems
+
+When multiple agents share a task, working memory gains a coordination dimension. Choose the right memory isolation pattern:
+
+| Pattern | Description | When to Use | Risk |
+|---|---|---|---|
+| **Shared working memory** | Common buffer accessible to all agents (shared scratchpad, blackboard, message bus) | Agents need real-time awareness of each other's progress; collaborative problem-solving | Cross-contamination — one agent's stale or incorrect state pollutes others |
+| **Isolated working memory** | Per-agent buffers with controlled inter-agent write access | Agents have distinct responsibilities; outputs combined only at aggregation | Coordination overhead — agents may duplicate work or operate on inconsistent views |
+| **Hierarchical working memory** | Supervisor maintains high-level task state; sub-agents maintain local execution state; outputs propagate upward on completion | Hierarchical topology (1.7); supervisor needs oversight without context explosion from sub-agent details | Supervisor bottleneck if sub-agents surface too much state; information loss if too little |
+
+**Implementation guidance:**
+
+- **Shared:** Use a shared state key with a reducer (e.g., `Annotated[list, operator.add]`). Scope writes — agents should append to shared state, not overwrite.
+- **Isolated:** Use subgraphs (3.5) for context isolation. Parent graph aggregates results without inheriting sub-agent working memory.
+- **Hierarchical:** Supervisor state holds plan-level keys. Sub-agents return structured summaries, not raw reasoning traces. Use `agent.as_tool()` to encapsulate sub-agent output.
+
+**Key failure mode:** Memory cross-contamination in shared buffers. Always key shared memory by agent ID or namespace. Monitor shared state size — unbounded shared buffers cause the same context rot as unbounded conversation history.
