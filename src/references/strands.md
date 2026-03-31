@@ -303,6 +303,19 @@ my-strands-agent/
 
 ---
 
+## Failure Modes
+
+| Failure Mode | Cause | Symptoms | Mitigation |
+|---|---|---|---|
+| **Infinite handoff loops** | Swarm agents hand off to each other without termination condition | CPU/token burn, no response returned | Set `max_handoffs` or total iteration cap; add cycle detection in handoff logic |
+| **Upstream task blocking** | Workflow task fails, blocking all dependent tasks | Workflow hangs; downstream agents never execute | Design idempotent tasks; add timeout per task; implement fallback paths for non-critical dependencies |
+| **Model-driven flow unpredictability** | No explicit state machine — model decides next action | Non-deterministic execution paths; hard to reproduce bugs | Use Graph pattern for critical flows; add `@tool` guards that validate preconditions; log full reasoning traces via OTEL |
+| **Tool schema drift** | Tool function signatures change but system prompt references stale descriptions | Agent calls tools with wrong arguments; silent failures | Auto-generate tool descriptions from docstrings; version tool schemas; test tool calls in CI |
+| **Session state loss** | SessionManager not configured or storage backend fails | Agent loses context across turns; repeated questions | Always configure persistent SessionManager in production; health-check storage backend at startup |
+| **Lambda cold start latency** | Large model initialization on first invocation | First request takes 5-15s; user-facing timeout | Use provisioned concurrency; keep model initialization outside handler; use lighter models for latency-sensitive paths |
+
+---
+
 ## Pattern Mapping
 
 How Strands patterns map to the agent-builder pattern catalogue (`references/patterns.md`):

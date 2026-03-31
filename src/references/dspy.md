@@ -510,6 +510,19 @@ my_dspy_project/
 
 ---
 
+## Failure Modes
+
+| Failure Mode | Cause | Symptoms | Mitigation |
+|---|---|---|---|
+| **Optimizer convergence failure** | Too few examples, poor metric signal, overly complex search space | Optimized program performs worse than baseline or shows no improvement | Start with ≥200 labeled examples; use MIPROv2 with `num_threads=24`; verify metric function returns meaningful gradients |
+| **Prompt drift** | Optimized prompts overfit to training distribution | High dev-set scores but production accuracy drops on novel inputs | Hold out a diverse test set; run walk-forward evaluation; re-optimize periodically on fresh production data |
+| **Few-shot contamination** | Optimizer selects demos that leak answers or create shortcuts | Model appears to reason but is pattern-matching on demo structure | Inspect `dspy.inspect_history()`; verify demos don't contain target answers; use `max_bootstrapped_demos` conservatively |
+| **Metric gaming** | Optimizer finds prompts that maximize metric without genuine quality | High metric scores but outputs are degenerate (e.g., always hedging, verbose padding) | Use multi-dimensional metrics; include human spot-checks; add length/format constraints to metric |
+| **Cold-start with small data** | < 50 labeled examples for optimization | Optimizer has insufficient signal; random search dominates | Use `BootstrapFewShotWithRandomSearch` for small datasets; bootstrap from a strong teacher model; augment data before optimizing |
+| **Module composition fragility** | Complex `forward()` chains with many sub-modules | One sub-module regression cascades through pipeline; hard to debug | Evaluate each sub-module independently; use `dspy.Assert` for intermediate checks; log per-module metrics |
+
+---
+
 ## Pattern Mapping
 
 How DSPy maps to the agent-builder pattern catalogue (`references/patterns.md`):

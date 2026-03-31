@@ -115,6 +115,16 @@ validate:
 			echo "ERROR: $$name missing 'When NOT to use' or failure modes section"; fail=1; \
 		fi; \
 	done; [ $$fail -eq 0 ]
+	@# Verify failure modes heading exists in files that need them (framework and data references)
+	@echo "Checking failure modes sections..."
+	@fail=0; for ref in src/references/langchain-langgraph.md src/references/strands.md src/references/dspy.md \
+		src/references/retrieval.md src/references/text-tools.md src/references/entity-resolution.md \
+		src/references/tabular-data.md src/references/structured-classification.md; do \
+		name=$$(basename $$ref); \
+		if ! grep -qiE '^##+ *([0-9]+\. *)?(Failure Mode|Anti-Pattern)' $$ref; then \
+			echo "ERROR: $$name missing Failure Modes or Anti-Patterns section heading"; fail=1; \
+		fi; \
+	done; [ $$fail -eq 0 ]
 	@echo "Validation passed!"
 
 # Clean build artifacts

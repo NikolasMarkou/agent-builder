@@ -232,6 +232,23 @@ function Invoke-Validate {
         }
     }
 
+    # Verify failure modes heading exists in files that need them (framework and data references)
+    Write-Host "Checking failure modes sections..."
+    $mustHaveFailureModes = @(
+        "langchain-langgraph.md", "strands.md", "dspy.md",
+        "retrieval.md", "text-tools.md", "entity-resolution.md",
+        "tabular-data.md", "structured-classification.md"
+    )
+    foreach ($name in $mustHaveFailureModes) {
+        $refPath = "src/references/$name"
+        if (Test-Path $refPath) {
+            $refContent = Get-Content $refPath -Raw
+            if ($refContent -notmatch '(?mi)^##+ *(\d+\. *)?(Failure Mode|Anti-Pattern)') {
+                $errors += "ERROR: $name missing Failure Modes or Anti-Patterns section heading"
+            }
+        }
+    }
+
     if ($errors.Count -gt 0) {
         $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1

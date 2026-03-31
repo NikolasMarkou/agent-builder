@@ -131,7 +131,7 @@ Memory architecture decisions require separating **what carries memory**, **why 
 | **In-context (short-term)** | Current session | Context window |
 | **Out-of-context (long-term)** | Cross-session | External databases (vector, graph, relational) |
 
-For implementation of each scope, see `deployment.md` § Long-Term Memory.
+**LangGraph mapping:** Conversation memory (token-level, working) maps to checkpointer-backed message history. Long-term memory (factual, experiential) maps to `Store` (InMemoryStore / PostgresStore). Parametric memory (model weights) is fixed at inference time and not typically managed at runtime. See `langchain-langgraph.md` §Memory for implementation and `deployment.md` §Long-Term Memory for infrastructure.
 
 ### Working Memory Structure
 

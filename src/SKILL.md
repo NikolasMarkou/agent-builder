@@ -103,13 +103,15 @@ Quick selection:
 |---|---|---|---|
 | Simple tool-calling agent | Single node (no topology) | ReAct | N/A |
 | Pipeline: ingest -> process -> output | Sequential | Tool Use at each step | Prompt Chaining |
-| Research with iteration | Loop | STORM or Reflection | Controlled Flow |
+| Research with iteration | Loop | Reflection | Controlled Flow |
 | Multi-source aggregation | Parallel | ReAct per worker | Map-Reduce |
 | Intent classification + routing | Router | ReAct per specialist | Controlled Flow | ← see `references/structured-classification.md` |
 | Quality-gated generation | Loop | Generator-Critic | Controlled Flow |
 | Team of specialists | Hierarchical | Plan-and-Execute (supervisor) + ReAct (workers) | Subgraph |
 | Flexible peer-to-peer collaboration | Network | ReAct + Handoffs | Swarm |
 | High-stakes with human approval | Any + HITL gates | Any + HITL | Any |
+
+**Composition recipes:** Some tasks require patterns from multiple layers composed together. For example, STORM (deep research) composes Parallel + Loop (topology) with ReAct (behavioral) and Map-Reduce (data flow) -- see `references/patterns.md` §2.5. Do not treat compositions as single-layer pattern choices; select each layer independently and verify compatibility.
 
 For scenario-specific recipes with complete topology diagrams, state shapes, guardrails, and failure modes, read `references/scaffolding.md`. Covers: deep research, customer support, code generation & review, data analysis, document processing, RAG, and autonomous task execution.
 
@@ -136,7 +138,7 @@ Override the default only when:
 
 **Cross-validation gate:** Before proceeding, verify that the selected framework supports the patterns chosen in Step 2.
 
-| Pattern | LangGraph | CrewAI | Strands | OpenAI SDK | Google ADK | Mastra | Semantic Kernel | DSPy | LlamaIndex | Agno | Smolagents |
+| Pattern | LangGraph | CrewAI | Strands Agents | OpenAI Agents SDK | Google ADK | Mastra | Semantic Kernel / MS | DSPy | LlamaIndex | Agno | Smolagents |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | Parallel (fan-out/fan-in) | Full | No | Full (Workflow) | No | Partial | Partial | Partial | No | No | No | No |
 | Sequential | Full | Full | Full | No | Full | Full | Full | No | Full | Full | Full |
@@ -146,7 +148,7 @@ Override the default only when:
 | Hierarchical | Full | Full | Full | No | Partial | No | Full | No | No | No | No |
 | HITL (interrupt/resume) | Full | No | No | No | No | No | No | No | No | No | No |
 
-If the framework does not support a selected pattern, either change the framework or change the pattern. Do not proceed with a mismatch. Note: DSPy, LlamaIndex, Agno, and Smolagents are not orchestration frameworks — they handle prompt optimization, retrieval, model-agnostic agents, and lightweight tool use respectively. For orchestration patterns (Parallel, Loop, Network, HITL), pair them with LangGraph or another full-orchestration framework. See `references/frameworks.md` for details.
+If the framework does not support a selected pattern, either change the framework or change the pattern. Do not proceed with a mismatch. Note: DSPy, LlamaIndex, Agno, and Smolagents are not orchestration frameworks — they handle prompt optimization, retrieval, model-agnostic agents, and lightweight tool use respectively. For orchestration patterns (Parallel, Loop, Network, HITL), pair them with LangGraph or another full-orchestration framework. The `references/frameworks.md` selection matrix also references external frameworks not covered in depth (Haystack, AutoGen, Vercel AI SDK, Letta/MemGPT) — see footnotes in that file if a use case aligns.
 
 **Emit DSB after Step 3** with framework filled in.
 

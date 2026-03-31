@@ -4,6 +4,22 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.11.1] - 2026-03-31
+
+### Fixed
+- **STORM pattern miscategorization** in `SKILL.md` -- removed STORM from quick selection behavioral column (it's a composition, not an atomic pattern); added composition recipes note with cross-reference to `patterns.md` §2.5.
+- **Framework naming inconsistencies** in `SKILL.md` cross-validation gate -- updated column headers to use full names (Strands Agents, OpenAI Agents SDK, Semantic Kernel / MS).
+- **Async/sync checkpointer mismatch** in `deployment.md` -- added inline comment explaining async variant is for FastAPI; sync `PostgresSaver` for non-async apps.
+- **Memory taxonomy not reconciled** in `production.md` -- added LangGraph mapping note connecting academic taxonomy to practical implementation (checkpointer, Store).
+
+### Added
+- **Failure modes section** in `dspy.md` -- optimizer convergence, prompt drift, few-shot contamination, metric gaming, cold-start, module composition fragility.
+- **Failure modes section** in `tabular-data.md` -- wrong format choice, token overflow, header loss, numeric precision, model-specific sensitivity, truncation artifacts.
+- **Failure modes section** in `strands.md` -- infinite handoff loops, upstream task blocking, model-driven flow unpredictability, tool schema drift, session state loss, Lambda cold start.
+- **Failure modes section** in `entity-resolution.md` -- blocking recall failure, transitive closure explosion, LLM matching inconsistency, schema mismatch, cost runaway, stale reference data.
+- **Footnoted frameworks note** in `SKILL.md` Step 3 -- acknowledges external frameworks (Haystack, AutoGen, Letta/MemGPT) referenced in `frameworks.md` selection matrix.
+- **Stricter failure modes validation** in `Makefile` and `build.ps1` -- new check verifies Failure Modes or Anti-Patterns heading exists in framework and data reference files.
+
 ## [1.11.0] - 2026-03-31
 
 ### Added

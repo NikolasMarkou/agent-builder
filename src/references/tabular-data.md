@@ -381,3 +381,16 @@ Is the data < 50 rows?
 | XML | ~76,100 | 3.9x |
 
 The tradeoff is clear: accuracy and token cost are inversely correlated. The formats that help the model understand the data best (Markdown-KV, XML) are the most expensive. Choose based on whether you're optimizing for correctness or cost.
+
+---
+
+## 9. Failure Modes
+
+| Failure Mode | Cause | Symptoms | Mitigation |
+|---|---|---|---|
+| **Wrong format for data shape** | Using flat format (CSV) for nested/hierarchical data, or verbose format (XML) for simple flat tables | Misinterpretation of parent-child relationships; wasted tokens on flat data | Match format to structure: Markdown-KV/XML for nested, CSV/Markdown table for flat |
+| **Token budget overflow** | Table too large for context window even in most compact format | Truncated data, incomplete analysis, hallucinated rows | Pre-filter aggressively; chunk into 50-100 row batches; use size-based strategy (§4) |
+| **Header loss in long tables** | Headers only at top; model loses column semantics after ~50 rows | Column confusion, swapped values, wrong field attribution | Repeat headers every 20-30 rows; use Markdown-KV (headers per record) for critical accuracy |
+| **Numeric precision degradation** | Model rounds or hallucinates numbers in large tables | Arithmetic errors, incorrect aggregations, phantom decimal places | Pre-compute aggregations outside the LLM; validate numeric outputs against source; state precision requirements explicitly |
+| **Model-specific format sensitivity** | Using a format the model handles poorly (e.g., CSV with Claude, complex XML with smaller models) | 15-20pp accuracy swing vs optimal format for same data | Test format accuracy on your model (see §7 Model-Specific Notes); default to Markdown-KV for highest robustness |
+| **Truncation artifacts** | Table cut mid-row when hitting context limits | Partial last row causes hallucinated completion; row count mismatch | Always state total row count upfront; end on complete row boundaries; add explicit "END OF DATA" marker |

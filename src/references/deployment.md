@@ -35,7 +35,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from langchain.agents import create_agent
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver  # async variant for FastAPI; for sync apps use PostgresSaver from langgraph.checkpoint.postgres
 
 graph = None
 checkpointer = None

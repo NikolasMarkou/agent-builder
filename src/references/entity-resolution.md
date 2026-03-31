@@ -444,6 +444,19 @@ The 100x cost difference between pure LLM and tiered approaches is why nobody ru
 
 ---
 
+## Failure Modes
+
+| Failure Mode | Cause | Symptoms | Mitigation |
+|---|---|---|---|
+| **Blocking recall failure** | Embedding model misses semantic similarity; blocking threshold too aggressive | True matches never reach matching stage; low pair completeness | Validate pair completeness >95% on labeled data; use hybrid blocking (vector + rule-based); lower similarity threshold |
+| **Transitive closure explosion** | Clustering propagates weak matches across chains (A≈B, B≈C → A≈C) | Massive false-positive clusters; unrelated entities merged | Use connected-component clustering with edge-weight thresholds; add cluster size caps; require minimum pairwise similarity |
+| **LLM matching inconsistency** | Non-deterministic LLM responses for borderline pairs | Same pair matched on one run, rejected on next; flaky eval metrics | Set temperature=0; use majority vote across 3 calls for borderline cases; cache LLM decisions by pair hash |
+| **Schema mismatch across sources** | Different sources use different field names, formats, or granularity | Blocking misses cross-source matches; matching compares wrong fields | Normalize schemas before blocking; map source fields to canonical schema; document field semantics per source |
+| **Cost runaway at scale** | LLM called for too many candidate pairs; insufficient deterministic pre-filtering | Monthly API costs 10-100x expected | Apply tiered matching: deterministic first (40-60% resolved), then similarity, then LLM for remaining ambiguous pairs only |
+| **Stale reference data** | Master entity records not updated as new data arrives | New records fail to match updated entities; duplicate clusters grow | Schedule periodic re-resolution; implement incremental ER on new records; add TTL to match confidence scores |
+
+---
+
 ## Implementation checklist
 
 1. **Define your entity schema.** What entity types? What attributes per type? What constitutes a "match" in your domain?
