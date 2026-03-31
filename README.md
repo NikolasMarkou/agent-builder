@@ -1,7 +1,7 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.10.0-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.11.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**

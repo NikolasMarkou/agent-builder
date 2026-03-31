@@ -12,6 +12,8 @@ Patterns for serving agents as APIs, containerizing them, and standing up a moni
 6. [Containerization](#containerization)
 7. [Monitoring Stack](#monitoring-stack)
 8. [Long-Term Memory](#long-term-memory)
+9. [Load Testing](#load-testing)
+10. [CI/CD Pipeline](#cicd-pipeline)
 
 ---
 
@@ -289,6 +291,8 @@ A production agent deployment has three layers:
 |---|---|
 | **Base image** | Slim Python image (3.12-slim or equivalent) — small, secure |
 | **Dependency caching** | Install dependencies in a separate layer before copying application code — Docker cache speeds rebuilds |
+| **Non-root user** | Create a dedicated `appuser` and switch to it after installing dependencies — never run containers as root |
+| **Entrypoint validation** | Use an entrypoint script that validates required env vars (API keys, DB credentials, JWT secret) at startup — fail fast before the app starts |
 | **Database** | PostgreSQL with pgvector extension — covers checkpointing, sessions, and vector similarity search in one service |
 | **Health checks** | Always define in orchestration config — prevents startup race conditions between app and database |
 | **Volumes** | Named volumes for database data — never bind-mount DB data directories in production |
@@ -490,6 +494,81 @@ agent = create_agent(
 5. **Use one database.** PostgreSQL + pgvector can serve as checkpointer storage, relational store, and vector store — reducing infrastructure complexity.
 
 For retrieval pipeline patterns over vector stores — hybrid search, reranking, chunking strategies, and agentic RAG architectures — see `retrieval.md`.
+
+---
+
+## Load Testing
+
+Agent services have unique load characteristics that standard web load tests don't cover: long-lived LLM calls (2–30 seconds), concurrent tool execution, stateful session persistence, and external provider rate limits. Test these specifically.
+
+### What to Test
+
+| Scenario | What It Validates | Target |
+|---|---|---|
+| **Concurrent chat sessions** | Connection pool sizing, checkpointer throughput, memory isolation | Simulate N users each creating a session, sending messages, verifying responses |
+| **Streaming under load** | SSE connection limits, backpressure handling, timeout behavior | N concurrent `/chat/stream` connections held open for full response duration |
+| **LLM provider rate limits** | Fallback logic, retry behavior, graceful degradation | Spike traffic to trigger 429s from the provider and verify model switching |
+| **Burst traffic** | Rate limiter effectiveness, queue depth, error rate under saturation | Sudden spike (10× normal) for 60 seconds, then measure recovery time |
+| **Long-running sessions** | Memory leaks, connection pool exhaustion, context growth | Sustained moderate load for 1–4 hours (soak test) |
+
+### Metrics to Capture
+
+| Metric | Source | Alert Threshold |
+|---|---|---|
+| **Success rate** | Test harness | < 95% = investigate |
+| **p50 / p95 / p99 latency** | Prometheus `http_request_duration_seconds` | p95 > 5s for chat endpoints |
+| **LLM fallback events** | Prometheus or application logs | Any occurrence = review provider health |
+| **DB connection pool usage** | Prometheus `db_connections_active` | > 90% of pool size = increase pool or reduce concurrency |
+| **Error breakdown** | Test harness + logs | Distinguish 429 (rate limit) from 500 (bug) from timeout |
+
+### Approach
+
+1. **Full-path testing:** Don't just ping `/health`. Simulate the real user flow: authenticate → create session → send chat message → verify response. This exercises auth, DB, LLM, and checkpointing together.
+2. **Dedicated environment:** Run load tests on infrastructure matching production specs, not local machines. Local network and CPU bottlenecks skew results.
+3. **Incremental ramp:** Start at expected load, ramp to 2×, 5×, 10×. Identify the breaking point, not just "it works at N."
+4. **Provider-aware:** LLM provider rate limits are external and shared. Load tests against live providers burn quota. Use mock LLM responses for infrastructure stress tests; use live providers only for end-to-end validation at moderate scale.
+
+### Tools
+
+| Tool | Strength | Fit |
+|---|---|---|
+| **k6** | Script-driven, good for API load testing, native JS scripting | Best for HTTP endpoint stress testing with custom flows |
+| **Locust** | Python-native, easy to script complex user behaviors | Best when test authors are Python developers |
+| **Custom async script** | Full control, can simulate exact agent interaction patterns | Best for agent-specific scenarios (session lifecycle, streaming) |
+
+---
+
+## CI/CD Pipeline
+
+Agent deployments need pipeline gates beyond standard build/test — eval regression checks, cost validation, and canary deployment before full rollout.
+
+### Pipeline Stages
+
+| Stage | Gate | Blocks Deploy? |
+|---|---|---|
+| **Build** | Docker image builds, dependencies resolve | Yes |
+| **Unit tests** | Tool functions, schema validation, utility logic | Yes |
+| **Eval regression** | Run eval suite against staging. Key metrics (hallucination, task completion, latency) must not regress beyond threshold | Yes |
+| **Cost check** | Estimated per-invocation cost within budget (token math from eval traces) | Warning — blocks if > 2× budget |
+| **Canary deploy** | Route 5–10% of traffic to new version, monitor error rate and latency for 15–30 minutes | Yes — auto-rollback if metrics degrade |
+| **Full rollout** | Promote canary to 100% | Manual approval for first deploys, automated after confidence builds |
+
+### Principles
+
+1. **Eval suite in CI:** Every PR runs the core eval dataset. Fail the build if hallucination score increases > 5% or task completion drops > 3%. Use a fast subset (50–100 examples) for PR checks; full suite nightly.
+2. **Image tagging:** Tag images with git SHA + environment. Never use `latest` in production. Enables instant rollback to last-known-good image.
+3. **Secret injection:** CI secrets (API keys, JWT secrets) injected at deploy time via the platform's secret store — never in the image or repo.
+4. **Entrypoint validation:** The container entrypoint script validates all required secrets are present before starting the application. Missing secrets = container exits immediately with a clear error, not a cryptic runtime crash.
+5. **Separate build and deploy:** Build the image once, promote the same artifact through staging → production. Don't rebuild per environment.
+
+### Deployment Strategies
+
+| Strategy | Risk | Speed | Best For |
+|---|---|---|---|
+| **Blue-green** | Low — instant rollback | Fast cutover | Stateless services, low-traffic agents |
+| **Canary** | Lowest — gradual exposure | Slow (15–60 min observation) | Production agents with real user traffic |
+| **Rolling** | Medium — partial rollback | Moderate | Multi-replica deployments |
+| **Shadow mode** | Zero — no user impact | Slow (days of observation) | First production deployment of a new agent |
 
 ---
 

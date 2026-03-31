@@ -4,6 +4,14 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.11.0] - 2026-03-31
+
+### Added
+- **Load testing section** in `deployment.md` -- agent-specific load test scenarios (concurrent sessions, streaming under load, provider rate limit triggering, soak tests), metrics to capture, testing approach, and tool recommendations (k6, Locust, custom async).
+- **CI/CD pipeline section** in `deployment.md` -- pipeline stages with eval regression gates, cost validation, canary deployment patterns, deployment strategies (blue-green, canary, rolling, shadow mode), and principles for image tagging, secret injection, and entrypoint validation.
+- **Docker security hardening** in `deployment.md` containerization section -- non-root user and entrypoint secret validation as container design principles.
+- **Deployment checklist items** in `production.md` -- load testing, CI/CD eval gates, and container security added to pre-production checklist.
+
 ## [1.10.0] - 2026-03-27
 
 ### Added

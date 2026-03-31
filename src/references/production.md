@@ -565,6 +565,9 @@ For pattern-level failure modes (infinite loops, context explosion, cascade erro
 - [ ] Error handling at every node (tool failures, model failures, timeout)
 - [ ] Max iteration caps on all loops
 - [ ] Concurrency caps on all parallel fan-outs
+- [ ] Load tested at 2× expected traffic (see `deployment.md` § Load Testing)
+- [ ] CI/CD pipeline with eval regression gates (see `deployment.md` § CI/CD Pipeline)
+- [ ] Container runs as non-root user with entrypoint secret validation
 
 ### At Production
 
