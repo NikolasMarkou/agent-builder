@@ -4,9 +4,9 @@ Guidance for working with the Agent Builder codebase.
 
 ## Project Purpose
 
-Claude Code skill -- builds production-grade AI agents from requirements. 5-step workflow: Assess requirements > Select patterns > Select framework > Build > Production harden.
+Claude Code skill -- builds, reviews, troubleshoots, and optimizes production-grade AI agents. Build workflow (5-step): Assess requirements > Select patterns > Select framework > Build > Production harden. Operational workflows: Review (architecture audit), Troubleshoot (symptom-based diagnostic), Optimize (cost/performance/prompt).
 
-Use cases: building agents from scratch, selecting patterns/frameworks, designing multi-agent architectures, production-hardening existing agents.
+Use cases: building agents from scratch, selecting patterns/frameworks, designing multi-agent architectures, production-hardening existing agents, reviewing existing agent architectures, troubleshooting agent issues, optimizing agent cost/performance/prompts, extending agents with new capabilities.
 
 ## Repository Structure
 
@@ -20,7 +20,7 @@ agent-builder/
 ├── Makefile                          # Unix/Linux/macOS build script (reads VERSION)
 ├── build.ps1                         # Windows PowerShell build script (reads VERSION)
 └── src/
-    ├── SKILL.md                      # Core skill (5-step workflow, code templates) - the main instruction set
+    ├── SKILL.md                      # Core skill (build workflow, review/troubleshoot/optimize workflows) - the main instruction set
     └── references/                   # Knowledge base documents (loaded on-demand)
         ├── patterns.md               # Pattern catalogue: topology (7), behavioral (7), data flow (5)
         ├── langchain-langgraph.md    # Default stack: LangChain v1.2.x + LangGraph v1.0.x
@@ -46,11 +46,17 @@ agent-builder/
 
 Agent-building requests, or: "build me an agent", "create an agent", "design agent architecture", "what framework should I use", "make this production-ready", "scaffold an agent project".
 
+Also triggers on operational requests: "review my agent", "audit my agent architecture", "why is my agent slow/expensive", "fix my agent", "my agent hallucinates", "optimize my agent", "reduce agent cost", "improve my prompts", "add memory/HITL/streaming to my agent", "migrate from X to Y framework".
+
 ## Skill Reference
 
 Complete spec in **src/SKILL.md**. Key sections:
 
-- **5-Step Workflow**: src/SKILL.md "Workflow" section (assess, patterns, framework, build, harden)
+- **Query Router**: src/SKILL.md "Query Router" section (classifies: Build, Review, Troubleshoot, Optimize, Extend)
+- **Build Workflow (5-Step)**: src/SKILL.md "Build Workflow" section (assess, patterns, framework, build, harden)
+- **Review Workflow**: src/SKILL.md "Review Workflow" section (map architecture, check pattern fit, production readiness audit)
+- **Troubleshoot Workflow**: src/SKILL.md "Troubleshoot Workflow" section (symptom table, diagnose, fix)
+- **Optimize Workflow**: src/SKILL.md "Optimize Workflow" section (cost, performance, prompt optimization)
 - **Complexity Classes**: src/SKILL.md Step 1 table (Simple → Batteries-included)
 - **Pattern Selection**: src/SKILL.md Step 2 + `src/references/patterns.md` (19 patterns across 3 layers)
 - **Framework Selection**: src/SKILL.md Step 3 table + `src/references/frameworks.md` (10 frameworks, 18 use cases)
@@ -118,10 +124,14 @@ make help                    # Show available targets
 ### Testing Changes
 
 Validate skill changes by testing with prompts like:
-- "Build me an agent that does X" (should trigger the full 5-step workflow)
+- "Build me an agent that does X" (should route to Build Workflow, trigger the full 5-step workflow)
 - "What framework should I use for Y?" (should consult framework selection matrix)
 - "Make this production-ready" (should reference production.md guidance)
 - "How should I evaluate my agent?" (should reference evals.md guidance)
+- "Review my agent's architecture" (should route to Review Workflow, map patterns + audit readiness)
+- "My agent is hallucinating" (should route to Troubleshoot Workflow, symptom table → diagnose → fix)
+- "Reduce my agent's cost" (should route to Optimize Workflow, cost optimization steps)
+- "Add memory to my agent" (should route to Extend, go to Step 4 + Step 5)
 
 ## Updating Local Skill
 

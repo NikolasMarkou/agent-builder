@@ -4,6 +4,20 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.12.0] - 2026-04-02
+
+### Added
+- **Query Router** in `SKILL.md` -- classifies user requests into Build, Review, Troubleshoot, Optimize, or Extend before dispatching to the appropriate workflow. Not every query is "build a new agent."
+- **Review Workflow** in `SKILL.md` -- structured architecture review of existing agents: map topology/behavioral/data flow patterns, check pattern fit against `patterns.md`, audit production readiness against `production.md` checklist, deliver prioritized findings.
+- **Troubleshoot Workflow** in `SKILL.md` -- symptom-based diagnostic with decision table mapping 10 common symptoms (hallucination, infinite loops, wrong tool selection, high cost, context loss, misrouting, bad retrieval, crashes on resume, inconsistent output) to root causes and reference files.
+- **Optimize Workflow** in `SKILL.md` -- prioritized optimization across three dimensions: cost (model routing, context compression, caching, loop efficiency, fan-out control, batch processing), performance (parallelization, streaming, pre-computation, retrieval tuning), and prompt quality (structure audit, DSPy optimization, tabular format selection).
+- **Extended activation triggers** -- skill now triggers on operational queries: "review my agent", "fix my agent", "optimize my agent", "add X to my agent", framework migration requests.
+
+### Changed
+- `SKILL.md` "Workflow" section renamed to "Build Workflow" to distinguish from new operational workflows.
+- `README.md` updated with non-build capabilities in description, "When to Use" table, and trigger phrases.
+- `CLAUDE.md` updated with new activation triggers, skill reference entries for all workflows, and operational test prompts.
+
 ## [1.11.1] - 2026-03-31
 
 ### Fixed

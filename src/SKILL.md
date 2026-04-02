@@ -1,6 +1,6 @@
 ---
 name: agent-builder
-description: Build AI agents from requirements. Covers single-agent, multi-agent, RAG, and production systems. Handles framework selection, pattern selection (topology, behavioral, data flow), state design, tool design, and full implementation. Defaults to Python with LangChain/LangGraph. Supports all major frameworks (CrewAI, Strands, OpenAI Agents SDK, Google ADK, Mastra, etc.). Use this skill whenever the user asks to build an agent, create an agentic system, implement a multi-agent workflow, design agent architecture, scaffold an agent project, or asks "how should I build an agent for X". Also trigger when the user mentions agent patterns, agent topology, ReAct loops, plan-and-execute, supervisor agents, swarm agents, handoffs, agent orchestration, or any agentic design question. Even if the user just says "build me an agent that does X" without mentioning frameworks, use this skill.
+description: Build, review, troubleshoot, and optimize AI agents. Covers single-agent, multi-agent, RAG, and production systems. Handles framework selection, pattern selection (topology, behavioral, data flow), state design, tool design, and full implementation. Defaults to Python with LangChain/LangGraph. Supports all major frameworks (CrewAI, Strands, OpenAI Agents SDK, Google ADK, Mastra, etc.). Use this skill whenever the user asks to build an agent, create an agentic system, implement a multi-agent workflow, design agent architecture, scaffold an agent project, or asks "how should I build an agent for X". Also trigger when the user mentions agent patterns, agent topology, ReAct loops, plan-and-execute, supervisor agents, swarm agents, handoffs, agent orchestration, or any agentic design question. Also trigger for non-build operations: reviewing agent architecture, troubleshooting agent issues (hallucination, loops, cost, latency), optimizing agent performance or prompts, extending existing agents with new capabilities, or migrating between frameworks. Even if the user just says "build me an agent that does X" without mentioning frameworks, use this skill.
 ---
 
 # Agent Builder
@@ -22,7 +22,26 @@ Six principles that recur across every reference file. Apply them at every workf
 
 These axioms flow from a single root constraint: LLM inference is expensive, slow, and non-deterministic. Designing around this constraint is what separates production agents from demos.
 
-## Workflow
+## Query Router
+
+Before starting, classify the user's request. Not every query is "build a new agent."
+
+| If the user is asking to... | Route to |
+|---|---|
+| Build, create, design, or scaffold a new agent | **Build Workflow** (Steps 1-5 below) |
+| Review, audit, or assess an existing agent's architecture | **Review Workflow** (below) |
+| Fix a broken agent, debug issues, diagnose failures | **Troubleshoot Workflow** (below) |
+| Reduce cost, improve performance, optimize prompts | **Optimize Workflow** (below) |
+| Add a capability to an existing agent (memory, HITL, streaming, tools, evals) | **Extend** — go to Step 4 (Build) + Step 5 (Harden), skip Steps 1-3. Read the relevant reference for the capability being added. |
+| Choose a framework or pattern (no existing agent) | **Build Workflow** Steps 1-3 |
+
+**Mixed requests** ("build a new agent and review my existing one"): handle the build first, then run the review workflow on the existing agent.
+
+**Default**: If unclear, ask the user whether they are building something new or working with an existing agent.
+
+---
+
+## Build Workflow
 
 Follow these steps in order. Do not skip the assessment phase.
 
@@ -218,3 +237,111 @@ For Strands Agents, read `references/strands.md` for multi-agent patterns (Swarm
 ## Reference Files
 
 Read these as needed -- each workflow step above specifies which references to load. Do NOT load all of them upfront.
+
+---
+
+## Review Workflow
+
+Structured architecture review of an existing agent. Read the agent's code first, then work through these steps.
+
+### Step R1: Map the Current Architecture
+
+Identify what the agent currently uses:
+1. **Topology**: How are agents/nodes wired? (Single agent, Sequential, Parallel, Router, Hierarchical, Network?) Compare against `references/patterns.md` topology patterns.
+2. **Behavioral pattern**: How does each agent reason? (ReAct, Plan-and-Execute, Reflection, Generator-Critic, STORM?) Compare against `references/patterns.md` behavioral patterns.
+3. **Data flow**: How does information move? (Prompt Chaining, Map-Reduce, Controlled Flow, Swarm, Subgraph?) Compare against `references/patterns.md` data flow patterns.
+4. **Framework**: What framework is used? Cross-check against `references/frameworks.md` for known limitations.
+
+### Step R2: Check Pattern Fit
+
+Using the pattern selection decision framework in `references/patterns.md`:
+- Does the chosen topology match the task shape? (e.g., using Hierarchical when Sequential suffices is over-engineering)
+- Does the chosen behavioral pattern match the reasoning requirements? (e.g., ReAct for a task that needs upfront planning is a mismatch)
+- Are patterns composed correctly? Check composition rules in `references/patterns.md` §Pattern Composition Rules.
+- Does the task match a known scenario? Compare against `references/scaffolding.md` -- if yes, check alignment with the scenario recipe.
+
+### Step R3: Production Readiness Audit
+
+Run through the Deployment Checklist in `references/production.md` §Deployment Checklist:
+- Are max iteration caps set on all loops?
+- Are concurrency caps on all parallel fan-outs?
+- Is there error handling at every node?
+- Are HITL gates at high-risk decision points?
+- Is context budget defined and enforced?
+- Is tool count minimized?
+- Is cost model computed?
+
+Check failure modes: compare the agent's patterns against the Failure Mode Catalogue in `references/patterns.md` §Failure Mode Catalogue. Are known failure modes mitigated?
+
+### Step R4: Deliver Review
+
+Present findings as:
+1. **Architecture summary** (topology + behavioral + data flow, with pattern names)
+2. **Pattern fit assessment** (correct / over-engineered / under-engineered / mismatch, with reasoning)
+3. **Production gaps** (specific items from the checklist that are missing)
+4. **Failure mode exposure** (which known failure modes are unmitigated)
+5. **Recommendations** (prioritized by impact, with reference pointers for implementation)
+
+---
+
+## Troubleshoot Workflow
+
+Symptom-based diagnostic for broken or underperforming agents. Start from the symptom, not the code.
+
+### Step T1: Identify the Symptom
+
+| Symptom | Likely Root Cause | Read |
+|---|---|---|
+| Agent hallucinates or invents facts | Context rot, missing grounding, no faithfulness check | `references/production.md` §Context Engineering, `references/retrieval.md` §Post-Retrieval |
+| Agent loops forever | Missing iteration cap, unreachable quality threshold, gap detection diverging | `references/patterns.md` §Failure Mode Catalogue (infinite loop) |
+| Agent picks wrong tools | Too many tools, unclear tool descriptions, no progressive disclosure | `references/production.md` §Tool Design Principles |
+| Agent is too slow | Sequential when Parallel possible, unnecessary loop iterations, no caching | `references/patterns.md` §1.1 Parallel, `references/deployment.md` §Streaming |
+| Agent costs too much | No model routing, no context compression, unbounded fan-out, no caching | `references/production.md` §Cost Modeling |
+| Agent loses context mid-conversation | No checkpointing, context window overflow, no summarization | `references/production.md` §Context Engineering, `references/langchain-langgraph.md` §Persistence |
+| Agent routes to wrong specialist | Classifier quality, overlapping categories, no fallback | `references/structured-classification.md`, `references/patterns.md` §1.4 Router |
+| RAG returns irrelevant results | Wrong retrieval method, bad chunking, no reranking, stale embeddings | `references/retrieval.md`, `references/embeddings.md` |
+| Agent crashes on resume | Stale checkpoints, missing state validation | `references/patterns.md` §Failure Mode Catalogue (stale state) |
+| Prompts produce inconsistent output | No structured output, poor delimiter choice, position bias | `references/prompt-structuring.md` |
+
+### Step T2: Diagnose
+
+1. Read the relevant reference(s) from the table above.
+2. Check the agent's code against the specific failure mode and its documented mitigation.
+3. If the symptom doesn't match the table, check the full Failure Mode Catalogue in `references/patterns.md` and Production Failure Modes in `references/production.md`.
+
+### Step T3: Fix
+
+Apply the documented mitigation. For each fix:
+- State what the root cause was.
+- State what the fix does and why.
+- Reference the specific pattern, guideline, or checklist item that the fix implements.
+
+---
+
+## Optimize Workflow
+
+Prioritized optimization for cost, performance, and prompt quality. Work through in order -- earlier items have higher ROI.
+
+### Step O1: Cost Optimization (highest ROI)
+
+Read `references/production.md` §Cost Modeling. Check in order:
+
+1. **Model routing**: Is a flagship model used for tasks a cheaper model could handle? Apply tiered escalation (Design Axiom 1). Implement `ModelFallbackMiddleware` or custom routing.
+2. **Context size**: Is unnecessary data in the context? Apply context compression (`SummarizationMiddleware`), tool output truncation, semantic deduplication. Read `references/production.md` §Context Engineering.
+3. **Caching**: Are identical or near-identical queries re-processed? Add tool result caching, embedding similarity caching (`references/retrieval.md` §cache by embedding similarity).
+4. **Loop efficiency**: Are loops running more iterations than needed? Tighten quality thresholds, add early exit conditions.
+5. **Fan-out control**: Are parallel branches unbounded? Cap concurrency, batch fan-out.
+6. **Batch processing**: Are realtime paths used for non-realtime workloads? Switch to Batch API (typically 50% cheaper).
+
+### Step O2: Performance Optimization
+
+1. **Parallelization**: Are sequential steps truly dependent? Independent steps should run in parallel (`references/patterns.md` §1.1 Parallel).
+2. **Streaming**: Is the user waiting for full completion? Add streaming (`references/deployment.md` §Streaming, `references/langchain-langgraph.md` §Streaming).
+3. **Pre-computation**: Can schemas, embeddings, or static context be cached at startup rather than computed per-request?
+4. **Retrieval tuning**: For RAG agents, check hybrid retrieval, reranking, and chunking strategies (`references/retrieval.md`).
+
+### Step O3: Prompt Optimization
+
+1. **Structure audit**: Check prompt structure against `references/prompt-structuring.md` -- delimiter format, block ordering, position bias.
+2. **Systematic optimization**: For prompts that need tuning beyond manual editing, use DSPy (`references/dspy.md`) to optimize prompts programmatically against evaluation metrics.
+3. **Tabular data**: If the agent processes tables/spreadsheets, check serialization format against `references/tabular-data.md` -- format choice alone swings accuracy 15-20pp.

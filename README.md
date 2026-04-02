@@ -1,12 +1,12 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.11.1-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.12.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that guides you through building production-grade AI agents from requirements. It assesses complexity, selects the right patterns and framework, generates working code, and hardens it for production -- so you don't ship a demo that falls apart at scale.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that guides you through building, reviewing, troubleshooting, and optimizing production-grade AI agents. It assesses complexity, selects the right patterns and framework, generates working code, and hardens it for production -- so you don't ship a demo that falls apart at scale. Already have an agent? The skill also provides structured workflows for architecture review, symptom-based troubleshooting, and cost/performance/prompt optimization.
 
 The problem it solves: you ask an AI to "build me an agent" and get a generic ReAct loop with no persistence, no error handling, and no thought given to whether an agent was even the right choice. Agent Builder applies a structured 5-step workflow with Decision State Blocks tracking every decision: assess requirements, select patterns across three layers, pick the right framework, build with real code templates, and apply production hardening before deployment. Six design axioms -- tiered escalation, decomposition, cost modeling, context minimization, real-data calibration, and failure mode documentation -- are enforced at every step.
 
@@ -124,8 +124,12 @@ Before deploying, the skill walks through:
 | Designing multi-agent architectures | Non-agentic ML/data science tasks |
 | Production-hardening an existing agent | |
 | Selecting the right patterns for a use case | |
+| Reviewing an existing agent's architecture | |
+| Troubleshooting agent issues (hallucination, loops, cost) | |
+| Optimizing agent cost, performance, or prompts | |
+| Extending an existing agent with new capabilities | |
 
-Trigger phrases: *"build me an agent"*, *"create an agent"*, *"design agent architecture"*, *"what framework should I use"*, *"make this production-ready"*, *"scaffold an agent project"*
+Trigger phrases: *"build me an agent"*, *"create an agent"*, *"design agent architecture"*, *"what framework should I use"*, *"make this production-ready"*, *"scaffold an agent project"*, *"review my agent"*, *"why is my agent slow"*, *"fix my agent"*, *"optimize my agent"*, *"add memory to my agent"*
 
 ---
 
@@ -159,7 +163,7 @@ agent-builder/
 ├── Makefile                  # Unix/Linux/macOS build
 ├── build.ps1                 # Windows PowerShell build
 └── src/
-    ├── SKILL.md              # Core skill -- the 5-step workflow and code templates
+    ├── SKILL.md              # Core skill -- build workflow, review/troubleshoot/optimize workflows
     └── references/
         ├── patterns.md           # Pattern catalogue (topology, behavioral, data flow)
         ├── langchain-langgraph.md # Default stack implementation reference
