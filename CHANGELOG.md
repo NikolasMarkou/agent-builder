@@ -4,6 +4,11 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.12.1] - 2026-04-02
+
+### Fixed
+- **YAML frontmatter parsing error** in `SKILL.md` -- description field used unquoted colons causing "mapping values are not allowed" error. Switched to YAML block scalar (`>-`) for safe multi-line strings.
+
 ## [1.12.0] - 2026-04-02
 
 ### Added
