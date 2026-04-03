@@ -4,6 +4,17 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.13.0] - 2026-04-03
+
+### Added
+- **Multi-hop RAG reference** (`src/references/multi-hop-rag.md`) -- 8 methodology families (query decomposition, IRCoT, graph-based, RAPTOR, corrective loops, plan-then-retrieve, beam/search-tree, adaptive routing), decision matrix, LangGraph implementation templates (IRCoT loop, parallel decomposition), multi-hop evaluation metrics, production consensus, and failure modes.
+- **Multi-hop troubleshoot symptom** in `SKILL.md` -- "RAG fails on multi-hop questions" added to symptom table with root causes and reference pointers.
+
+### Changed
+- `retrieval.md` §9 (GraphRAG and Multi-Hop) refactored from inline descriptions to summary table + pointer to new reference. Added NodeRAG, HopRAG, CatRAG to variants. Decision framework expanded with multi-hop method selection sub-tree.
+- `SKILL.md` Step 1 requirements checklist and Step 4 references updated to include `multi-hop-rag.md` when queries involve cross-document reasoning.
+- `README.md` and `CLAUDE.md` project structure updated with new file.
+
 ## [1.12.1] - 2026-04-02
 
 ### Fixed
