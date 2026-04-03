@@ -89,7 +89,7 @@ Before writing code, determine:
    - Does the agent process tabular data (spreadsheets, CSVs, database results)? If yes: `references/tabular-data.md` needed at Step 4.
    - Does the agent need entity resolution (matching/deduplication across sources, AML/KYC, knowledge graphs)? If yes: `references/entity-resolution.md` needed at Step 4.
    - Does the agent use text search, data filtering, or code navigation? If yes: `references/text-tools.md` needed at Step 4.
-   - Does the agent retrieve and synthesize from a knowledge base or document corpus (RAG)? If yes: `references/retrieval.md` needed at Step 4.
+   - Does the agent retrieve and synthesize from a knowledge base or document corpus (RAG)? If yes: `references/retrieval.md` needed at Step 4. If queries require cross-document reasoning or evidence chaining (multi-hop): also `references/multi-hop-rag.md`.
    - Does the agent classify or route user input to different handlers? If yes: `references/structured-classification.md` needed at Step 4.
    - Does the task match a known scenario (deep research, customer support, code gen, data analysis, document processing, RAG, autonomous execution)? If yes: `references/scaffolding.md` needed at Steps 2 and 4.
    - Will the agent be deployed as a service? If yes: `references/deployment.md` needed at Step 5.
@@ -182,7 +182,7 @@ Load these based on DSB data requirements (identified in Step 1 checklist):
 - **Tabular data**: read `references/tabular-data.md` -- serialization format selection, size-based strategies, token cost tradeoffs.
 - **Entity resolution**: read `references/entity-resolution.md` -- blocking + matching + clustering pipeline, tiered matching, multi-agent ER, domain-specific patterns.
 - **Text search / code navigation**: read `references/text-tools.md` -- three-layer search stack, tool-by-tool reference, agent-optimized search tools, cost math.
-- **Knowledge base retrieval (RAG)**: read `references/retrieval.md` -- sparse/dense/hybrid retrieval, reranking, query transformation, corrective loops, GraphRAG, chunking strategies, agentic RAG architectures. For embedding model selection, evaluation protocols, and efficiency trade-offs, also read `references/embeddings.md`.
+- **Knowledge base retrieval (RAG)**: read `references/retrieval.md` -- sparse/dense/hybrid retrieval, reranking, query transformation, corrective loops, GraphRAG, chunking strategies, agentic RAG architectures. For multi-hop queries (cross-document reasoning, entity-relationship traversal, evidence chain construction), also read `references/multi-hop-rag.md`. For embedding model selection, evaluation protocols, and efficiency trade-offs, also read `references/embeddings.md`.
 - **Intent classification / routing**: read `references/structured-classification.md` -- classifier schema design, enforcement mechanisms (prompt vs constrained decoding), confidence thresholding, handler routing, hierarchical classification for large class sets.
 - **Scenario scaffolding**: read `references/scaffolding.md` -- if the task matches a known scenario (deep research, customer support, code gen, data analysis, document processing, RAG, autonomous execution), use the scenario-specific state shape, guardrails, and failure modes.
 
@@ -301,6 +301,7 @@ Symptom-based diagnostic for broken or underperforming agents. Start from the sy
 | Agent loses context mid-conversation | No checkpointing, context window overflow, no summarization | `references/production.md` §Context Engineering, `references/langchain-langgraph.md` §Persistence |
 | Agent routes to wrong specialist | Classifier quality, overlapping categories, no fallback | `references/structured-classification.md`, `references/patterns.md` §1.4 Router |
 | RAG returns irrelevant results | Wrong retrieval method, bad chunking, no reranking, stale embeddings | `references/retrieval.md`, `references/embeddings.md` |
+| RAG fails on multi-hop questions | Single-hop retrieval for cross-document queries, no evidence chaining, bad decomposition | `references/multi-hop-rag.md`, `references/retrieval.md` §GraphRAG |
 | Agent crashes on resume | Stale checkpoints, missing state validation | `references/patterns.md` §Failure Mode Catalogue (stale state) |
 | Prompts produce inconsistent output | No structured output, poor delimiter choice, position bias | `references/prompt-structuring.md` |
 

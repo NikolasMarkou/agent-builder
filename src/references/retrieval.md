@@ -285,31 +285,40 @@ Reduces cost 40-60% vs. running full agentic RAG on all queries.
 
 ## GraphRAG and Multi-Hop Retrieval
 
-Standard hybrid RAG retrieves passages. It cannot reason across relationships between entities. GraphRAG builds an entity-relationship graph over the corpus.
+When queries require reasoning across multiple documents, entity-relationship traversal, or connecting 2-N evidence fragments, standard hybrid retrieval is insufficient. This section covers the basics; for the full multi-hop methodology taxonomy, decision matrix, implementation templates, and evaluation metrics, see `multi-hop-rag.md`.
 
-### When to Use GraphRAG
+### Quick Reference
 
-**When to use:** Queries require traversing entity relationships across multiple documents. Multi-hop reasoning ("indirect financial exposures of X to Y's suppliers"). Thematic/global questions over a corpus ("what are the main themes across all reports?").
+| Method | Best For | Latency |
+|---|---|---|
+| Query Decomposition | Predictable hop structures | Medium |
+| IRCoT (interleaved retrieval + CoT) | Variable-hop, dependent evidence chains | High |
+| GraphRAG | Relational/entity reasoning | Medium-High |
+| RAPTOR | Thematic/hierarchical documents | Low |
+| CRAG Loop | High-stakes accuracy (layer on any method) | Medium |
+| REAPER | Latency-critical production | Low (207ms) |
+| Adaptive Routing | Mixed workloads, cost control | Variable |
 
-**When NOT to use:** Simple factoid queries (flat hybrid search is sufficient and faster). Corpora >3-5M tokens (graph traversal becomes less discriminative; edge count grows exponentially). No entity-relationship structure in the data.
+### When to Use Multi-Hop
 
-**Performance:** Best GraphRAG variants outperform vanilla RAG by 5-20 points on multi-hop benchmarks. Construction cost is high. ROI is proportional to query reasoning depth.
+**When to use:** Queries require combining evidence from 2+ documents. Entity-relationship traversal ("indirect exposures of X to Y's suppliers"). Temporal or causal chain reasoning.
 
-### Microsoft GraphRAG
+**When NOT to use:** Simple factoid queries (flat hybrid search is sufficient and faster). Corpus fits in context window (<100K tokens). No cross-document reasoning needed.
 
-Constructs entity graphs, clusters communities via Leiden/Louvain, generates hierarchical summaries at each community level. Local search uses graph-aware passage retrieval; global search uses community summaries.
+> **Design axiom: Tiered escalation.** Most queries are single-hop. Running full multi-hop on everything wastes 40-60% of compute. Use adaptive routing to classify query complexity and route accordingly. See `multi-hop-rag.md` §Adaptive Routing.
 
-### RAPTOR
+### GraphRAG Variants
 
-Recursive tree of increasingly abstract document summaries via clustering + LLM summarization. Retrieval can target any level: raw chunks (specific), mid-level summaries (intermediate), top-level abstractions (thematic). Best for long-document comprehension where thematic structure matters.
+| System | Mechanism | Trade-off |
+|---|---|---|
+| Microsoft GraphRAG | Entity graphs + Leiden community clustering + hierarchical summaries | High construction cost; degrades above ~3M tokens; 5-20 point gain |
+| HopRAG | Passage graph with pseudo-query edges; retrieve-reason-prune | Strong on logical relevance gaps |
+| LightRAG / GLightRAG | Simplified KG structures | 10-50x lower construction cost; some accuracy loss |
+| HippoRAG | Personalized PageRank over knowledge graphs | Memory-inspired; less production-proven |
+| NodeRAG | Heterogeneous graph (entities, chunks, events, summaries as nodes) | Best indexing time and query efficiency |
+| RAPTOR | Recursive tree of increasingly abstract summaries | Low latency; best for thematic/hierarchical docs |
 
-### Lightweight Variants
-
-| Variant | Trade-off |
-|---|---|
-| LightRAG / GLightRAG | 10-50x lower construction cost vs. full GraphRAG; some accuracy loss |
-| HippoRAG | Personalized PageRank over knowledge graphs; memory-inspired |
-| FastGraphRAG | Optimized for speed-critical multi-hop traversal |
+For implementation templates (LangGraph IRCoT loop, query decomposition with parallel retrieval, multi-hop state shape), see `multi-hop-rag.md` §Implementation.
 
 ---
 
@@ -494,7 +503,12 @@ Is the corpus domain-specific with specialized vocabulary?
   NO  → Generic bi-encoder (bge, e5) is sufficient.
 
 Are queries multi-hop or cross-document relational?
-  YES → GraphRAG or RAPTOR + agentic sub-query decomposition.
+  YES → See multi-hop-rag.md for method selection:
+        Predictable hops → Query Decomposition
+        Variable/dependent hops → IRCoT
+        Entity-relational → GraphRAG
+        Latency-critical → REAPER
+        Mixed workloads → Adaptive Routing + method per class
   NO  → Flat hybrid search.
 
 Is precision at top-1 critical?
@@ -529,4 +543,4 @@ Is the system agentic (multi-step reasoning)?
 
 ---
 
-**See also:** `embeddings.md` for embedding model selection, evaluation protocols, and efficiency trade-offs (MRL truncation, quantization, domain-specific models). `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability.
+**See also:** `multi-hop-rag.md` for multi-hop methodology taxonomy, decision matrix, LangGraph implementation templates, and multi-hop evaluation metrics. `embeddings.md` for embedding model selection, evaluation protocols, and efficiency trade-offs (MRL truncation, quantization, domain-specific models). `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability.

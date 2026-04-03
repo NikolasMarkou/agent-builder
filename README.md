@@ -180,6 +180,7 @@ agent-builder/
         ├── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
         ├── text-tools.md            # Text tools for agents: search stack, ripgrep, ast-grep, jq, sqlite3
         ├── retrieval.md             # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
+        ├── multi-hop-rag.md         # Multi-hop RAG: methodology taxonomy, IRCoT, query decomposition, graph traversal
         ├── embeddings.md            # Embedding model selection, evaluation protocols, efficiency trade-offs
         ├── structured-classification.md # Structured classification: intent detection, schema design, routing
         └── scaffolding.md           # Scenario scaffolding: recipes for research, support, code gen, RAG, and more
