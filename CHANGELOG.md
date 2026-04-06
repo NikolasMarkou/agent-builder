@@ -4,6 +4,19 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.14.0] - 2026-04-06
+
+### Added
+- **Failure Modes section** in `embeddings.md` — 7 failure modes (embedding drift, quantization degradation, domain mismatch, dimensionality over-reduction, leaderboard-production gap, stale index, null/adversarial input) with symptoms and mitigations.
+- **Migration route** in `SKILL.md` Query Router — explicit routing for "migrate agent from framework X to Y" (Review R1-R2 → Build Steps 3-5).
+- **Expanded LangGraph failure modes** in `langchain-langgraph.md` — added stale state on resume, middleware ordering bugs, silent node failures alongside existing checkpoint bloat and fan-out entries. Cross-linked to `patterns.md` §Failure Mode Catalogue.
+
+### Changed
+- **Step 5 hardening tiers** in `SKILL.md` — expanded from 2 tiers (Simple/Moderate vs Complex+) to 4 tiers matching DSB complexity classes (Simple/Moderate, Complex, Multi-agent, Batteries-included) with tier-specific hardening guidance.
+- **Validation logic** in `Makefile` and `build.ps1` — tightened content guideline check from substring match ("pitfall") to requiring formal section headings (`## Failure Modes`, `## When NOT`, or `## Anti-Pattern`). Added `embeddings.md` to strict failure modes heading check list.
+- **Microsoft Agent Framework** in `frameworks.md` — updated tense from "is merging" to "has merged" (AutoGen + Semantic Kernel unification).
+- **Cross-reference enrichment**: `structured-classification.md` now links to `patterns.md` §1.4 Router; `embeddings.md` See Also now includes `multi-hop-rag.md`.
+
 ## [1.13.0] - 2026-04-03
 
 ### Added

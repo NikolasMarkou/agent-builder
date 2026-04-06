@@ -223,12 +223,12 @@ function Invoke-Validate {
         }
     }
 
-    # Verify content guideline compliance (failure modes or when-not-to-use)
+    # Verify content guideline compliance (failure modes or when-not-to-use section heading)
     Write-Host "Checking content guideline compliance..."
     Get-ChildItem "src/references/*.md" | ForEach-Object {
         $refContent = Get-Content $_.FullName -Raw
-        if ($refContent -notmatch '(?i)(when not|failure mode|anti-pattern|pitfall)') {
-            $errors += "ERROR: $($_.Name) missing 'When NOT to use' or failure modes section"
+        if ($refContent -notmatch '(?mi)^##+ *(\d+\. *)?.*(Failure Mode|Anti-Pattern|When NOT|When .* Not)') {
+            $errors += "ERROR: $($_.Name) missing 'When NOT to use' or Failure Modes section heading"
         }
     }
 
@@ -237,7 +237,8 @@ function Invoke-Validate {
     $mustHaveFailureModes = @(
         "langchain-langgraph.md", "strands.md", "dspy.md",
         "retrieval.md", "text-tools.md", "entity-resolution.md",
-        "tabular-data.md", "structured-classification.md"
+        "tabular-data.md", "structured-classification.md",
+        "embeddings.md"
     )
     foreach ($name in $mustHaveFailureModes) {
         $refPath = "src/references/$name"

@@ -35,6 +35,7 @@ Before starting, classify the user's request. Not every query is "build a new ag
 | Reduce cost, improve performance, optimize prompts | **Optimize Workflow** (below) |
 | Add a capability to an existing agent (memory, HITL, streaming, tools, evals) | **Extend** — go to Step 4 (Build) + Step 5 (Harden), skip Steps 1-3. Read the relevant reference for the capability being added. |
 | Choose a framework or pattern (no existing agent) | **Build Workflow** Steps 1-3 |
+| Migrate or convert an agent from one framework to another | **Review Workflow** (map current architecture, Steps R1-R2), then **Build Workflow** Steps 3-5 (select new framework, rebuild, harden) |
 
 **Mixed requests** ("build a new agent and review my existing one"): handle the build first, then run the review workflow on the existing agent.
 
@@ -203,7 +204,9 @@ Check the DSB: if `Production hardening: no`, skip this step. If `Deployment: ap
 
 Scale hardening to complexity (from DSB):
 - **Simple/Moderate**: Focus on guardrails, cost modeling, basic observability. Skip resilience patterns and multi-agent failure modes.
-- **Complex and above**: Full hardening -- all sections below apply.
+- **Complex**: Full hardening -- all sections below apply.
+- **Multi-agent**: Full hardening + multi-agent failure modes (supervisor saturation, handoff loops, agent identity drift). Read `references/patterns.md` §Failure Mode Catalogue for multi-agent-specific entries.
+- **Batteries-included**: Full hardening + deep agent monitoring (subagent cost tracking, task planning divergence, long-term memory consistency). Set budget caps and observe subagent spawn depth.
 
 Read `references/production.md` before deploying. Covers:
 - Context engineering (context rot, token budget, three-artefact architecture)

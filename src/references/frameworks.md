@@ -186,7 +186,7 @@ response = await agent.run_async("Find the latest AI agent frameworks")
 **License:** MIT | **Stars:** ~27K | **Language:** C#, Python, Java
 **Best for:** .NET/Java enterprise, Azure-native, SOC 2/HIPAA compliance.
 
-**Note:** Microsoft is merging AutoGen + Semantic Kernel into unified Microsoft Agent Framework. Target this for new Microsoft-ecosystem projects.
+**Note:** Microsoft has merged AutoGen + Semantic Kernel into the unified Microsoft Agent Framework. Target this for new Microsoft-ecosystem projects.
 
 **Core concepts:**
 - Kernel: central orchestrator
@@ -401,6 +401,18 @@ print(result.sentiment)
 ### Mastra vs Vercel AI SDK
 - **Mastra**: Complete framework (agents, workflows, RAG, memory).
 - **Vercel AI SDK**: Streaming-first UI with React/Next.js (2.8M vs 220K weekly downloads). Many use both.
+
+---
+
+## Framework Selection Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| **Hype-driven selection** | Choosing a framework because it's trending, not because it fits the task shape | Match framework to patterns selected in Step 2; use the cross-validation gate |
+| **Orchestration in the wrong layer** | Using DSPy/LlamaIndex/Agno for orchestration (Parallel, Loop, HITL) when they're prompt optimization/retrieval/model-agnostic tools | Pair non-orchestration frameworks with LangGraph or Strands for complex topologies |
+| **Vendor lock-in blindness** | Deep investment in a single-model SDK (OpenAI Agents) without evaluating model-agnostic alternatives | Assess model-switching likelihood; prefer model-agnostic frameworks if multi-model is possible |
+| **Over-engineering with full orchestration** | Using LangGraph/Strands for Simple complexity when `create_agent` suffices | Check complexity class (Step 1); Simple agents don't need graph orchestration |
+| **Ignoring ecosystem constraints** | Selecting a Python framework for a TypeScript team, or LangGraph for an AWS-native shop | Weight team language, cloud provider, and existing infrastructure in selection |
 
 ---
 

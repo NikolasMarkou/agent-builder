@@ -557,4 +557,18 @@ Check coverage before deployment:
 
 ---
 
-**See also:** `retrieval.md` for retrieval architecture (sparse/dense/hybrid, reranking, chunking, agentic RAG). `evals.md` for the full agent evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability. `structured-classification.md` for classification via constrained decoding (alternative to embedding-based classification).
+## Failure Modes
+
+| Failure Mode | Symptom | Mitigation |
+|---|---|---|
+| **Embedding drift** | Retrieval quality degrades over time as corpus grows or domain shifts | Monitor retrieval metrics (nDCG, MRR) weekly; schedule periodic re-embedding with latest model version; version-tag all indexes |
+| **Quantization degradation** | Quality drops after int8/binary quantization exceed acceptable threshold | Run quantization degradation test (§Efficiency Trade-offs) before deploying; set quality delta threshold (e.g., <2% nDCG drop) |
+| **Domain mismatch** | General-purpose model underperforms on specialized vocabulary (legal, biomedical, code) | Evaluate domain-specific models (§Domain-Specific Considerations); fine-tune or use domain-adapted models; always test on your own data |
+| **Dimensionality over-reduction** | MRL truncation too aggressive, losing semantic nuance | Binary search for minimum viable dimension (§MRL Dimension Reduction); retain >=97% of full-dimension quality |
+| **Leaderboard-production gap** | Model tops MTEB but underperforms on your task | Never skip empirical evaluation on held-out data (§Step 5); leaderboard rankings are aggregates, not guarantees |
+| **Stale index** | New documents not retrievable; deleted documents still returned | Implement incremental indexing pipeline; add index freshness monitoring; schedule re-index for bulk updates |
+| **Null/adversarial input** | Empty strings, prompt injections, or garbage text produce unpredictable embeddings | Validate inputs before encoding; test edge cases (§Production Readiness Testing); add input sanitization layer |
+
+---
+
+**See also:** `retrieval.md` for retrieval architecture (sparse/dense/hybrid, reranking, chunking, agentic RAG). `multi-hop-rag.md` for multi-hop query patterns requiring cross-document reasoning. `evals.md` for the full agent evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability. `structured-classification.md` for classification via constrained decoding (alternative to embedding-based classification).

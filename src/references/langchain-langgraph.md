@@ -595,10 +595,13 @@ agent = create_deep_agent(
 
 ## Failure Modes
 
-See the Failure Mode Catalogue in `patterns.md` for the full list of pattern-level failure modes and mitigations. The most common LangGraph-specific issues:
+See the Failure Mode Catalogue in `patterns.md` for the full list of pattern-level failure modes and mitigations (including multi-agent-specific entries like supervisor saturation and handoff loops). The most common LangGraph-specific issues:
 
 - **Checkpoint bloat**: Set TTL on checkpoints, use `PostgresSaver` with periodic pruning.
 - **Fan-out cost explosion**: Cap `len(tasks)` before `Send()` dispatch, add concurrency limit.
+- **Stale state on resume**: Validate checkpoint schema version on load; reject or migrate stale checkpoints rather than crashing mid-graph.
+- **Middleware ordering bugs**: Middleware executes in registration order. Place moderation before retry, summarization before LLM calls. Test the chain end-to-end.
+- **Silent node failures**: A node that returns `{}` (empty update) is indistinguishable from success. Use explicit error keys in state or raise exceptions for critical failures.
 
 ## Cost Guidelines
 

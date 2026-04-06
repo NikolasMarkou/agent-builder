@@ -107,19 +107,20 @@ validate:
 	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null); do \
 		grep -q '```' $$ref || { echo "ERROR: $$ref has no code examples"; fail=1; }; \
 	done; [ $$fail -eq 0 ]
-	@# Verify content guideline compliance (failure modes or when-not-to-use)
+	@# Verify content guideline compliance (failure modes or when-not-to-use section heading)
 	@echo "Checking content guideline compliance..."
 	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null); do \
 		name=$$(basename $$ref); \
-		if ! grep -qi "when not\|failure mode\|anti-pattern\|pitfall" $$ref; then \
-			echo "ERROR: $$name missing 'When NOT to use' or failure modes section"; fail=1; \
+		if ! grep -qiE '^##+ *([0-9]+\. *)?.*(Failure Mode|Anti-Pattern|When NOT|When .* Not)' $$ref; then \
+			echo "ERROR: $$name missing 'When NOT to use' or Failure Modes section heading"; fail=1; \
 		fi; \
 	done; [ $$fail -eq 0 ]
 	@# Verify failure modes heading exists in files that need them (framework and data references)
 	@echo "Checking failure modes sections..."
 	@fail=0; for ref in src/references/langchain-langgraph.md src/references/strands.md src/references/dspy.md \
 		src/references/retrieval.md src/references/text-tools.md src/references/entity-resolution.md \
-		src/references/tabular-data.md src/references/structured-classification.md; do \
+		src/references/tabular-data.md src/references/structured-classification.md \
+		src/references/embeddings.md; do \
 		name=$$(basename $$ref); \
 		if ! grep -qiE '^##+ *([0-9]+\. *)?(Failure Mode|Anti-Pattern)' $$ref; then \
 			echo "ERROR: $$name missing Failure Modes or Anti-Patterns section heading"; fail=1; \

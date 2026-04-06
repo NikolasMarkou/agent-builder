@@ -1,6 +1,6 @@
 # Structured Classification Reference
 
-LLM-based classification: mapping free-form input to predefined classes with validated JSON output. The foundational pattern behind Router topology agents, intent detection, and controlled flow routing.
+LLM-based classification: mapping free-form input to predefined classes with validated JSON output. The foundational pattern behind Router topology agents (see `patterns.md` §1.4 Router for topology-level design), intent detection, and controlled flow routing.
 
 ## Table of Contents
 
