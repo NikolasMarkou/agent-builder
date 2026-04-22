@@ -348,7 +348,8 @@ When migrating existing LangGraph agents to Strands:
 | `Send()` for fan-out | Workflow with independent tasks |
 | `interrupt()` for HITL | No built-in equivalent — implement via blocking tool |
 | Checkpointer | SessionManager for session persistence |
-| `create_react_agent` | `Agent()` (default behavior) |
+| `create_agent` (LangChain 1.x) | `Agent()` (default behavior) |
+| `create_react_agent` (LangChain 0.x) | `Agent()` (default behavior) |
 | `create_swarm` | `Swarm()` |
 | Node functions | Agents or custom Graph nodes |
 | `@tool` decorator | `@tool` decorator (same concept, different import) |

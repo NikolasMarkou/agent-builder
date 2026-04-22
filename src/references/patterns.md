@@ -2,6 +2,8 @@
 
 Complete catalogue of agentic AI patterns across three orthogonal layers. Production systems compose across all three.
 
+**19 patterns across 3 layers**: 7 topology + 7 behavioral + 5 data flow.
+
 ## Table of Contents
 
 1. [Layer 1: Topology Patterns](#layer-1-topology-patterns)

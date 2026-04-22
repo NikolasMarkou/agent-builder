@@ -9,3 +9,20 @@ dist/
 nul
 plans/
 analyses/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor artifacts
+.idea/
+.vscode/
+*.swp
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Environment / secrets
+.env
+.venv/

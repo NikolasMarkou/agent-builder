@@ -26,7 +26,7 @@ build:
 	@# Copy reference files
 	cp $(REFERENCE_FILES) $(BUILD_DIR)/$(SKILL_NAME)/references/
 	@# Copy documentation
-	cp $(DOC_FILES) $(BUILD_DIR)/$(SKILL_NAME)/ 2>/dev/null || true
+	cp $(DOC_FILES) $(BUILD_DIR)/$(SKILL_NAME)/
 	@echo "Build complete: $(BUILD_DIR)/$(SKILL_NAME)"
 
 # Create a combined single-file skill (SKILL.md with references inlined)
@@ -80,7 +80,7 @@ validate:
 	@test -d src/references || (echo "ERROR: src/references/ directory not found" && exit 1)
 	@# Verify all references/ cross-references in SKILL.md resolve to actual files
 	@echo "Checking cross-references..."
-	@fail=0; for ref in $$(grep -oE 'references/[a-z0-9_-]+\.md' $(SKILL_FILE) | sort -u); do \
+	@fail=0; for ref in $$(grep -oE 'references/[A-Za-z0-9_-]+\.md' $(SKILL_FILE) | sort -u); do \
 		test -f "src/$$ref" || { echo "ERROR: $(SKILL_FILE) references src/$$ref but file not found"; fail=1; }; \
 	done; [ $$fail -eq 0 ]
 	@# Verify SKILL.md has frontmatter delimiters

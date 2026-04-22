@@ -157,7 +157,7 @@ function Invoke-Validate {
 
         # Verify all references/ cross-references resolve to actual files
         Write-Host "Checking cross-references..."
-        $refs = [regex]::Matches($content, 'references/[a-z0-9_-]+\.md') | ForEach-Object { $_.Value } | Sort-Object -Unique
+        $refs = [regex]::Matches($content, 'references/[A-Za-z0-9_-]+\.md') | ForEach-Object { $_.Value } | Sort-Object -Unique
         foreach ($ref in $refs) {
             if (-not (Test-Path "src/$ref")) {
                 $errors += "ERROR: SKILL.md references src/$ref but file not found"
