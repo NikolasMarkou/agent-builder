@@ -458,7 +458,7 @@ For rubric design theory, scale selection, and bias mitigation, see `llm-as-judg
 
 | Dimension | What It Measures | When It Matters Most |
 |---|---|---|
-| **Hallucination** | Whether the response contains fabricated facts, invented sources, or claims unsupported by the provided context | RAG agents, knowledge-base QA, any agent that retrieves and synthesizes information |
+| **Hallucination** | Whether the response contains fabricated facts, invented sources, or claims unsupported by the provided context | RAG agents, knowledge-base QA, any agent that retrieves and synthesizes information. For RAG systems, decompose into Faithfulness (A\|C) and Context Support (C\|A) — see `rag-evals.md`. |
 | **Toxicity** | Whether the response contains harmful, offensive, discriminatory, or inappropriate content | All user-facing agents — non-negotiable safety baseline |
 | **Helpfulness** | Whether the response addresses the user's actual need with accurate, actionable, complete information | Task-oriented agents, customer support, advisory systems |
 | **Relevancy** | Whether the response stays on topic and avoids tangential content | Agents handling diverse queries, routed multi-agent systems |
@@ -483,7 +483,7 @@ Not every agent needs all five. Select based on risk profile:
 | Agent Type | Must Have | Should Have | Nice to Have |
 |---|---|---|---|
 | **Customer-facing chat** | Toxicity, Helpfulness | Hallucination, Relevancy | Conciseness |
-| **RAG / knowledge QA** | Hallucination, Relevancy | Helpfulness | Conciseness, Toxicity |
+| **RAG / knowledge QA** | Hallucination, Relevancy | Helpfulness | Conciseness, Toxicity | → For RAG-specific evaluation (6-metric Q/A/C framework, tiered cadence, domain mapping), see `rag-evals.md` |
 | **Code generation** | Helpfulness (correctness) | — | Conciseness |
 | **Voice / realtime** | Conciseness, Helpfulness | Toxicity | Relevancy |
 | **Internal tooling** | Helpfulness | Hallucination | — |

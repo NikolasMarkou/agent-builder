@@ -458,27 +458,16 @@ For detailed framework comparison, see `frameworks.md`. LlamaIndex is recommende
 
 ## Retrieval Evaluation
 
-Standard IR metrics plus RAG-specific metrics. For the full evaluation framework, see `evals.md`.
+For comprehensive RAG evaluation — the Q/A/C framework, 6 exhaustive metrics across 3 tiers, domain-severity mapping, and evaluation harness guidance — see `rag-evals.md`.
 
-### Retrieval-Specific Metrics
+Quick reference for retrieval-specific operational metrics:
 
-| Metric | What It Measures | Target |
+| Metric | What It Signals | Target |
 |---|---|---|
-| Hit Rate / Recall@k | Correct passage in top-k? | >0.9 for k=10 |
-| MRR (Mean Reciprocal Rank) | How high is first relevant hit? | >0.7 |
-| nDCG@10 | Full ranking quality | >0.6 |
-| Context Precision (RAGAS) | Are retrieved docs relevant? | >0.8 |
-| Context Recall (RAGAS) | Was all necessary info retrieved? | >0.8 |
-| Faithfulness (RAGAS) | Does answer stick to retrieved facts? | >0.9 |
-
-### Agentic Loop Metrics
-
-| Metric | What It Signals |
-|---|---|
-| Retrieval cycles per query | Should stay low (median ≤1.5). High = first-stage quality problem. |
-| CRAG trigger rate | High trigger rate = first-stage retrieval needs improvement. |
-| Latency P50/P95 per retrieval call | Budget ≤120ms P50 first-call; flag if P95 >500ms. |
-| Cache hit rate | Should be >30% for steady-state workloads. |
+| Retrieval cycles per query | First-stage quality (should stay low) | Median ≤1.5 |
+| CRAG trigger rate | First-stage retrieval sufficiency | Lower is better |
+| Latency P50/P95 per retrieval call | Performance budget | ≤120ms P50; flag if P95 >500ms |
+| Cache hit rate | Steady-state efficiency | >30% |
 
 ---
 

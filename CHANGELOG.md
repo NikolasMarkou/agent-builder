@@ -4,6 +4,17 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.15.0] - 2026-04-22
+
+### Added
+- **RAG evaluation reference** (`src/references/rag-evals.md`) -- Q/A/C framework with 6 exhaustive evaluation metrics (Context Relevance, Faithfulness, Answer Relevance, Context Support, Question Answerability, Self-Containment), 3-tier evaluation cadence (retrieval prerequisites → core metrics → advanced diagnostics), domain-severity mapping, failure-to-metric mapping, evaluation harness guidance, and Opik code example.
+
+### Changed
+- `retrieval.md` §Retrieval Evaluation refactored from inline metric definitions to pointer to new `rag-evals.md` reference. Operational metrics (retrieval cycles, CRAG trigger rate, latency, cache hit rate) retained.
+- `evals.md` §Core Eval Dimensions updated with RAG-specific cross-references: Hallucination dimension now points to Faithfulness/Context Support decomposition; RAG/knowledge QA row links to `rag-evals.md`.
+- `SKILL.md` updated in 3 locations: Step 1 requirements checklist, Step 5 evaluation loading, and troubleshoot symptom table — all reference `rag-evals.md`.
+- `README.md` and `CLAUDE.md` project structure updated with new file.
+
 ## [1.14.0] - 2026-04-06
 
 ### Added

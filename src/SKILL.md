@@ -94,7 +94,7 @@ Before writing code, determine:
    - Does the agent classify or route user input to different handlers? If yes: `references/structured-classification.md` needed at Step 4.
    - Does the task match a known scenario (deep research, customer support, code gen, data analysis, document processing, RAG, autonomous execution)? If yes: `references/scaffolding.md` needed at Steps 2 and 4.
    - Will the agent be deployed as a service? If yes: `references/deployment.md` needed at Step 5.
-   - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5.
+   - Does the agent need production hardening and evaluation? If yes: `references/production.md` + `references/evals.md` needed at Step 5. For RAG-specific evaluation (6-metric framework, tiered cadence, domain mapping): `references/rag-evals.md` needed at Step 5.
 
 **Emit DSB after Step 1.** Then apply tier routing:
 - **Needs agent: no**: Recommend the appropriate non-agent approach:
@@ -211,7 +211,7 @@ Scale hardening to complexity (from DSB):
 Read `references/production.md` before deploying. Covers:
 - Context engineering (context rot, token budget, three-artefact architecture)
 - Tool design principles (minimize action space, shape to model capabilities, elicitation)
-- Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines. For LLM-as-judge implementation details, read `references/llm-as-judge.md`. For rubric design with binary decomposition, read `references/binary-evals.md`.
+- Evaluation strategy (domain-specific evals, not generic benchmarks). Read `references/evals.md` for comprehensive evaluation guidance: frameworks, benchmarks, metrics, LLM-as-judge, safety evals, monitoring, and building eval pipelines. For LLM-as-judge implementation details, read `references/llm-as-judge.md`. For rubric design with binary decomposition, read `references/binary-evals.md`. For RAG-specific evaluation (Q/A/C framework, 6 exhaustive metrics, tiered cadence, domain-severity mapping, evaluation harness), read `references/rag-evals.md`.
 - Cost modeling (token math at scale)
 - Observability (LangSmith tracing, structured logging, Prometheus metrics, Langfuse)
 - Guardrails (input validation, output validation, tool permission scoping)
@@ -303,7 +303,7 @@ Symptom-based diagnostic for broken or underperforming agents. Start from the sy
 | Agent costs too much | No model routing, no context compression, unbounded fan-out, no caching | `references/production.md` §Cost Modeling |
 | Agent loses context mid-conversation | No checkpointing, context window overflow, no summarization | `references/production.md` §Context Engineering, `references/langchain-langgraph.md` §Persistence |
 | Agent routes to wrong specialist | Classifier quality, overlapping categories, no fallback | `references/structured-classification.md`, `references/patterns.md` §1.4 Router |
-| RAG returns irrelevant results | Wrong retrieval method, bad chunking, no reranking, stale embeddings | `references/retrieval.md`, `references/embeddings.md` |
+| RAG returns irrelevant results | Wrong retrieval method, bad chunking, no reranking, stale embeddings | `references/retrieval.md`, `references/embeddings.md`, `references/rag-evals.md` |
 | RAG fails on multi-hop questions | Single-hop retrieval for cross-document queries, no evidence chaining, bad decomposition | `references/multi-hop-rag.md`, `references/retrieval.md` §GraphRAG |
 | Agent crashes on resume | Stale checkpoints, missing state validation | `references/patterns.md` §Failure Mode Catalogue (stale state) |
 | Prompts produce inconsistent output | No structured output, poor delimiter choice, position bias | `references/prompt-structuring.md` |

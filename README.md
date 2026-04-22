@@ -1,7 +1,7 @@
 # Agent Builder
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Skill](https://img.shields.io/badge/Skill-v1.14.0-green.svg)](CHANGELOG.md)
+[![Skill](https://img.shields.io/badge/Skill-v1.15.0-green.svg)](CHANGELOG.md)
 [![Sponsored by Electi](https://img.shields.io/badge/Sponsored%20by-Electi-red.svg)](https://www.electiconsulting.com)
 
 **Stop guessing how to build AI agents. This skill does the thinking for you.**
@@ -180,6 +180,7 @@ agent-builder/
         ├── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
         ├── text-tools.md            # Text tools for agents: search stack, ripgrep, ast-grep, jq, sqlite3
         ├── retrieval.md             # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
+        ├── rag-evals.md             # RAG evaluation: Q/A/C framework, 6 exhaustive metrics, tiered cadence, domain mapping
         ├── multi-hop-rag.md         # Multi-hop RAG: methodology taxonomy, IRCoT, query decomposition, graph traversal
         ├── embeddings.md            # Embedding model selection, evaluation protocols, efficiency trade-offs
         ├── structured-classification.md # Structured classification: intent detection, schema design, routing
