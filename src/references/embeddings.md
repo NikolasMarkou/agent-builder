@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Embedding Model Selection and Evaluation
 
 Guidance for selecting, evaluating, and deploying embedding models in agent systems. Covers intrinsic evaluation, task-specific evaluation protocols, production readiness testing, domain-specific model recommendations, and efficiency trade-offs.

@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Structuring Tabular Data for LLM Consumption
 
 How to serialize tables, spreadsheets, and structured records for LLM prompts: format selection, size-based strategies, and cost/accuracy tradeoffs.

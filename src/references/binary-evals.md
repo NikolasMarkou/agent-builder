@@ -1,6 +1,7 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Binary Rules for LLM-as-Judge
 
-Binary decomposition — breaking evaluation criteria into yes/no checklist questions — is the single highest-leverage change you can make to your LLM evaluation pipeline. It improves inter-evaluator agreement by +0.45, improves correlation with human judgments by +0.10, cuts evaluation time by 50%+, and produces interpretable, traceable scores.
+Binary decomposition — breaking evaluation criteria into yes/no checklist questions — is the single highest-leverage change you can make to your LLM evaluation pipeline. It improves inter-evaluator agreement by **+0.45 (absolute Cohen's κ)**, improves correlation with human judgments by +0.10 (Pearson r), cuts evaluation time by 50%+, and produces interpretable, traceable scores.
 
 This is a deep-dive companion to `llm-as-judge.md`. Read that file first for the broader LLM-as-Judge landscape (implementation patterns, bias mitigation, calibration, judge model selection, agent evaluation, production deployment).
 
@@ -28,7 +29,7 @@ Binary questions eliminate this. "Does the response contain factual errors? Yes/
 
 **Evidence:**
 
-- **CheckEval** (Lee et al., EMNLP 2025): Decomposed binary questions improved average inter-evaluator agreement by **+0.45** across 12 evaluator models and multiple datasets. Score variance dropped substantially.
+- **CheckEval** (Lee et al., EMNLP 2025): Decomposed binary questions improved average inter-evaluator agreement by **+0.45 (absolute Cohen's κ)** across 12 evaluator models and multiple datasets. Score variance dropped substantially.
 - **Google Research Adaptive Precise Boolean rubrics** (2025): Boolean rubrics showed "clear, positive correlation" with quality improvements while Likert scales showed "limited sensitivity." Evaluation time dropped 50%+ compared to Likert.
 - **Arize AI** (2025): Testing with GPT-4o-mini, Claude Opus, and Qwen3 confirmed "numeric scoring can flag major differences but breaks down for finer judgments" — scores produce plateaus, discontinuous jumps, and bimodal distributions.
 - **Confident AI / DeepEval**: LLMs can be reliable judges for binary factual correctness, but as scoring scales become more detailed, they produce arbitrary scores with more randomness.

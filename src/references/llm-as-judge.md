@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # LLM-as-Judge: Practitioner's Guide
 
 Using LLMs to evaluate AI system outputs at scale. Covers implementation patterns, bias mitigation, calibration, rubric design, agent evaluation, production deployment, frameworks, and anti-patterns.
@@ -139,7 +140,7 @@ The single most impactful rubric design decision is **scale granularity**.
 | 1-5 with anchors | Acceptable | Development with well-defined anchor descriptions per level | Without anchored descriptions for every score level |
 | 1-10 or continuous | Avoid | Almost never | Always — LLMs perform poorly at fine-grained discrimination |
 
-CheckEval (Lee et al., EMNLP 2025): decomposing criteria into binary checklist questions improved inter-evaluator agreement by **+0.45** and average correlation with human judgments by **+0.10** across 12 evaluator models. For full CheckEval implementation patterns, scale selection, and prompt templates, see `binary-evals.md`.
+CheckEval (Lee et al., EMNLP 2025): decomposing criteria into binary checklist questions improved inter-evaluator agreement by **+0.45 (absolute Cohen's κ)** and average correlation with human judgments by **+0.10 (Pearson r)** across 12 evaluator models. For full CheckEval implementation patterns, scale selection, and prompt templates, see `binary-evals.md`.
 
 ### Anchor Description Example (1-5 Helpfulness)
 

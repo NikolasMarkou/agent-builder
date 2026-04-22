@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Entity Resolution in Agentic Workflows: A Practical Guide
 
 ## What this guide covers

@@ -255,7 +255,96 @@ function Invoke-Validate {
         exit 1
     }
 
+    Invoke-ValidateXrefStyle
+    Invoke-ValidateFrameworkParity
+    Invoke-ValidateBenchmarkStamps
+    Invoke-ValidateCitationDensity
+
     Write-Host "Validation passed!" -ForegroundColor Green
+}
+
+function Invoke-ValidateXrefStyle {
+    Write-Host "Checking cross-reference style inside references/..." -ForegroundColor Yellow
+    $hits = @()
+    Get-ChildItem -Path "src/references" -Filter "*.md" | ForEach-Object {
+        $lines = Get-Content $_.FullName
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -match '\breferences/[a-z][a-z_-]*\.md\b') {
+                $hits += ("{0}:{1}: {2}" -f $_.FullName, ($i + 1), $lines[$i])
+            }
+        }
+    }
+    if ($hits.Count -gt 0) {
+        Write-Host "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):" -ForegroundColor Red
+        $hits | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+        exit 1
+    }
+}
+
+function Invoke-ValidateFrameworkParity {
+    Write-Host "Checking framework table parity (SKILL.md <-> frameworks.md)..." -ForegroundColor Yellow
+    $skillContent = Get-Content "src/SKILL.md" -Raw
+    $step3Match = [regex]::Match($skillContent, '(?s)### Step 3: Select Framework.*?### Step 4:')
+    $skillFrameworks = @()
+    if ($step3Match.Success) {
+        $pattern = 'CrewAI|Strands Agents|OpenAI Agents SDK|Semantic Kernel|Google ADK|Mastra|LlamaIndex|DSPy|Agno|Smolagents'
+        $skillFrameworks = [regex]::Matches($step3Match.Value, $pattern) | ForEach-Object { $_.Value } | Sort-Object -Unique
+    }
+    $refContent = Get-Content "src/references/frameworks.md" -Raw
+    $matrixMatch = [regex]::Match($refContent, '(?s)## Framework Selection Matrix.*?## Head-to-Head')
+    $refFrameworks = @()
+    if ($matrixMatch.Success) {
+        $refFrameworks = ([regex]::Matches($matrixMatch.Value, '(?m)^## (.+)$') |
+            ForEach-Object { ($_.Groups[1].Value -split ' */ ')[0].Trim() } |
+            Where-Object { $_ -notin @('Framework Selection Matrix', 'Head-to-Head') }) |
+            Sort-Object -Unique
+    }
+    $missingInRef   = $skillFrameworks | Where-Object { $refFrameworks -notcontains $_ }
+    $missingInSkill = $refFrameworks   | Where-Object { $skillFrameworks -notcontains $_ }
+    if ($missingInRef.Count -gt 0) {
+        Write-Host "WARN: frameworks in SKILL.md Step 3 not found as '## X' heading in frameworks.md:" -ForegroundColor Yellow
+        $missingInRef | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    }
+    if ($missingInSkill.Count -gt 0) {
+        Write-Host "WARN: frameworks with '## X' heading in frameworks.md not listed in SKILL.md Step 3 override table:" -ForegroundColor Yellow
+        $missingInSkill | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    }
+    Write-Host "Framework parity check complete (advisory)."
+}
+
+function Invoke-ValidateBenchmarkStamps {
+    Write-Host "Checking benchmark date-stamps..." -ForegroundColor Yellow
+    $benchmarkFiles = @(
+        "multi-hop-rag.md", "retrieval.md", "entity-resolution.md", "evals.md",
+        "llm-as-judge.md", "binary-evals.md", "tabular-data.md", "embeddings.md"
+    )
+    $errors = @()
+    foreach ($name in $benchmarkFiles) {
+        $refPath = "src/references/$name"
+        if (Test-Path $refPath) {
+            $refContent = Get-Content $refPath -Raw
+            if ($refContent -notmatch '<!-- *benchmarks-as-of: *\d{4}-\d{2} *-->') {
+                $errors += "ERROR: $name missing <!-- benchmarks-as-of: YYYY-MM --> banner"
+            }
+        }
+    }
+    if ($errors.Count -gt 0) {
+        $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+        exit 1
+    }
+}
+
+function Invoke-ValidateCitationDensity {
+    Write-Host "Checking citation density (advisory)..." -ForegroundColor Yellow
+    Get-ChildItem -Path "src/references" -Filter "*.md" | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        $nums  = [regex]::Matches($content, '[0-9]+(\.[0-9]+)?%|[0-9]+\.[0-9]+\s*(points?|pp|x|ms|s|F1|BLEU|ROUGE|accuracy)').Count
+        $cites = [regex]::Matches($content, 'https?://|et al\.|\([A-Z][a-z]+,? [0-9]{4}\)').Count
+        if ($nums -gt 8 -and $cites -lt 2) {
+            Write-Host ("WARN: {0} has {1} numeric claims but only {2} citation markers" -f $_.Name, $nums, $cites) -ForegroundColor Yellow
+        }
+    }
+    Write-Host "Citation density check complete (advisory)."
 }
 
 function Invoke-PackageTar {

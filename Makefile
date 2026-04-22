@@ -126,7 +126,78 @@ validate:
 			echo "ERROR: $$name missing Failure Modes or Anti-Patterns section heading"; fail=1; \
 		fi; \
 	done; [ $$fail -eq 0 ]
+	@$(MAKE) --no-print-directory validate-xref-style
+	@$(MAKE) --no-print-directory validate-framework-parity
+	@$(MAKE) --no-print-directory validate-benchmark-stamps
+	@$(MAKE) --no-print-directory validate-citation-density
 	@echo "Validation passed!"
+
+# Linter: no rooted `references/foo.md` paths inside src/references/*.md
+# (intra-directory refs should be bare sibling paths; see CLAUDE.md)
+.PHONY: validate-xref-style
+validate-xref-style:
+	@echo "Checking cross-reference style inside references/..."
+	@hits=$$(grep -rnE '\breferences/[a-z][a-z_-]*\.md\b' src/references/ 2>/dev/null || true); \
+	if [ -n "$$hits" ]; then \
+		echo "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):"; \
+		echo "$$hits"; \
+		exit 1; \
+	fi
+
+# Linter: framework names in SKILL.md Step 3 override table must match
+# top-level `## ` headings in frameworks.md (modulo the default LangChain/LangGraph)
+.PHONY: validate-framework-parity
+validate-framework-parity:
+	@echo "Checking framework table parity (SKILL.md ↔ frameworks.md)..."
+	@tmp=$$(mktemp -d); \
+	awk '/^### Step 3: Select Framework/,/^### Step 4:/' $(SKILL_FILE) \
+		| grep -oE '(CrewAI|Strands Agents|OpenAI Agents SDK|Semantic Kernel|Google ADK|Mastra|LlamaIndex|DSPy|Agno|Smolagents)' \
+		| sort -u > $$tmp/skill.txt; \
+	awk '/^## Framework Selection Matrix/,/^## Head-to-Head/' src/references/frameworks.md \
+		| grep -E '^## ' | sed -E 's/^## *//;s/ *\/.*$$//' \
+		| grep -vE '^(Framework Selection Matrix|Head-to-Head)$$' \
+		| sort -u > $$tmp/ref.txt; \
+	missing_in_ref=$$(comm -23 $$tmp/skill.txt $$tmp/ref.txt); \
+	missing_in_skill=$$(comm -13 $$tmp/skill.txt $$tmp/ref.txt); \
+	if [ -n "$$missing_in_ref" ]; then \
+		echo "WARN: frameworks in SKILL.md Step 3 not found as '## N. X' heading in frameworks.md:"; \
+		echo "$$missing_in_ref"; \
+	fi; \
+	if [ -n "$$missing_in_skill" ]; then \
+		echo "WARN: frameworks with '## N. X' heading in frameworks.md not listed in SKILL.md Step 3 override table:"; \
+		echo "$$missing_in_skill"; \
+	fi; \
+	rm -rf $$tmp; \
+	echo "Framework parity check complete (advisory)."
+
+# Linter: benchmark-heavy files must carry <!-- benchmarks-as-of: YYYY-MM --> banner
+.PHONY: validate-benchmark-stamps
+validate-benchmark-stamps:
+	@echo "Checking benchmark date-stamps..."
+	@fail=0; for ref in src/references/multi-hop-rag.md src/references/retrieval.md \
+		src/references/entity-resolution.md src/references/evals.md \
+		src/references/llm-as-judge.md src/references/binary-evals.md \
+		src/references/tabular-data.md src/references/embeddings.md; do \
+		name=$$(basename $$ref); \
+		if ! grep -qE '<!-- *benchmarks-as-of: *[0-9]{4}-[0-9]{2} *-->' $$ref; then \
+			echo "ERROR: $$name missing <!-- benchmarks-as-of: YYYY-MM --> banner"; fail=1; \
+		fi; \
+	done; [ $$fail -eq 0 ]
+
+# Linter (advisory): flag files with many numeric/percentage claims but few citations
+# A citation signal is any http(s) URL, "et al.", or (AuthorYYYY) pattern.
+.PHONY: validate-citation-density
+validate-citation-density:
+	@echo "Checking citation density (advisory)..."
+	@for ref in $$(ls src/references/*.md 2>/dev/null); do \
+		name=$$(basename $$ref); \
+		nums=$$(grep -oE '[0-9]+(\.[0-9]+)?%|[0-9]+\.[0-9]+\s*(points?|pp|x|ms|s|F1|BLEU|ROUGE|accuracy)' $$ref | wc -l); \
+		cites=$$(grep -cE 'https?://|et al\.|\([A-Z][a-z]+,? [0-9]{4}\)' $$ref); \
+		if [ "$$nums" -gt 8 ] && [ "$$cites" -lt 2 ]; then \
+			echo "WARN: $$name has $$nums numeric claims but only $$cites citation markers"; \
+		fi; \
+	done; \
+	echo "Citation density check complete (advisory)."
 
 # Clean build artifacts
 .PHONY: clean

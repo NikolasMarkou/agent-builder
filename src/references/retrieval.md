@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Text Retrieval for Agentic AI
 
 Production retrieval patterns for agents that need to search, rank, and synthesize from knowledge bases. Covers sparse retrieval (BM25), dense retrieval (bi-encoders), hybrid fusion, reranking, query transformation, corrective loops, GraphRAG, and agentic RAG architectures.

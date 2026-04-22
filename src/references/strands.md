@@ -44,8 +44,8 @@ Every Strands agent has three components:
 | Component | Role | Design Principle |
 |---|---|---|
 | **Model Provider** | Reasoning engine | Choose based on deployment target and cost. Bedrock for AWS, direct API for others. |
-| **System Prompt** | Agent role, behavior, constraints | Apply prompt structuring from `references/prompt-structuring.md`. |
-| **Toolbelt** | Functions the agent can call | Apply tool design from `references/production.md`. Minimize action space. |
+| **System Prompt** | Agent role, behavior, constraints | Apply prompt structuring from `prompt-structuring.md`. |
+| **Toolbelt** | Functions the agent can call | Apply tool design from `production.md`. Minimize action space. |
 
 **Agentic loop:** The LLM iteratively reasons, selects a tool, executes it, incorporates the result, and decides the next step — until it reaches a final answer. No developer-defined graph or state machine. The model IS the control flow.
 
@@ -76,7 +76,7 @@ Strands is model-agnostic. Supported providers:
 
 Any Python function with type hints and a docstring becomes a tool via the `@tool` decorator. The docstring is exposed to the LLM as the tool description.
 
-**Design rules** (same as `references/production.md` tool design):
+**Design rules** (same as `production.md` tool design):
 - One tool = one action. Don't combine "search and summarize" into one tool.
 - Docstring is the tool's interface to the LLM. Be specific about inputs, outputs, and constraints.
 - Type hints are mandatory — they define the tool's parameter schema.
@@ -130,7 +130,7 @@ Agents hand off to each other dynamically via `strands.multiagent.Swarm`. Each a
 | **Termination** | Agent omits `agentId` to end and return final response |
 | **Failure mode** | Infinite handoff loops. Mitigate with max handoff count or timeout. |
 
-**Maps to:** Network topology + Swarm data flow pattern from `references/patterns.md`.
+**Maps to:** Network topology + Swarm data flow pattern from `patterns.md`.
 
 ### Graph (Deterministic Routing)
 
@@ -144,7 +144,7 @@ Directed graph where agents are nodes and edges define routing. Supports conditi
 | **Topology** | DAG for pipelines, cyclic for feedback loops and iterative refinement |
 | **State passing** | Output from one node becomes input to connected nodes |
 
-**Maps to:** Router/Loop topology + Controlled Flow data flow pattern from `references/patterns.md`.
+**Maps to:** Router/Loop topology + Controlled Flow data flow pattern from `patterns.md`.
 
 ### Workflow (Dependency-Based Parallelism)
 
@@ -157,7 +157,7 @@ Developer-defined task graph with explicit dependencies. Independent branches ru
 | **Parallelism** | Automatic — tasks without mutual dependencies run concurrently |
 | **Failure mode** | Upstream task failure blocks all dependents. Design idempotent tasks. |
 
-**Maps to:** Parallel topology + Map-Reduce data flow pattern from `references/patterns.md`.
+**Maps to:** Parallel topology + Map-Reduce data flow pattern from `patterns.md`.
 
 ### Pattern Selection (Strands-Specific)
 
@@ -188,7 +188,7 @@ Developer-defined task graph with explicit dependencies. Independent branches ru
 
 Strands supports Pydantic model-based structured output via the `output_schema` parameter. The agent's response is parsed and validated against the schema automatically.
 
-**When to use:** Classification, extraction, structured report generation, any case where you need typed output rather than free-form text. Apply schema design principles from `references/structured-classification.md`.
+**When to use:** Classification, extraction, structured report generation, any case where you need typed output rather than free-form text. Apply schema design principles from `structured-classification.md`.
 
 ---
 
@@ -274,7 +274,7 @@ Strands provides `strands-agents-evals` for agent evaluation:
 | **Tool-specific** | Verify correct tool selection and parameter passing |
 | **Manual** | Human review for edge cases and safety |
 
-Apply evaluation principles from `references/evals.md` and `references/llm-as-judge.md`.
+Apply evaluation principles from `evals.md` and `llm-as-judge.md`.
 
 ---
 
@@ -318,7 +318,7 @@ my-strands-agent/
 
 ## Pattern Mapping
 
-How Strands patterns map to the agent-builder pattern catalogue (`references/patterns.md`):
+How Strands patterns map to the agent-builder pattern catalogue (`patterns.md`):
 
 | Agent-Builder Pattern | Strands Implementation | Notes |
 |---|---|---|

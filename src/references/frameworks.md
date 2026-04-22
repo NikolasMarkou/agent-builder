@@ -110,7 +110,7 @@ Use this reference when the default LangChain/LangGraph stack is not the best fi
 **Production:** AWS AgentCore (managed serverless runtime, up to 8hr tasks), Lambda, Docker/K8s.
 **Unique:** A2A protocol for cross-framework agent interop, Agent SOPs for natural language workflows, semantic tool retrieval for 100+ tool sets.
 
-For implementation patterns and deployment guidance, read `references/strands.md`.
+For implementation patterns and deployment guidance, read `strands.md`.
 
 ---
 
@@ -347,7 +347,7 @@ result = agent.run("Find the latest AI agent frameworks")
 
 ## DSPy
 
-> **Deep-dive reference:** `references/dspy.md` covers Signatures, Modules, optimizer selection, RAG patterns, multi-agent composition, and integration with orchestration frameworks.
+> **Deep-dive reference:** `dspy.md` covers Signatures, Modules, optimizer selection, RAG patterns, multi-agent composition, and integration with orchestration frameworks.
 
 **Architecture:** Optimization-first. Replace manual prompts with compiled signatures.
 **License:** MIT | **Stars:** ~29K | **Language:** Python

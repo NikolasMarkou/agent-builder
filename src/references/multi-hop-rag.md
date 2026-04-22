@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Multi-Hop RAG Methodologies
 
 Patterns for answering questions that require reasoning across 2-N pieces of evidence scattered across a corpus. Standard RAG retrieves passages similar to a single query. Multi-hop RAG connects evidence chains: the answer to sub-question 1 determines what to retrieve for sub-question 2.

@@ -15,3 +15,7 @@ jobs:
         run: make validate
       - name: Build package (smoke test)
         run: make package
+      - name: Build combined skill (smoke test)
+        run: make package-combined
+      - name: Build tarball (smoke test)
+        run: make package-tar

@@ -4,6 +4,28 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.16.0] - 2026-04-22
+
+### Added
+- **Cross-reference conventions** in `CLAUDE.md` — documents bare-sibling style (`foo.md`) inside `src/references/` vs root-relative style (`references/foo.md`) in `SKILL.md`. Enforced by new `validate-xref-style` target.
+- **Validation tiers** section in `CLAUDE.md` — documents the two-tier failure-modes check (generic Tier 1 for all 20 files; strict Tier 2 for 9 curated framework/data references) and explains the rationale for the Tier 2 list.
+- **Benchmark date-stamps** — 8 benchmark-heavy reference files (`multi-hop-rag.md`, `retrieval.md`, `entity-resolution.md`, `evals.md`, `llm-as-judge.md`, `binary-evals.md`, `tabular-data.md`, `embeddings.md`) now carry a `<!-- benchmarks-as-of: YYYY-MM -->` banner. Enforced by new `validate-benchmark-stamps` target.
+- **New Makefile / build.ps1 targets**:
+  - `validate-xref-style` — errors on rooted `references/foo.md` paths inside `src/references/*.md`.
+  - `validate-framework-parity` — advisory comparison of SKILL.md Step 3 framework overrides vs `frameworks.md` `## ` headings.
+  - `validate-benchmark-stamps` — requires the date-stamp banner on the 8 benchmark files listed above.
+  - `validate-citation-density` — advisory warning on files with many numeric claims and few citation markers.
+  All four are wired into `make validate`.
+- **CI workflow** now smoke-tests `make package-combined` and `make package-tar` in addition to `make package`.
+
+### Changed
+- **Cross-reference path style normalized** inside `src/references/`: `strands.md`, `dspy.md`, and `frameworks.md` converted from root-relative `references/foo.md` to bare sibling `foo.md` (14 occurrences). Matches the convention already used by the other 17 reference files. (OBS-001/003 from 2026-04-22 review.)
+- **Install block** in `langchain-langgraph.md` now lists `langgraph-swarm` and `langchain-mcp-adapters` — previously imported by templates below without being declared. (OBS-002/006 from 2026-04-22 review.)
+- **Inter-evaluator agreement claims** in `binary-evals.md` and `llm-as-judge.md` now specify the metric: `+0.45` is **absolute Cohen's κ**, `+0.10` is **Pearson r**. (OBS-007 partial fix.)
+
+### Notes
+- Codebase review (analysis_2026-04-22_806a2c2b) surfaced 8 defects + 5 opportunities. This release addresses all defects except the Opik/evals-matrix gap (user-confirmed intentional; no action). The 4 new Makefile linters tackle opportunities 1-4; opportunity 5 (Opik/RAGAS code gallery) remains deferred.
+
 ## [1.15.0] - 2026-04-22
 
 ### Added

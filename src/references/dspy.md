@@ -177,7 +177,7 @@ toolset = MCPToolset.from_server(server_command="uvx", server_args=["your-mcp-se
 agent = dspy.ReAct("question -> answer", tools=toolset.as_tools())
 ```
 
-**Design rule:** Same tool design principles from `references/production.md` apply — one tool = one action, clear docstrings, minimize action space.
+**Design rule:** Same tool design principles from `production.md` apply — one tool = one action, clear docstrings, minimize action space.
 
 ---
 
@@ -244,7 +244,7 @@ optimized.save("optimized_program.json")
 
 ## Evaluation
 
-Always establish a baseline before optimizing. DSPy's evaluation framework mirrors the principles in `references/evals.md`.
+Always establish a baseline before optimizing. DSPy's evaluation framework mirrors the principles in `evals.md`.
 
 ```python
 from dspy.evaluate import Evaluate
@@ -278,7 +278,7 @@ def llm_judge_metric(example, prediction, trace=None):
     return result.score
 ```
 
-**Design rule:** Define your metric before writing any module code. The metric drives everything — module selection, optimizer choice, and iteration decisions. See `references/evals.md` and `references/llm-as-judge.md` for comprehensive evaluation guidance.
+**Design rule:** Define your metric before writing any module code. The metric drives everything — module selection, optimizer choice, and iteration decisions. See `evals.md` and `llm-as-judge.md` for comprehensive evaluation guidance.
 
 ---
 
@@ -484,7 +484,7 @@ async def query(req: QueryRequest):
     return {"answer": result.answer}
 ```
 
-For full deployment patterns (Docker, monitoring, long-term memory), see `references/deployment.md`.
+For full deployment patterns (Docker, monitoring, long-term memory), see `deployment.md`.
 
 ---
 
@@ -525,7 +525,7 @@ my_dspy_project/
 
 ## Pattern Mapping
 
-How DSPy maps to the agent-builder pattern catalogue (`references/patterns.md`):
+How DSPy maps to the agent-builder pattern catalogue (`patterns.md`):
 
 | Pattern | DSPy Support | Notes |
 |---|---|---|

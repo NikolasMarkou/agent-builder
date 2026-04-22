@@ -34,6 +34,8 @@ The old chain-based paradigm (LCEL pipes, `SequentialChain`) is in `langchain-le
 ```bash
 pip install langchain "langchain[anthropic]"  # or [openai], [google-genai]
 pip install langgraph
+pip install langgraph-swarm          # required for the Swarm template below
+pip install langchain-mcp-adapters   # required for the MCP template below
 pip install deepagents
 ```
 

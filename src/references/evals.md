@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # Evaluation Reference
 
 Comprehensive guide to evaluating AI agents in production. Covers evaluation frameworks, benchmarks, metrics, grading methods, safety evaluation, monitoring, tooling, and building eval pipelines.

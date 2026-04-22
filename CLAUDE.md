@@ -87,6 +87,36 @@ Do not duplicate skill content here. Read src/SKILL.md directly.
 - Include failure modes and mitigations, not just happy paths.
 - Keep code templates minimal but functional -- enough to copy-paste and adapt.
 
+### Cross-reference Conventions
+
+- **Inside `src/references/*.md`**: use bare sibling paths — `` `foo.md` ``, not `` `references/foo.md` ``. All reference files are siblings in the same directory; the bare form is unambiguous and robust to the reader's CWD.
+- **Inside `src/SKILL.md`**: use `` `references/foo.md` `` — resolves from skill root.
+- **Code examples that reference a package**: every non-stdlib import must be covered by the install block at the top of the file. If you add an import, extend the install block in the same edit.
+
+Enforced by `make validate-xref-style` (fails on `references/[a-z_-]+\.md` inside `src/references/`).
+
+### Validation Tiers
+
+`make validate` enforces two tiers of content-structure checks:
+
+**Tier 1 — Generic (all 20 reference files)**: every file must contain at least one heading matching `Failure Mode | Anti-Pattern | When NOT | When ... Not`. This is the minimum bar for "show the unhappy path."
+
+**Tier 2 — Strict (9 curated framework/data references)**: must contain a heading specifically matching `Failure Mode | Anti-Pattern` (the "When NOT" variant does not satisfy Tier 2). The 9 files are: `langchain-langgraph.md`, `strands.md`, `dspy.md`, `retrieval.md`, `text-tools.md`, `entity-resolution.md`, `tabular-data.md`, `structured-classification.md`, `embeddings.md`.
+
+Rationale: these 9 are the most dense, code-heavy references where missing a failure mode is highest-cost. Other files (patterns.md, scaffolding.md, prompt-structuring.md, the eval family, production.md, deployment.md, multi-hop-rag.md, rag-evals.md, frameworks.md) pass under Tier 1 because they structure content differently (pattern catalogues, scenario recipes, evaluation rubrics) where a single "Failure Modes" heading would be artificial.
+
+Changes to the Tier 2 list must be made in both `Makefile` and `build.ps1` and documented here.
+
+### Benchmark Date Stamps
+
+Any reference file containing benchmark tables, leaderboards, or benchmark-derived numeric claims must begin with an HTML comment:
+
+```
+<!-- benchmarks-as-of: YYYY-MM -->
+```
+
+Enforced by `make validate-benchmark-stamps` on files declared as benchmark-heavy in the Makefile check list. Refresh the date when benchmarks are updated.
+
 ### Build Commands
 
 ```bash
