@@ -7,6 +7,11 @@ Production retrieval patterns for agents that need to search, rank, and synthesi
 
 > **Design axiom: Tiered escalation.** The same principle from `text-tools.md` applies here. Cheap sparse retrieval first, dense only when needed, reranking only when precision matters, agentic loops only for complex multi-hop queries. Each tier up costs more but handles harder queries.
 
+**Install:**
+```bash
+pip install langchain langgraph
+```
+
 ## Table of Contents
 
 1. [When RAG vs. When Not](#when-rag-vs-when-not)

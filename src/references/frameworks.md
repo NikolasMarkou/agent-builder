@@ -2,6 +2,11 @@
 
 Use this reference when the default LangChain/LangGraph stack is not the best fit. Each section covers when to choose the framework, architecture, and implementation patterns.
 
+**Install:** (Python frameworks shown below; Mastra is npm `@mastra/core`)
+```bash
+pip install google-adk llama-index agno smolagents dspy
+```
+
 ## Table of Contents
 
 1. [Framework Selection Matrix](#framework-selection-matrix)

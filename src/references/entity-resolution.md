@@ -7,6 +7,11 @@ Entity resolution (ER) -- the process of determining whether two or more records
 
 This guide covers how ER fits into agentic architectures, the dominant implementation patterns, the multi-agent decomposition that outperforms monolithic approaches, practical evaluation, and the specific domains where ER is a hard requirement.
 
+**Install:**
+```bash
+pip install sentence-transformers faiss-cpu numpy openai langchain
+```
+
 ---
 
 ## The three integration points

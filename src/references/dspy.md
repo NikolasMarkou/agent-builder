@@ -2,6 +2,11 @@
 
 Implementation reference for building agents with DSPy. Use when the framework decision (Step 3) selects DSPy for prompt optimization, or when combining DSPy with an orchestration framework (LangGraph, Strands) to optimize LLM calls within agents.
 
+**Install:**
+```bash
+pip install dspy pydantic langgraph strands-agents mlflow fastapi
+```
+
 ## Table of Contents
 
 1. [When This Reference Applies](#when-this-reference-applies)

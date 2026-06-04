@@ -2,6 +2,11 @@
 
 LLM-based classification: mapping free-form input to predefined classes with validated JSON output. The foundational pattern behind Router topology agents (see `patterns.md` §1.4 Router for topology-level design), intent detection, and controlled flow routing.
 
+**Install:**
+```bash
+pip install openai anthropic instructor pydantic langgraph
+```
+
 ## Table of Contents
 
 1. [When to Use](#when-to-use)

@@ -7,6 +7,11 @@ Patterns for answering questions that require reasoning across 2-N pieces of evi
 
 > **Design axiom: Tiered escalation.** Most queries are single-hop. Running full multi-hop on everything wastes 40-60% of compute. Route by complexity: simple factoid -> single-hop dense, moderate -> hybrid, complex multi-hop -> agentic loop. See [Adaptive Routing](#8-adaptive-routing).
 
+**Install:**
+```bash
+pip install langgraph
+```
+
 ## Table of Contents
 
 1. [When Multi-Hop vs. When Not](#when-multi-hop-vs-when-not)

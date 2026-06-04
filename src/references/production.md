@@ -2,6 +2,11 @@
 
 Everything needed to take an agent from prototype to production. Covers context engineering, tool design, evaluation, cost modeling, observability, guardrails, and failure modes.
 
+**Install:**
+```bash
+pip install langchain
+```
+
 ## Table of Contents
 
 1. [The Reality Check](#the-reality-check)

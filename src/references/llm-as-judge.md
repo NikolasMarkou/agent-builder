@@ -3,6 +3,11 @@
 
 Using LLMs to evaluate AI system outputs at scale. Covers implementation patterns, bias mitigation, calibration, rubric design, agent evaluation, production deployment, frameworks, and anti-patterns.
 
+**Install:**
+```bash
+pip install deepeval
+```
+
 ## Table of Contents
 
 1. [Core Implementation Patterns](#core-implementation-patterns)

@@ -7,6 +7,11 @@ Guidance for selecting, evaluating, and deploying embedding models in agent syst
 
 > **Design axiom: Calibrate on real data.** Leaderboard scores (MTEB, BEIR) are aggregates across heterogeneous datasets. No model dominates every task. Models that top the STS subtab routinely underperform in retrieval. Always evaluate on a held-out sample of your own data before committing to a model.
 
+**Install:**
+```bash
+pip install sentence-transformers scikit-learn numpy scipy beir
+```
+
 ## Table of Contents
 
 1. [Why Leaderboards Are Insufficient](#why-leaderboards-are-insufficient)

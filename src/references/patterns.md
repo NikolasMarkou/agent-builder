@@ -4,6 +4,11 @@ Complete catalogue of agentic AI patterns across three orthogonal layers. Produc
 
 **19 patterns across 3 layers**: 7 topology + 7 behavioral + 5 data flow.
 
+**Install:**
+```bash
+pip install langgraph langgraph-swarm pydantic
+```
+
 ## Table of Contents
 
 1. [Layer 1: Topology Patterns](#layer-1-topology-patterns)

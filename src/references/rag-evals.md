@@ -4,6 +4,11 @@ Systematic evaluation framework for Retrieval-Augmented Generation systems. Base
 
 For general agent evaluation (frameworks, benchmarks, safety, monitoring), see `evals.md`. For LLM-as-judge implementation, see `llm-as-judge.md`. For retrieval infrastructure (sparse/dense/hybrid search, reranking, chunking), see `retrieval.md`. For multi-hop retrieval evaluation, see `multi-hop-rag.md` §Evaluation.
 
+**Install:**
+```bash
+pip install opik
+```
+
 ## Table of Contents
 
 1. [The Q/A/C Framework](#the-qac-framework)
