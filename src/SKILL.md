@@ -1,7 +1,7 @@
 ---
 name: agent-builder
 description: >-
-  Build, review, troubleshoot, and optimize AI agents. Covers single-agent, multi-agent, RAG, and production systems. Handles framework selection, pattern selection (topology, behavioral, data flow), state design, tool design, and full implementation. Defaults to Python with LangChain/LangGraph. Supports all major frameworks (CrewAI, Strands, OpenAI Agents SDK, Google ADK, Mastra, etc.). Use this skill whenever the user asks to build an agent, create an agentic system, implement a multi-agent workflow, design agent architecture, scaffold an agent project, or asks "how should I build an agent for X". Also trigger when the user mentions agent patterns, agent topology, ReAct loops, plan-and-execute, supervisor agents, swarm agents, handoffs, agent orchestration, or any agentic design question. Also trigger for non-build operations - reviewing agent architecture, troubleshooting agent issues (hallucination, loops, cost, latency), optimizing agent performance or prompts, extending existing agents with new capabilities, or migrating between frameworks. Even if the user just says "build me an agent that does X" without mentioning frameworks, use this skill.
+  Build, review, troubleshoot, optimize, and extend AI agents — single-agent, multi-agent, RAG, and production systems. Covers framework selection, pattern selection (topology, behavioral, data flow), agent orchestration, state design, and tool design. Defaults to Python with LangChain/LangGraph; also supports CrewAI, Strands, OpenAI Agents SDK, Google ADK, and Mastra. Use whenever the user wants to build, design, scaffold, review, debug, optimize, extend, or migrate an agent or agentic system.
 ---
 
 # Agent Builder
@@ -33,7 +33,7 @@ Before starting, classify the user's request. Not every query is "build a new ag
 | Review, audit, or assess an existing agent's architecture | **Review Workflow** (below) |
 | Fix a broken agent, debug issues, diagnose failures | **Troubleshoot Workflow** (below) |
 | Reduce cost, improve performance, optimize prompts | **Optimize Workflow** (below) |
-| Add a capability to an existing agent (memory, HITL, streaming, tools, evals) | **Extend** — go to Step 4 (Build) + Step 5 (Harden), skip Steps 1-3. Read the relevant reference for the capability being added. |
+| Add a capability to an existing agent (memory, HITL, streaming, tools, evals) | **Extend Workflow** (below) — reuses Step 4 (Build) + Step 5 (Harden) on the new capability only, skipping Steps 1-3 |
 | Choose a framework or pattern (no existing agent) | **Build Workflow** Steps 1-3 |
 | Migrate or convert an agent from one framework to another | **Review Workflow** (map current architecture, Steps R1-R2), then **Build Workflow** Steps 3-5 (select new framework, rebuild, harden) |
 
@@ -126,11 +126,13 @@ Quick selection:
 | Pipeline: ingest -> process -> output | Sequential | Tool Use at each step | Prompt Chaining |
 | Research with iteration | Loop | Reflection | Controlled Flow |
 | Multi-source aggregation | Parallel | ReAct per worker | Map-Reduce |
-| Intent classification + routing | Router | ReAct per specialist | Controlled Flow | ← see `references/structured-classification.md` |
+| Intent classification + routing | Router | ReAct per specialist | Controlled Flow |
 | Quality-gated generation | Loop | Generator-Critic | Controlled Flow |
 | Team of specialists | Hierarchical | Plan-and-Execute (supervisor) + ReAct (workers) | Subgraph |
 | Flexible peer-to-peer collaboration | Network | ReAct + Handoffs | Swarm |
 | High-stakes with human approval | Any + HITL gates | Any + HITL | Any |
+
+> Intent classification + routing: see `references/structured-classification.md` for classifier schema design, enforcement, and handler routing.
 
 **Composition recipes:** Some tasks require patterns from multiple layers composed together. For example, STORM (deep research) composes Parallel + Loop (topology) with ReAct (behavioral) and Map-Reduce (data flow) -- see `references/patterns.md` §2.5. Do not treat compositions as single-layer pattern choices; select each layer independently and verify compatibility.
 
@@ -350,3 +352,37 @@ Read `references/production.md` §Cost Modeling. Check in order:
 1. **Structure audit**: Check prompt structure against `references/prompt-structuring.md` -- delimiter format, block ordering, position bias.
 2. **Systematic optimization**: For prompts that need tuning beyond manual editing, use DSPy (`references/dspy.md`) to optimize prompts programmatically against evaluation metrics.
 3. **Tabular data**: If the agent processes tables/spreadsheets, check serialization format against `references/tabular-data.md` -- format choice alone swings accuracy 15-20pp.
+
+---
+
+## Extend Workflow
+
+Add a capability (memory, HITL, streaming, new tools, evals, retrieval, guardrails) to an existing, working agent. You are modifying a system that already has a topology, behavioral pattern, and framework -- do NOT re-run Steps 1-3. Preserve the existing architecture unless the new capability fundamentally conflicts with it.
+
+### Step E1: Locate the Extension Point
+
+1. Read the agent's code. Identify its current topology, framework, and state shape (same as Review Step R1).
+2. Reconstruct a minimal DSB from the existing agent (Complexity, Framework, Patterns, References loaded). This anchors the extension in the current architecture rather than a greenfield design.
+3. Map the requested capability to the reference it requires:
+
+| Capability to add | Read |
+|---|---|
+| Conversation memory / persistence | `references/langchain-langgraph.md` §Persistence |
+| Long-term memory (across sessions) | `references/deployment.md` §Long-Term Memory |
+| Human-in-the-loop (approval gates) | `references/langchain-langgraph.md` §HITL, `references/patterns.md` §HITL |
+| Streaming responses | `references/deployment.md` §Streaming, `references/langchain-langgraph.md` §Streaming |
+| New tools | `references/production.md` §Tool Design Principles |
+| Retrieval / RAG | `references/retrieval.md` (+ `references/multi-hop-rag.md`, `references/embeddings.md` as needed) |
+| Evaluation harness | `references/evals.md` (+ `references/rag-evals.md` for RAG) |
+| Guardrails / security | `references/production.md` §Guardrails, §Security |
+| Middleware (retry, fallback, moderation, summarization) | `references/langchain-langgraph.md` §Middleware |
+
+### Step E2: Build the Extension (Step 4, scoped)
+
+Apply Step 4 (Build) to the new capability ONLY. Add to the existing graph/state -- new nodes, edges, middleware, or tools -- without rewriting working code. If the capability needs a new state field, add it with the correct reducer; do not mutate existing fields. Re-emit the DSB with the new reference(s) under `References loaded` and any new patterns appended.
+
+### Step E3: Harden the Extension (Step 5, scoped)
+
+Apply Step 5 (Production Hardening) to the new surface area only: guardrails for new inputs, the cost impact of the new capability, observability for the new nodes, and any new failure modes the capability introduces (adding a loop introduces an iteration-cap requirement; adding HITL introduces a resume-path requirement). Scale hardening to the existing agent's complexity class.
+
+**Conflict check:** If the capability cannot be added without changing the topology or framework (e.g., adding HITL to a framework that lacks interrupt/resume -- see the Step 3 cross-validation gate), stop: this is a migration, not an extension. Route to the **Review Workflow** (map current architecture) then **Build Workflow** Steps 3-5 instead.
