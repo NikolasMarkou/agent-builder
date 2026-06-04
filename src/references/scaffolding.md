@@ -33,19 +33,7 @@ If your use case does not match any scenario, fall back to the pattern selection
 
 ## Composition Escalation Rule
 
-When composing patterns, start simple and escalate only when a specific, measured failure demands it:
-
-```
-1. Single agent with tools (ReAct)           <- try this first
-2. Sequential pipeline                       <- add when steps have strict ordering
-3. Sequential + Loop (quality gates)         <- add when quality requires iteration
-4. Router + Sequential                       <- add when inputs vary widely
-5. Parallel + Aggregator                     <- add when independent tasks exist
-6. Hierarchical                              <- add when scale requires delegation
-7. Hierarchical + Swarm or Network           <- only when evidence demands it
-```
-
-> **Design axiom: Tiered escalation.** Each level adds coordination overhead. A Hierarchical + Swarm system that could have been a Sequential pipeline wastes tokens on supervision. Measure the failure that motivates the upgrade.
+When composing patterns, start simple and escalate only when a specific, measured failure demands it. See `patterns.md` §Composition Escalation Rule for the full 7-level escalation ladder (single agent → sequential → loop → router → parallel → hierarchical → swarm/network) and the tiered-escalation design axiom. Each scenario below indicates where on that ladder it sits.
 
 ---
 

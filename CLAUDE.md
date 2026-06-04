@@ -117,6 +117,10 @@ Any reference file containing benchmark tables, leaderboards, or benchmark-deriv
 
 Enforced by `make validate-benchmark-stamps` on files declared as benchmark-heavy in the Makefile check list. Refresh the date when benchmarks are updated.
 
+### Install-Block Coverage
+
+Every reference file that contains a non-stdlib Python import must carry a `pip install` block covering it, so code examples are copy-paste runnable (see Cross-reference Conventions). `make validate-install-blocks` (advisory, WARN-only — mirrored in `build.ps1` as `Invoke-ValidateInstallBlocks`) flags any `src/references/*.md` that has a non-stdlib `import`/`from` line but no `pip install` block. It is wired into `make validate` alongside `validate-citation-density`. Advisory because some import-bearing files are intentionally illustrative; promote to blocking only if drift recurs.
+
 ### Build Commands
 
 ```bash
@@ -174,6 +178,7 @@ When asked to "update local skill", copy **everything** from the repo to `~/.cla
 cp src/SKILL.md ~/.claude/skills/agent-builder/SKILL.md
 cp -r src/references/ ~/.claude/skills/agent-builder/references/
 cp README.md LICENSE CHANGELOG.md ~/.claude/skills/agent-builder/
+cp CLAUDE.md ~/.claude/skills/agent-builder/
 ```
 
 Always verify with `diff -rq` after copying. Every file, every time.
