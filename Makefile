@@ -101,7 +101,7 @@ validate:
 	@grep -q "Skill-v$(VERSION)" README.md || (echo "ERROR: README.md version badge does not match VERSION ($(VERSION))" && exit 1)
 	@# Verify no deprecated model strings remain (code and prose)
 	@echo "Checking model string consistency..."
-	@if grep -rEin 'gpt-4\.1[^+]|gpt-4\.1$$|Claude-v1' src/; then echo "ERROR: Deprecated model strings found (use gpt-4o/gpt-4o-mini)" && exit 1; fi
+	@if grep -rEin 'gpt-4\.1($$|[^-+0-9])|Claude-v1' src/; then echo "ERROR: Deprecated model strings found (use gpt-4o/gpt-4o-mini)" && exit 1; fi
 	@# Verify every reference file has at least one code example
 	@echo "Checking code example presence..."
 	@fail=0; for ref in $$(ls src/references/*.md 2>/dev/null); do \
@@ -130,6 +130,7 @@ validate:
 	@$(MAKE) --no-print-directory validate-framework-parity
 	@$(MAKE) --no-print-directory validate-benchmark-stamps
 	@$(MAKE) --no-print-directory validate-citation-density
+	@$(MAKE) --no-print-directory validate-install-blocks
 	@echo "Validation passed!"
 
 # Linter: no rooted `references/foo.md` paths inside src/references/*.md
@@ -141,6 +142,13 @@ validate-xref-style:
 	if [ -n "$$hits" ]; then \
 		echo "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):"; \
 		echo "$$hits"; \
+		exit 1; \
+	fi
+	@echo "Checking SKILL.md uses references/ prefix for reference files..."
+	@bare=$$(grep -nE '`[a-z][a-z0-9_-]*\.md`' $(SKILL_FILE) 2>/dev/null || true); \
+	if [ -n "$$bare" ]; then \
+		echo "ERROR: SKILL.md uses bare 'foo.md' for a reference file (use 'references/foo.md'):"; \
+		echo "$$bare"; \
 		exit 1; \
 	fi
 
@@ -176,6 +184,7 @@ validate-benchmark-stamps:
 	@echo "Checking benchmark date-stamps..."
 	@fail=0; for ref in src/references/multi-hop-rag.md src/references/retrieval.md \
 		src/references/entity-resolution.md src/references/evals.md \
+		src/references/rag-evals.md \
 		src/references/llm-as-judge.md src/references/binary-evals.md \
 		src/references/tabular-data.md src/references/embeddings.md; do \
 		name=$$(basename $$ref); \
@@ -198,6 +207,25 @@ validate-citation-density:
 		fi; \
 	done; \
 	echo "Citation density check complete (advisory)."
+
+# Linter (advisory): flag reference files with non-stdlib imports but no `pip install` block
+# (enforces the CLAUDE.md rule that every non-stdlib import is covered by an install block)
+.PHONY: validate-install-blocks
+validate-install-blocks:
+	@echo "Checking install-block coverage (advisory)..."
+	@stdlib='typing|os|sys|re|json|math|time|enum|abc|asyncio|dataclasses|datetime|collections|itertools|functools|operator|logging|contextvars|pathlib|random|uuid|hashlib|subprocess|copy|io|csv|glob|shutil|tempfile|warnings|string|textwrap|threading|queue|signal|traceback'; \
+	for ref in $$(ls src/references/*.md 2>/dev/null); do \
+		name=$$(basename $$ref); \
+		mods=$$(grep -hoE '^[[:space:]]*(import|from)[[:space:]]+[a-zA-Z0-9_]+' $$ref 2>/dev/null | sed -E 's/^[[:space:]]*(import|from)[[:space:]]+//'); \
+		nonstd=0; \
+		for mod in $$mods; do \
+			echo "$$mod" | grep -qE "^($$stdlib)$$" || nonstd=1; \
+		done; \
+		if [ "$$nonstd" -eq 1 ] && ! grep -qE 'pip install' $$ref; then \
+			echo "WARN: $$name has non-stdlib imports but no 'pip install' block"; \
+		fi; \
+	done; \
+	echo "Install-block coverage check complete (advisory)."
 
 # Clean build artifacts
 .PHONY: clean

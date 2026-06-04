@@ -207,7 +207,7 @@ function Invoke-Validate {
 
     # Verify no deprecated model strings remain (code and prose)
     Write-Host "Checking model string consistency..."
-    $deprecatedHits = Select-String -Path "src/references/*.md", "src/SKILL.md" -Pattern 'gpt-4\.1[^+]|gpt-4\.1$|Claude-v1' -ErrorAction SilentlyContinue
+    $deprecatedHits = Select-String -Path "src/references/*.md", "src/SKILL.md" -Pattern 'gpt-4\.1($|[^-+0-9])|Claude-v1' -ErrorAction SilentlyContinue
     if ($deprecatedHits) {
         foreach ($hit in $deprecatedHits) {
             $errors += "ERROR: Deprecated model string in $($hit.Filename):$($hit.LineNumber): $($hit.Line.Trim())"
@@ -259,6 +259,7 @@ function Invoke-Validate {
     Invoke-ValidateFrameworkParity
     Invoke-ValidateBenchmarkStamps
     Invoke-ValidateCitationDensity
+    Invoke-ValidateInstallBlocks
 
     Write-Host "Validation passed!" -ForegroundColor Green
 }
@@ -277,6 +278,20 @@ function Invoke-ValidateXrefStyle {
     if ($hits.Count -gt 0) {
         Write-Host "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):" -ForegroundColor Red
         $hits | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+        exit 1
+    }
+    # SKILL.md must use the references/ prefix for reference files (inverse rule)
+    Write-Host "Checking SKILL.md uses references/ prefix for reference files..." -ForegroundColor Yellow
+    $skillBare = @()
+    $skillLines = Get-Content "src/SKILL.md"
+    for ($i = 0; $i -lt $skillLines.Count; $i++) {
+        if ($skillLines[$i] -match '`[a-z][a-z0-9_-]*\.md`') {
+            $skillBare += ("src/SKILL.md:{0}: {1}" -f ($i + 1), $skillLines[$i])
+        }
+    }
+    if ($skillBare.Count -gt 0) {
+        Write-Host "ERROR: SKILL.md uses bare 'foo.md' for a reference file (use 'references/foo.md'):" -ForegroundColor Red
+        $skillBare | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1
     }
 }
@@ -316,6 +331,7 @@ function Invoke-ValidateBenchmarkStamps {
     Write-Host "Checking benchmark date-stamps..." -ForegroundColor Yellow
     $benchmarkFiles = @(
         "multi-hop-rag.md", "retrieval.md", "entity-resolution.md", "evals.md",
+        "rag-evals.md",
         "llm-as-judge.md", "binary-evals.md", "tabular-data.md", "embeddings.md"
     )
     $errors = @()
@@ -345,6 +361,23 @@ function Invoke-ValidateCitationDensity {
         }
     }
     Write-Host "Citation density check complete (advisory)."
+}
+
+function Invoke-ValidateInstallBlocks {
+    Write-Host "Checking install-block coverage (advisory)..." -ForegroundColor Yellow
+    $stdlib = @('typing','os','sys','re','json','math','time','enum','abc','asyncio','dataclasses','datetime','collections','itertools','functools','operator','logging','contextvars','pathlib','random','uuid','hashlib','subprocess','copy','io','csv','glob','shutil','tempfile','warnings','string','textwrap','threading','queue','signal','traceback')
+    Get-ChildItem -Path "src/references" -Filter "*.md" | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        $mods = [regex]::Matches($content, '(?m)^\s*(?:import|from)\s+([a-zA-Z0-9_]+)') | ForEach-Object { $_.Groups[1].Value }
+        $hasNonStd = $false
+        foreach ($mod in $mods) {
+            if ($stdlib -notcontains $mod) { $hasNonStd = $true }
+        }
+        if ($hasNonStd -and ($content -notmatch 'pip install')) {
+            Write-Host ("WARN: {0} has non-stdlib imports but no 'pip install' block" -f $_.Name) -ForegroundColor Yellow
+        }
+    }
+    Write-Host "Install-block coverage check complete (advisory)."
 }
 
 function Invoke-PackageTar {

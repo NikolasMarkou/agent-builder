@@ -1,3 +1,4 @@
+<!-- benchmarks-as-of: 2026-04 -->
 # RAG Evaluation: The 6 Metrics Framework
 
 Systematic evaluation framework for Retrieval-Augmented Generation systems. Based on the exhaustive combinatorial analysis of RAG's three core variables — every RAG failure maps to exactly one of six relationships.
