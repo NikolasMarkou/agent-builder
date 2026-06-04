@@ -41,6 +41,7 @@ agent-builder/
         ├── multi-hop-rag.md          # Multi-hop RAG: methodology taxonomy, IRCoT, query decomposition, graph traversal
         ├── embeddings.md             # Embedding model selection, evaluation protocols, efficiency trade-offs
         ├── structured-classification.md # Structured classification: intent detection, routing, constrained decoding
+        ├── direct-corpus-interaction.md # Direct Corpus Interaction (DCI): agentic grep-based retrieval, six patterns, DCI-vs-RAG decision guide
         └── scaffolding.md            # Scenario scaffolding: recipes for research, support, code gen, RAG, and more
 ```
 

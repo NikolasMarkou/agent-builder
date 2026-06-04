@@ -185,6 +185,7 @@ validate-benchmark-stamps:
 	@fail=0; for ref in src/references/multi-hop-rag.md src/references/retrieval.md \
 		src/references/entity-resolution.md src/references/evals.md \
 		src/references/rag-evals.md \
+		src/references/direct-corpus-interaction.md \
 		src/references/llm-as-judge.md src/references/binary-evals.md \
 		src/references/tabular-data.md src/references/embeddings.md; do \
 		name=$$(basename $$ref); \

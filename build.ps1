@@ -334,7 +334,7 @@ function Invoke-ValidateBenchmarkStamps {
     Write-Host "Checking benchmark date-stamps..." -ForegroundColor Yellow
     $benchmarkFiles = @(
         "multi-hop-rag.md", "retrieval.md", "entity-resolution.md", "evals.md",
-        "rag-evals.md",
+        "rag-evals.md", "direct-corpus-interaction.md",
         "llm-as-judge.md", "binary-evals.md", "tabular-data.md", "embeddings.md"
     )
     $errors = @()
