@@ -4,6 +4,30 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.17.0] - 2026-06-04
+
+### Fixed
+- **Invalid model ID corrected across 8 reference files** — `claude-sonnet-4-6-20250514` (the `20250514` snapshot belongs to the original Sonnet 4, not Sonnet 4.6) replaced with the stable alias `claude-sonnet-4-6` at all 24 sites in `patterns.md`, `langchain-langgraph.md`, `production.md`, `dspy.md`, `frameworks.md`, `evals.md`, `structured-classification.md`, `deployment.md`. (H1)
+- **Model-deprecation regex false positive** in `validate` (Makefile + `build.ps1`) — `gpt-4\.1[^+]` matched the valid `gpt-4.1-mini`/`gpt-4.1-nano`; tightened to `gpt-4\.1($|[^-+0-9])` (POSIX-safe, no PCRE lookahead). (M1)
+- **`build.ps1` validators no longer fail-fast** — `Invoke-ValidateXrefStyle` and `Invoke-ValidateBenchmarkStamps` returned via direct `exit 1`, silently skipping later checks; they now return error arrays and `Invoke-Validate` aggregates and exits once, matching the Makefile's collect-all behavior. (H4)
+- **Malformed table row** in `SKILL.md` Step 2 quick-selection table — the "Intent classification + routing" row had a 5th cell against a 4-column header; the annotation moved to a note below the table. (M2)
+- **`update local skill` procedure** in `CLAUDE.md` claimed "copy everything" but omitted `CLAUDE.md`; added the missing `cp CLAUDE.md` line. (M5)
+
+### Added
+- **`pip install` blocks** in 11 import-bearing reference files (`dspy.md`, `embeddings.md`, `entity-resolution.md`, `frameworks.md`, `llm-as-judge.md`, `multi-hop-rag.md`, `patterns.md`, `production.md`, `rag-evals.md`, `structured-classification.md`, `retrieval.md`) so every non-stdlib import is install-covered. (H2)
+- **`validate-install-blocks` linter** (Makefile + `build.ps1`, advisory/WARN-only) — flags reference files with non-stdlib imports but no `pip install` block; wired into `make validate` and documented in `CLAUDE.md`. (H2)
+- **`Extend Workflow`** section in `SKILL.md` — the Query Router routed "add a capability" to Extend but no section existed; adds Steps E1–E3 (locate extension point + capability→reference map, scoped Build, scoped Harden) with a migration conflict-check. (H5)
+- **Windows CI job** — `.github/workflows/validate.yml` gains a `windows-latest` leg running `.\build.ps1 validate` and `.\build.ps1 package`, so PowerShell parity is now tested in CI (previously Ubuntu-only). (H3)
+- **Benchmark date-stamp** on `rag-evals.md` (`<!-- benchmarks-as-of: 2026-04 -->`), added to the `validate-benchmark-stamps` enforced list in both build scripts. (M3)
+- **SKILL.md cross-reference scan** — `validate-xref-style` now also flags bare `` `foo.md` `` references in `SKILL.md` that should use the `references/foo.md` prefix. (M7)
+
+### Changed
+- **Activation description** in `SKILL.md` trimmed from 1,166 to ~490 chars (drops the redundant closing sentence and topology-keyword dump; retains all five router verbs and framework names). (M4)
+- **Composition Escalation Rule** de-duplicated — `scaffolding.md` no longer copies the 7-level ladder verbatim from `patterns.md`; it now points to `patterns.md` §Composition Escalation Rule. (M6)
+
+### Notes
+- Addresses all HIGH (H1–H5) and MEDIUM (M1–M7) findings from a comprehensive codebase review (plan_2026-06-04_afcd0304). No CRITICALs surfaced — the build was CI-green throughout. LOW findings (citation-density advisories, undated vendor stats, README missing build targets, `.github/` undocumented in trees, `evals.md` `checkout@v5` vs CI `@v4`) deferred.
+
 ## [1.16.0] - 2026-04-22
 
 ### Added
