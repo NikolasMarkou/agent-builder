@@ -250,22 +250,26 @@ function Invoke-Validate {
         }
     }
 
+    # Blocking sub-validators return their error arrays (no longer exit directly);
+    # advisory sub-validators only Write-Host. Aggregate all, then exit once.
+    $errors += Invoke-ValidateXrefStyle
+    Invoke-ValidateFrameworkParity
+    $errors += Invoke-ValidateBenchmarkStamps
+    Invoke-ValidateCitationDensity
+    Invoke-ValidateInstallBlocks
+
+    $errors = @($errors | Where-Object { $_ })
     if ($errors.Count -gt 0) {
         $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
         exit 1
     }
-
-    Invoke-ValidateXrefStyle
-    Invoke-ValidateFrameworkParity
-    Invoke-ValidateBenchmarkStamps
-    Invoke-ValidateCitationDensity
-    Invoke-ValidateInstallBlocks
 
     Write-Host "Validation passed!" -ForegroundColor Green
 }
 
 function Invoke-ValidateXrefStyle {
     Write-Host "Checking cross-reference style inside references/..." -ForegroundColor Yellow
+    $errs = @()
     $hits = @()
     Get-ChildItem -Path "src/references" -Filter "*.md" | ForEach-Object {
         $lines = Get-Content $_.FullName
@@ -276,9 +280,8 @@ function Invoke-ValidateXrefStyle {
         }
     }
     if ($hits.Count -gt 0) {
-        Write-Host "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):" -ForegroundColor Red
-        $hits | ForEach-Object { Write-Host $_ -ForegroundColor Red }
-        exit 1
+        $errs += "ERROR: rooted 'references/foo.md' paths found inside src/references/ (use bare sibling 'foo.md'):"
+        $errs += $hits
     }
     # SKILL.md must use the references/ prefix for reference files (inverse rule)
     Write-Host "Checking SKILL.md uses references/ prefix for reference files..." -ForegroundColor Yellow
@@ -290,10 +293,10 @@ function Invoke-ValidateXrefStyle {
         }
     }
     if ($skillBare.Count -gt 0) {
-        Write-Host "ERROR: SKILL.md uses bare 'foo.md' for a reference file (use 'references/foo.md'):" -ForegroundColor Red
-        $skillBare | ForEach-Object { Write-Host $_ -ForegroundColor Red }
-        exit 1
+        $errs += "ERROR: SKILL.md uses bare 'foo.md' for a reference file (use 'references/foo.md'):"
+        $errs += $skillBare
     }
+    return $errs
 }
 
 function Invoke-ValidateFrameworkParity {
@@ -344,10 +347,7 @@ function Invoke-ValidateBenchmarkStamps {
             }
         }
     }
-    if ($errors.Count -gt 0) {
-        $errors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
-        exit 1
-    }
+    return $errors
 }
 
 function Invoke-ValidateCitationDensity {
