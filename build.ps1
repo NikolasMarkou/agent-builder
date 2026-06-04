@@ -365,7 +365,7 @@ function Invoke-ValidateCitationDensity {
 
 function Invoke-ValidateInstallBlocks {
     Write-Host "Checking install-block coverage (advisory)..." -ForegroundColor Yellow
-    $stdlib = @('typing','os','sys','re','json','math','time','enum','abc','asyncio','dataclasses','datetime','collections','itertools','functools','operator','logging','contextvars','pathlib','random','uuid','hashlib','subprocess','copy','io','csv','glob','shutil','tempfile','warnings','string','textwrap','threading','queue','signal','traceback')
+    $stdlib = @('typing','os','sys','re','json','math','time','enum','abc','asyncio','dataclasses','datetime','collections','itertools','functools','operator','logging','contextvars','contextlib','pathlib','random','uuid','hashlib','secrets','base64','decimal','heapq','bisect','struct','subprocess','copy','io','csv','glob','shutil','tempfile','warnings','string','textwrap','threading','queue','signal','traceback','sqlite3','urllib','http','html','socket','ssl','inspect','importlib','types','weakref','array','statistics','concurrent','unittest')
     Get-ChildItem -Path "src/references" -Filter "*.md" | ForEach-Object {
         $content = Get-Content $_.FullName -Raw
         $mods = [regex]::Matches($content, '(?m)^\s*(?:import|from)\s+([a-zA-Z0-9_]+)') | ForEach-Object { $_.Groups[1].Value }

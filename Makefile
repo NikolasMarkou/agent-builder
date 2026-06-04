@@ -213,7 +213,7 @@ validate-citation-density:
 .PHONY: validate-install-blocks
 validate-install-blocks:
 	@echo "Checking install-block coverage (advisory)..."
-	@stdlib='typing|os|sys|re|json|math|time|enum|abc|asyncio|dataclasses|datetime|collections|itertools|functools|operator|logging|contextvars|pathlib|random|uuid|hashlib|subprocess|copy|io|csv|glob|shutil|tempfile|warnings|string|textwrap|threading|queue|signal|traceback'; \
+	@stdlib='typing|os|sys|re|json|math|time|enum|abc|asyncio|dataclasses|datetime|collections|itertools|functools|operator|logging|contextvars|contextlib|pathlib|random|uuid|hashlib|secrets|base64|decimal|heapq|bisect|struct|subprocess|copy|io|csv|glob|shutil|tempfile|warnings|string|textwrap|threading|queue|signal|traceback|sqlite3|urllib|http|html|socket|ssl|inspect|importlib|types|weakref|array|statistics|concurrent|unittest'; \
 	for ref in $$(ls src/references/*.md 2>/dev/null); do \
 		name=$$(basename $$ref); \
 		mods=$$(grep -hoE '^[[:space:]]*(import|from)[[:space:]]+[a-zA-Z0-9_]+' $$ref 2>/dev/null | sed -E 's/^[[:space:]]*(import|from)[[:space:]]+//'); \
