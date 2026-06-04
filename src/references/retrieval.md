@@ -40,6 +40,7 @@ Before building a retrieval pipeline, determine whether you actually need one.
 |---|---|
 | Corpus fits in context window (<100K tokens) | Skip RAG. Load directly. Cheaper, simpler, higher recall. |
 | Corpus is a codebase | Use `text-tools.md` (ripgrep + ast-grep + semantic tools). Just-in-time context, not pre-indexed RAG. |
+| Corpus too large for context but greppable; exact terms / multi-hop constraints dominate; or it changes daily | Direct Corpus Interaction (DCI) — agentic grep, no index. See `direct-corpus-interaction.md`. |
 | Corpus is structured data (tables, JSON, SQL) | Use `tabular-data.md` or `text-tools.md` (jq, sqlite3). |
 | Corpus is large, unstructured, and changes infrequently | RAG with pre-indexed embeddings. This reference applies. |
 | Corpus is large and changes frequently | RAG with incremental indexing + staleness monitoring. |
@@ -538,4 +539,4 @@ Is the system agentic (multi-step reasoning)?
 
 ---
 
-**See also:** `multi-hop-rag.md` for multi-hop methodology taxonomy, decision matrix, LangGraph implementation templates, and multi-hop evaluation metrics. `embeddings.md` for embedding model selection, evaluation protocols, and efficiency trade-offs (MRL truncation, quantization, domain-specific models). `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability.
+**See also:** `multi-hop-rag.md` for multi-hop methodology taxonomy, decision matrix, LangGraph implementation templates, and multi-hop evaluation metrics. `embeddings.md` for embedding model selection, evaluation protocols, and efficiency trade-offs (MRL truncation, quantization, domain-specific models). `text-tools.md` for code search and structured data filtering (just-in-time context, not pre-indexed RAG). `entity-resolution.md` for vector blocking in entity matching pipelines. `tabular-data.md` for tabular data chunking (50-100 row chunks). `deployment.md` for vector store infrastructure (pgvector, long-term memory). `evals.md` for the full evaluation framework including RAGAS. `production.md` for context engineering, cost modeling, and observability. `direct-corpus-interaction.md` for agentic grep-based retrieval (corpus-as-filesystem) when the corpus is large, evolving, or keyword-heavy and a vector index is overkill.
