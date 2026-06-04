@@ -4,6 +4,13 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.18.0] - 2026-06-04
+
+### Added
+- **`direct-corpus-interaction.md` reference** — new load-on-demand reference on Direct Corpus Interaction (DCI): the corpus-as-filesystem paradigm where the agent searches a corpus directly via shell/grep tools instead of a vector index. Covers when to use DCI vs semantic RAG vs hybrid, the six operation patterns, context-window management (L0–L4), scaling, hybrid architectures (semantic pre-filter, GraphRAG, A-RAG, Interact-RAG), production sandboxing/cost/observability, a Local/S3/Azure environment-mapping table, and failure modes. Distilled to high-level patterns (bash-only, no SDK code); cross-links `text-tools.md` and `retrieval.md`. Tier-1, benchmark-stamped (`2026-06`).
+- **DCI wired into `SKILL.md`** at 5 sites — Step 1 requirements checklist, Step 4 load-on-demand block, Troubleshoot symptom table, Extend capability table, and the DSB `Data requirements` enum.
+- **Build + doc registration** — `direct-corpus-interaction.md` added to the `validate-benchmark-stamps` lists (Makefile + `build.ps1`, parity), the README.md + CLAUDE.md reference trees, and bidirectional back-links from `retrieval.md` and `text-tools.md`.
+
 ## [1.17.0] - 2026-06-04
 
 ### Fixed
