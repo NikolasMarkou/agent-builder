@@ -19,3 +19,14 @@ jobs:
         run: make package-combined
       - name: Build tarball (smoke test)
         run: make package-tar
+
+  validate-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run skill validation (PowerShell)
+        run: .\build.ps1 validate
+        shell: pwsh
+      - name: Build package (smoke test)
+        run: .\build.ps1 package
+        shell: pwsh
