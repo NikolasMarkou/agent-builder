@@ -147,7 +147,7 @@ researcher = create_agent(model="openai:gpt-4o", tools=[web_search], system_prom
 coder = create_agent(model="openai:gpt-4o", tools=[run_code], system_prompt="Code specialist.")
 
 supervisor = create_agent(
-    model="claude-sonnet-4-6-20250514",
+    model="claude-sonnet-4-6",
     tools=[
         researcher.as_tool(name="researcher", description="Research any topic"),
         coder.as_tool(name="coder", description="Write and run code"),
@@ -173,7 +173,7 @@ The default agent loop. Model reasons about the task, calls a tool, observes the
 
 ```python
 # Minimal ReAct with iteration cap
-agent = create_agent(model="claude-sonnet-4-6-20250514", tools=[search, calculator])
+agent = create_agent(model="claude-sonnet-4-6", tools=[search, calculator])
 ```
 
 ### 2.2 Reflection / Self-Critique
@@ -217,7 +217,7 @@ def planner(state):
     plan = model.with_structured_output(Plan).invoke(f"Break this into steps: {state['task']}")
     return {"steps": plan.steps, "current_step": 0}
 
-executor_agent = create_agent(model="claude-sonnet-4-6-20250514", tools=[search])
+executor_agent = create_agent(model="claude-sonnet-4-6", tools=[search])
 
 def executor(state):
     step = state["steps"][state["current_step"]]
@@ -238,7 +238,7 @@ Separate generator and critic agents. Generator proposes, critic evaluates, gene
 
 ```python
 generator = create_agent(model="openai:gpt-4o", tools=[search], system_prompt="Generate detailed responses.")
-critic = create_agent(model="claude-sonnet-4-6-20250514", tools=[], system_prompt="Evaluate against rubric. Reply PASS or FAIL with reasons.")
+critic = create_agent(model="claude-sonnet-4-6", tools=[], system_prompt="Evaluate against rubric. Reply PASS or FAIL with reasons.")
 
 def gen_node(state):
     result = generator.invoke({"messages": [{"role": "user", "content": state["task"] + "\nFeedback: " + state.get("critique", "")}]})

@@ -307,7 +307,7 @@ from agno.agent import Agent
 from agno.models.anthropic import Claude
 
 agent = Agent(
-    model=Claude(id="claude-sonnet-4-6-20250514"),
+    model=Claude(id="claude-sonnet-4-6"),
     instructions="You are a helpful assistant.",
     tools=[search_tool],
     learning=True,  # persistent memory
@@ -370,7 +370,7 @@ result = agent.run("Find the latest AI agent frameworks")
 ```python
 import dspy
 
-lm = dspy.LM("anthropic/claude-sonnet-4-6-20250514")
+lm = dspy.LM("anthropic/claude-sonnet-4-6")
 dspy.configure(lm=lm)
 
 classify = dspy.Predict("sentence -> sentiment: str")

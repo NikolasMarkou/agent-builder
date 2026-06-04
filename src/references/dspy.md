@@ -59,11 +59,11 @@ DSPy separates AI system design into three layers:
 import dspy
 
 # Configure with any supported provider (OpenAI, Anthropic, Google, Ollama, Azure)
-lm = dspy.LM("anthropic/claude-sonnet-4-6-20250514")
+lm = dspy.LM("anthropic/claude-sonnet-4-6")
 dspy.configure(lm=lm)
 
 # Multiple LMs for cost optimization
-strong_lm = dspy.LM("anthropic/claude-sonnet-4-6-20250514")
+strong_lm = dspy.LM("anthropic/claude-sonnet-4-6")
 cheap_lm  = dspy.LM("openai/gpt-4o-mini")
 dspy.configure(lm=cheap_lm)  # default for most modules; override per-call
 ```
