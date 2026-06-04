@@ -2,6 +2,11 @@
 
 Patterns for serving agents as APIs, containerizing them, and standing up a monitoring stack. Complements `production.md` (which covers what to build) with how to deploy it.
 
+**Install:**
+```bash
+pip install fastapi uvicorn pydantic langchain langgraph prometheus-client
+```
+
 ## Table of Contents
 
 1. [API Serving](#api-serving)
