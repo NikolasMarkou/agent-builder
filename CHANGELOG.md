@@ -4,6 +4,11 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.18.1] - 2026-06-05
+
+### Changed
+- **README reference tree synced to the authoritative `CLAUDE.md` descriptions** — the Project Structure file tree in `README.md` is the only place that enumerates the 21 reference files, and 10 of its one-line descriptions had drifted as files matured. All 21 are now verbatim-identical to the `CLAUDE.md` tree (`patterns`, `langchain-langgraph`, `frameworks`, `production`, `evals`, `prompt-structuring`, `llm-as-judge`, `binary-evals`, `text-tools`, `structured-classification` corrected; the rest already matched). Comment columns realigned and the `references/` directory comment added. Docs-only; `direct-corpus-interaction.md` (added in 1.18.0) was already listed correctly.
+
 ## [1.18.0] - 2026-06-04
 
 ### Added
