@@ -164,28 +164,28 @@ agent-builder/
 ├── build.ps1                 # Windows PowerShell build
 └── src/
     ├── SKILL.md              # Core skill -- build workflow, review/troubleshoot/optimize workflows
-    └── references/
-        ├── patterns.md           # Pattern catalogue (topology, behavioral, data flow)
-        ├── langchain-langgraph.md # Default stack implementation reference
-        ├── frameworks.md          # Alternative framework guidance (10 frameworks)
-        ├── strands.md             # Strands Agents: patterns, multi-agent, deployment, A2A
-        ├── dspy.md                # DSPy: signatures, modules, optimizers, orchestration integration
-        ├── production.md          # Production hardening reference
-        ├── deployment.md          # Deployment: API serving, Docker, monitoring stack, memory
-        ├── evals.md               # Evaluation reference (frameworks, benchmarks, metrics, tooling)
-        ├── prompt-structuring.md  # Prompt structure: delimiters, 7-block template, techniques
-        ├── tabular-data.md        # Tabular data serialization: formats, size strategies, token costs
-        ├── llm-as-judge.md        # LLM-as-Judge: biases, calibration, rubrics, production deployment
-        ├── binary-evals.md        # Binary evaluation rules: CheckEval, boolean rubrics, scoring
-        ├── entity-resolution.md   # Entity resolution: blocking, matching, clustering, multi-agent ER
-        ├── text-tools.md            # Text tools for agents: search stack, ripgrep, ast-grep, jq, sqlite3
-        ├── retrieval.md             # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
-        ├── rag-evals.md             # RAG evaluation: Q/A/C framework, 6 exhaustive metrics, tiered cadence, domain mapping
-        ├── multi-hop-rag.md         # Multi-hop RAG: methodology taxonomy, IRCoT, query decomposition, graph traversal
-        ├── embeddings.md            # Embedding model selection, evaluation protocols, efficiency trade-offs
-        ├── structured-classification.md # Structured classification: intent detection, schema design, routing
+    └── references/                      # Knowledge base documents (loaded on-demand)
+        ├── patterns.md                  # Pattern catalogue: topology (7), behavioral (7), data flow (5)
+        ├── langchain-langgraph.md       # Default stack: LangChain v1.2.x + LangGraph v1.0.x
+        ├── frameworks.md                # 10 framework reviews, selection matrix, head-to-head comparisons
+        ├── strands.md                   # Strands Agents: patterns, multi-agent, deployment, A2A protocol
+        ├── dspy.md                      # DSPy: signatures, modules, optimizers, orchestration integration
+        ├── production.md                # Context engineering, tool design, evals, cost, observability, guardrails, security, resilience
+        ├── deployment.md                # Deployment: API serving (FastAPI), Docker, monitoring stack, long-term memory
+        ├── evals.md                     # Evaluation: frameworks, benchmarks, metrics, LLM-as-judge, safety, monitoring
+        ├── prompt-structuring.md        # Prompt structure: delimiters, 7-block template, techniques, output control
+        ├── tabular-data.md              # Tabular data serialization: formats, size strategies, token costs
+        ├── llm-as-judge.md              # LLM-as-Judge: patterns, biases, calibration, rubrics, production deployment
+        ├── binary-evals.md              # Binary evaluation rules: CheckEval, boolean rubrics, scale selection
+        ├── entity-resolution.md         # Entity resolution: blocking, matching, clustering, multi-agent ER
+        ├── text-tools.md                # Text tools: search stack, ripgrep, ast-grep, jq, sqlite3, cost math
+        ├── retrieval.md                 # Text retrieval: sparse/dense/hybrid search, reranking, RAG, GraphRAG
+        ├── rag-evals.md                 # RAG evaluation: Q/A/C framework, 6 exhaustive metrics, tiered cadence, domain mapping
+        ├── multi-hop-rag.md             # Multi-hop RAG: methodology taxonomy, IRCoT, query decomposition, graph traversal
+        ├── embeddings.md                # Embedding model selection, evaluation protocols, efficiency trade-offs
+        ├── structured-classification.md # Structured classification: intent detection, routing, constrained decoding
         ├── direct-corpus-interaction.md # Direct Corpus Interaction (DCI): agentic grep-based retrieval, six patterns, DCI-vs-RAG decision guide
-        └── scaffolding.md           # Scenario scaffolding: recipes for research, support, code gen, RAG, and more
+        └── scaffolding.md               # Scenario scaffolding: recipes for research, support, code gen, RAG, and more
 ```
 
 ---
