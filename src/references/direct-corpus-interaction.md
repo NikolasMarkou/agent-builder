@@ -3,7 +3,7 @@
 
 Retrieval-augmented generation (RAG) preprocesses a corpus into an index, and the LLM only ever sees what the index chooses to return. The semantic understanding lives in the embedding model and the chunker — decisions frozen at index time. Direct Corpus Interaction (DCI) inverts this: it hands the LLM a terminal over the raw corpus. The agent decides what to search, runs the search itself, reads the result, then decides the next search. There is no offline index and no fixed retrieval boundary; the semantic understanding lives in the model at inference time, not in a precomputed vector space.
 
-This matters most when precision is the bottleneck. On closed-corpus deep-research benchmarks, the DCI *localization* score — how tightly the agent narrows to the exact lines that answer the question — is more than 2x the best embedding retriever (Li et al., 2026, arXiv:2605.05242). DCI wins not by retrieving *more* documents but by extracting more value from the documents it reaches: it can re-search, intersect constraints, and read surrounding context on demand, instead of being limited to the top-k chunks a one-shot retriever happened to surface.
+This matters most when precision is the bottleneck. On closed-corpus deep-research benchmarks, the DCI *localization* score — how tightly the agent narrows to the exact lines that answer the question — is more than 2x the best embedding retriever (Li et al., 2026, in published closed-corpus deep-research benchmarks). DCI wins not by retrieving *more* documents but by extracting more value from the documents it reaches: it can re-search, intersect constraints, and read surrounding context on demand, instead of being limited to the top-k chunks a one-shot retriever happened to surface.
 
 > **Design axiom: the corpus is a filesystem, the agent is a developer at a terminal.** Every search is a shell command that can be composed, piped, and refined.
 
@@ -141,7 +141,7 @@ Key insight: compaction keeps **which tools ran in what order** (the search traj
 
 ## Scaling DCI
 
-**Latency at scale.** A naive recursive grep over a 20GB dump is 10-30s per command, and accuracy degrades with corpus size: roughly ~100K docs → ~80% accuracy / 38 tool calls; ~200K → ~66% / 87 calls; ~400K → ~37% / 122 calls (GrepSeek, arXiv:2605.29307). Beyond a few hundred thousand documents, raw recursive grep is no longer viable on its own.
+**Latency at scale.** A naive recursive grep over a 20GB dump is 10-30s per command, and accuracy degrades with corpus size: roughly ~100K docs → ~80% accuracy / 38 tool calls; ~200K → ~66% / 87 calls; ~400K → ~37% / 122 calls (GrepSeek, 2026). Beyond a few hundred thousand documents, raw recursive grep is no longer viable on its own.
 
 **Sharded-parallel execution.** Split the corpus into N shards and run semantics-preserving pipelines across all shards concurrently, then merge by operation type: filter results concatenate, counts sum, sorted results merge-sort. This recovers most of the per-command latency lost at scale without changing the agent's mental model.
 
@@ -168,12 +168,12 @@ This is the highest-value table in the file: it answers "should I reach for DCI 
 
 | Axis | Pure DCI | Semantic RAG | Hybrid |
 |---|---|---|---|
-| Corpus size | <50K docs | any (index amortizes) | 50-200K (pre-filter), >200K (mandatory, + sharding) |
+| Corpus size | <50K docs comfortably; usable to ~100K with L3 context mgmt | any (index amortizes) | 50-200K (pre-filter pays off), >200K (mandatory, + sharding) |
 | Query type | exact string / entity / error code / function name; multi-hop with exact constraints (or A-RAG) | fuzzy conceptual / synonym-heavy | mixed exact + conceptual |
 | Corpus dynamics | evolving daily (no re-index); unknown / heterogeneous schema | static, governed, auditable index | evolving with a stable core |
 | Cost / infra | no RAG infra — start here | vector DB already deployed | DB deployed → add DCI as a verification/localization layer; use DCI traces to find where chunking fails |
 
-Cross-link: this extends `retrieval.md` "When RAG vs. When Not" with a third (DCI) branch — for corpora too large to load but small or governed enough to grep.
+The <50K figure is a *preference* threshold, not a hard limit: pure DCI still answers at ~80% around 100K docs (see Scaling above) and degrades past ~200K — the table routes to hybrid where a pre-filter starts paying off, not where DCI stops working. Cross-link: this extends `retrieval.md` "When RAG vs. When Not" with a third (DCI) branch — for corpora too large to load but small or governed enough to grep.
 
 ---
 
