@@ -292,7 +292,23 @@ Many systems combine both, and some vector DBs add filterable-index links so fil
 
 **Schema-as-contract.** You can only filter on what you tagged at index time — changing the schema means re-indexing. Failure modes: schema gaps (a facet was never tagged), inconsistent tagging (`"Sci-Fi"` vs `"Science Fiction"`, or mismatched date formats that silently miss documents), and filter over-specificity (too many `AND`s or a low-cardinality field collapsing to a near-empty result set).
 
-Hand-written filters are the manual baseline; **self-query** automates them by translating a natural-language query into this structured filter (covered next under Self-Query / text-to-filter).
+Hand-written filters are the manual baseline; **self-query** automates them by translating a natural-language query into this structured filter (covered next under Self-Query, below).
+
+### Self-Query (Text-to-Filter)
+
+A **self-querying retriever** uses an LLM to translate one natural-language query into a structured query with TWO parts: (a) a *semantic search string* used for similarity, and (b) a *filter expression* over metadata. "Horror movies made after 1980 with lots of explosions" becomes semantic string "lots of explosions" + filter `genre = Horror AND year > 1980`. It is the automation layer over the metadata filtering above — the user writes prose, the model emits the gate.
+
+**How the translation is constrained.** The model is given (1) a description of what the documents contain, (2) the metadata field schema — field name, description, and type per field, (3) the ALLOWED comparators (`eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `exists`) and boolean operators (`AND` / `OR` / `NOT`), and (4) a few-shot examples mapping example queries to their filters. A query that needs no filter must emit an explicit "no filter" signal. You MUST tell the model which comparators are allowed — otherwise it writes filters the store cannot execute.
+
+**Why it beats plain semantic search.** Standard RAG embeds the whole query, blurring hard constraints ("after 1980", "directed by Nolan") into the vector where they cannot be enforced exactly. Self-query carves those constraints out into an exact filter and leaves only the genuinely semantic remainder ("lots of explosions") for vector matching — much higher precision on faceted queries.
+
+**The schema is the contract.** The same metadata schema written at index time defines what can be filtered at query time. If the indexing schema and the query-time schema drift apart, retrieval silently breaks.
+
+**Failure modes:** hallucinated filters (the model invents attributes or values not in the schema — the canonical failure; the store then errors or returns nothing); over-eager filtering or a wrong "no filter" decision on ambiguous queries; schema, syntax, or quoting errors the translator cannot parse; comparator/type mismatch (a numeric comparator on a string field, or a comparator the store does not support).
+
+**Mitigation:** validate the generated filter against the schema BEFORE executing it; fall back to no-filter on any validation failure; constrain the model tightly with the full schema plus the allowed-comparator list plus 3-5 few-shot examples.
+
+Self-query is the user-friendly face of metadata filtering, and it is also a building block of agentic routing — an agent can call self-query as a single tool, then choose among stores (see the Decision Framework and dual-store material later in this file).
 
 ---
 
