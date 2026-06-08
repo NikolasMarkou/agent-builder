@@ -4,6 +4,22 @@ All notable changes to the Agent Builder project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.19.0] - 2026-06-08
+
+### Added
+- **Structured & Global Retrieval woven into `retrieval.md`** — a Local-vs-Global organizing frame (entity/relationship-scoped *local* questions vs corpus-spanning *global* questions) with GlobalQA-style evidence that flat top-k vector search degrades on global questions; a **metadata-filtering pre-retrieval gate** subsection (hard pre-filter on structured fields before semantic ranking); a **self-query (text-to-filter)** subsection (LLM extracts structured predicates from the natural-language query); and a **dual-store (vector + relational)** architecture subsection (route to the store whose shape fits the question).
+- **LazyGraphRAG** rows added to the GraphRAG-variant tables in `retrieval.md` and `multi-hop-rag.md` (defer graph/community summarization to query time to cut indexing cost).
+- **GraphRAG LLM-as-judge bias caution** in `rag-evals.md` — judges over-reward verbose graph-synthesized answers; pair with grounded checks.
+- **Typed store workers** (vector / SQL / graph) in the `scaffolding.md` Multi-Agent RAG recipe, with the supervisor routing by query shape.
+
+### Changed
+- **Adaptive-routing axiom extended to store selection by query shape** (vector vs SQL vs graph) in `retrieval.md` and `multi-hop-rag.md`, with **misrouting** named as the failure-prone component (added to Failure Modes).
+- **Discoverability cross-links** added from `patterns.md` (Router / Hierarchical) and `SKILL.md` into the structured/global retrieval material.
+- **Benchmark stamps refreshed to `2026-06`** on `retrieval.md`, `multi-hop-rag.md`, and `rag-evals.md`.
+
+### Notes
+- No new reference file — the reference tree stays at **21** files. This release is a deep weave into existing references (primarily `retrieval.md`, plus `multi-hop-rag.md`, `rag-evals.md`, `scaffolding.md`, `patterns.md`, `SKILL.md`), avoiding the copy-paste/duplication failure mode and triggering no new validators.
+
 ## [1.18.1] - 2026-06-05
 
 ### Changed
