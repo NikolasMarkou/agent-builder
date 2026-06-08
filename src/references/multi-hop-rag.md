@@ -106,7 +106,7 @@ Builds an explicit graph structure over the corpus, then traverses edges to gath
 
 **When NOT to use:** Simple factoid queries (flat hybrid search is sufficient and faster). Corpora >3-5M tokens (graph traversal becomes less discriminative). No entity-relationship structure in the data.
 
-> **Design axiom: Model costs first.** GraphRAG ROI is proportional to query reasoning depth. If <20% of your queries are multi-hop relational, the construction cost is not justified. Use adaptive routing to send only relational queries to the graph path.
+> **Design axiom: Model costs first.** GraphRAG ROI is proportional to query reasoning depth. If <20% of your queries are multi-hop relational, the construction cost is not justified. Use adaptive routing to select the store by query shape — vector for semantic lookup, SQL for exact computation, graph only for multi-hop-relational queries. Misrouting (e.g., an exact-computation query sent to the graph) is the failure-prone component: it returns a confident-but-incomplete answer with no error. See `retrieval.md` for the full store-selection decision tree.
 
 ---
 
@@ -443,7 +443,7 @@ Best practices from production multi-hop systems (2025-2026):
 
 4. **GraphRAG ROI is proportional to query reasoning depth.** If <20% of queries need relational reasoning, the graph construction cost is not justified. Use adaptive routing.
 
-5. **Adaptive routing is mandatory for cost control.** Running full agentic multi-hop on simple factoid queries wastes 40-60% of compute. Classify, then route.
+5. **Adaptive routing is mandatory for cost control.** Running full agentic multi-hop on simple factoid queries wastes 40-60% of compute. Route by query shape (vector vs SQL vs graph), not only vector-vs-graph: classify, then route. Misrouting is the highest-leverage, most failure-prone component — a query sent to the wrong store fails silently with a confident-but-incomplete answer (see `retrieval.md` Decision Framework).
 
 6. **Observability is non-negotiable.** Log every retrieval call, confidence score, hop count, and corrective action per query. Track hop budget exhaustion rate. Standard tools: LangSmith, Arize Phoenix, Maxim.
 

@@ -564,6 +564,13 @@ Is the corpus domain-specific with specialized vocabulary?
   YES → Fine-tune embeddings or use SPLADE.
   NO  → Generic bi-encoder (bge, e5) is sufficient.
 
+What is the query's shape? (route by shape, not by default to vector)
+  Local-faceted (date/category/author constraints) → Metadata Filtering / Self-Query gate
+  Exact-computation (counts/sums/sorting/top-k/date math) → SQL / Dual-Store Architecture
+  Multi-hop-relational (reason across entities) → GraphRAG ↓
+  Global-thematic (aggregate across the whole corpus) → GraphRAG global-search / RAPTOR
+  Plain semantic lookup → Flat hybrid search.
+
 Are queries multi-hop or cross-document relational?
   YES → See multi-hop-rag.md for method selection:
         Predictable hops → Query Decomposition
@@ -572,6 +579,10 @@ Are queries multi-hop or cross-document relational?
         Latency-critical → REAPER
         Mixed workloads → Adaptive Routing + method per class
   NO  → Flat hybrid search.
+
+Misrouting is the highest-leverage, most failure-prone step here: a query
+sent to the wrong store returns a confident-but-incomplete answer with no
+error, so the router/classifier deserves the most evaluation effort.
 
 Is precision at top-1 critical?
   YES → Add cross-encoder or ColBERT reranker.
@@ -602,6 +613,7 @@ Is the system agentic (multi-step reasoning)?
 | **Infinite retry loop** | Agentic loop rewrites query indefinitely | Hard cap at 3 retries; generate with disclaimer after cap |
 | **Cold cache stampede** | All queries miss cache simultaneously under load | Pre-warm cache with common queries; use embedding similarity-based cache (cosine >0.95 = hit) |
 | **Single-vector collapse** | Bi-encoder collapses semantically different queries to same embedding | Use ColBERT (per-token) for fine-grained matching; add a [metadata-filtering pre-retrieval gate](#metadata-filtering-pre-retrieval-gate) |
+| **Misrouting (wrong store)** | An exact-computation query sent to vector search (or a faceted query left unfiltered) returns a confident-but-incomplete answer with no error | Route by query shape (see Decision Framework); evaluate the router/classifier as the highest-leverage component; log routed-store + fall back to broader retrieval on low confidence |
 
 ---
 
