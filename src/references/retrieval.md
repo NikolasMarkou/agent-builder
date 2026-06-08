@@ -60,7 +60,7 @@ Before selecting methods, classify the *question shape*. This is the organizing 
 
 **Global questions** require aggregating across the *entire* corpus — "What are the main themes?", "Which are the top 10 most-cited papers?", "How many filings mention sanctions?". Counting, sorting, extremum, and top-k-over-everything are all global: no fixed set of k chunks contains the answer, because the answer is a property of the whole collection.
 
-**Dense retrieval fails catastrophically on global queries.** A dense retriever ranks all documents by similarity and returns only the top k — but a global answer needs information scattered across *all* of them. On the GlobalQA benchmark, the strongest naive retrieval baseline scored only **1.51 F1** (Luo & Li et al. 2025). Three causes are diagnosed:
+**Dense retrieval fails catastrophically on global queries.** A dense retriever ranks all documents by similarity and returns only the top k — but a global answer needs information scattered across *all* of them. On the GlobalQA benchmark, the strongest naive retrieval baseline reportedly scored only **~1.5 F1** (Luo et al. 2025; directional — the order-of-magnitude collapse, not the exact figure, is the point). Three causes are diagnosed:
 
 1. **Fixed-granularity chunking disrupts document integrity.** Splitting at arbitrary token boundaries separates an entity from its attributes, producing double-counting or omissions when the agent tries to aggregate.
 2. **Dense retrieval returns relevant-but-not-useful noise.** Semantically similar passages crowd out the factually required ones and consume the context window, so the genuinely needed evidence never reaches the generator.
