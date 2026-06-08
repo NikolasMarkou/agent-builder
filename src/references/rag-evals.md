@@ -1,4 +1,4 @@
-<!-- benchmarks-as-of: 2026-04 -->
+<!-- benchmarks-as-of: 2026-06 -->
 # RAG Evaluation: The 6 Metrics Framework
 
 Systematic evaluation framework for Retrieval-Augmented Generation systems. Based on the exhaustive combinatorial analysis of RAG's three core variables — every RAG failure maps to exactly one of six relationships.
@@ -292,3 +292,13 @@ For custom LLM judges with rubrics (recommended for Tier 2 metrics), see `llm-as
 | No unanswerable queries in eval set | System optimizes for always answering, never refusing | Add negative examples that exercise Answerability (Q\|C) |
 | Treating Faithfulness and Context Support as the same | Missing subtle hallucinations where context was insufficient | Evaluate both: A\|C catches deviation, C\|A catches insufficiency |
 | Ignoring tool routing in agentic RAG | Good retrieval metrics but wrong data source queried | Add code-based checks for tool selection alongside RAG metrics |
+
+### Treat Graph-RAG win rates as directional, not exact
+
+Published Graph-RAG / LightRAG comprehensiveness and diversity "win rates" (e.g., the GraphRAG lineage of Edge et al. 2024) rest on LLM-as-judge **pairwise comparisons**, which carry systematic biases:
+
+- **Position bias** — the answer shown first wins disproportionately often.
+- **Length bias** — a small token-count difference can swing the reported win rate substantially; padding alone can inflate it.
+- **Trial bias** — identical comparisons return different verdicts across runs.
+
+Concretely, under an unbiased re-evaluation (Zeng et al. 2025) a reported LightRAG win rate of ~66.7% vs naive RAG corrected to ~39.06% — the advantage reversed. When comparing retrieval architectures, control answer order and length, run multiple trials, and prefer objective metrics (claim recall, factual correctness) over raw LLM-judge win rates. See `llm-as-judge.md` for the judge-bias mechanics in depth.
