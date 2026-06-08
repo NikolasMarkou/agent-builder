@@ -89,6 +89,7 @@ A classifier agent examines the input and dispatches to the appropriate speciali
 **When NOT to use:** Categories overlap heavily (router will oscillate), single handler covers all cases.
 **Key design:** Router prompt is the most critical component. Use structured output for routing decisions, not free text. For complete classifier schema design, prompt engineering, confidence thresholding, and implementation patterns, see `structured-classification.md`.
 **Scaling:** Max ~15 classes per router. Beyond that, use hierarchical classification (two-stage routing). See `structured-classification.md` §Multi-Intent and Hierarchical Classification.
+**See also:** Routing a query to the right *store* (vector / SQL / graph) by query shape is covered in `retrieval.md` (Decision Framework / Dual-Store); the typed-worker topology that fans those stores out under a supervisor is in `scaffolding.md`.
 
 LangGraph: Conditional edge from router node to specialist nodes.
 
