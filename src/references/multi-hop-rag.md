@@ -1,4 +1,4 @@
-<!-- benchmarks-as-of: 2026-04 -->
+<!-- benchmarks-as-of: 2026-06 -->
 # Multi-Hop RAG Methodologies
 
 Patterns for answering questions that require reasoning across 2-N pieces of evidence scattered across a corpus. Standard RAG retrieves passages similar to a single query. Multi-hop RAG connects evidence chains: the answer to sub-question 1 determines what to retrieve for sub-question 2.
@@ -94,10 +94,11 @@ Builds an explicit graph structure over the corpus, then traverses edges to gath
 
 | System | Mechanism | Trade-off |
 |---|---|---|
-| **Microsoft GraphRAG** | Entity graphs + Leiden community clustering + hierarchical summaries. Local search = graph-aware passage retrieval; global search = community summaries. | High construction cost. Degrades above ~3M tokens corpus. 5-20 point gain on multi-hop benchmarks. |
+| **Microsoft GraphRAG** | Entity graphs + Leiden community clustering + hierarchical summaries (Edge et al. 2024). Local search = graph-aware passage retrieval; global search = community summaries. | High construction cost. Degrades above ~3M tokens corpus. 5-20 point gain on multi-hop benchmarks. |
+| **LazyGraphRAG** | Defers LLM-based community summarization to query time; only lightweight graph construction at index time (Microsoft 2024). | Indexing cost ≈ vector RAG (far below full GraphRAG). Much lower query cost for global queries, tunable via a relevance budget. Microsoft reports ~700x lower query cost than full GraphRAG (directional). |
 | **HopRAG** | Passage graph with LLM-generated pseudo-queries as edges. Retrieve-reason-prune mechanism with "Helpfulness" metric. | Strong on logical relevance gaps. Medium construction cost. |
 | **HippoRAG** | Personalized PageRank over knowledge graphs. Memory-inspired retrieval. | Novel approach; less production-proven. |
-| **LightRAG / GLightRAG** | Simplified KG structures. | 10-50x lower construction cost vs. full GraphRAG; trades some accuracy. |
+| **LightRAG / GLightRAG** | Simplified KG structures (Guo et al. 2024). | 10-50x lower construction cost vs. full GraphRAG; trades some accuracy. |
 | **NodeRAG** | Heterogeneous graph (entities, relationships, chunks, events, summaries all as nodes). | Outperforms GraphRAG and LightRAG in indexing time and query efficiency. |
 | **CatRAG** | Symbolic anchoring + query-aware dynamic edge weighting + key-fact passage enhancement. | Introduces "reasoning completeness" metric for evidence chain recovery. |
 

@@ -374,7 +374,8 @@ When queries require reasoning across multiple documents, entity-relationship tr
 
 | System | Mechanism | Trade-off |
 |---|---|---|
-| Microsoft GraphRAG | Entity graphs + Leiden community clustering + hierarchical summaries | High construction cost; degrades above ~3M tokens; 5-20 point gain |
+| Microsoft GraphRAG | Entity graphs + Leiden community clustering + hierarchical summaries (Edge et al. 2024) | High construction cost; degrades above ~3M tokens; 5-20 point gain |
+| LazyGraphRAG | Defers LLM-based community summarization to query time; only lightweight graph construction at index time (Microsoft 2024) | Indexing cost ≈ vector RAG (far below full GraphRAG); much lower query cost for global queries, tunable via a relevance budget. Microsoft reports ~700x lower query cost than full GraphRAG (directional) |
 | HopRAG | Passage graph with pseudo-query edges; retrieve-reason-prune | Strong on logical relevance gaps |
 | LightRAG / GLightRAG | Simplified KG structures | 10-50x lower construction cost; some accuracy loss |
 | HippoRAG | Personalized PageRank over knowledge graphs | Memory-inspired; less production-proven |
