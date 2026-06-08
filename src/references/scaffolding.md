@@ -494,15 +494,17 @@ Retrieval quality is the floor under which no generation quality improvement can
 ```
 [Query]
   |
-[Decomposer: breaks into sub-queries]
-  |-- [Retriever Agent A: Domain 1]
-  |-- [Retriever Agent B: Domain 2]
-  +-- [Retriever Agent C: Web]
+[Supervisor / Decomposer: splits into sub-questions, routes by query shape]
+  |-- [Vector worker: semantic / fuzzy "find similar"]
+  |-- [SQL worker:   exact computation -- counts, sums, joins, date math]
+  +-- [Graph worker: multi-hop relational + global "across the corpus"]
         |
   [Evaluator Agent: score and filter retrieved evidence]
   |
   [Generator]
 ```
+
+> **Type workers by store, not by topic.** The supervisor decomposes a complex query into sub-questions and routes each to the worker whose store/query-shape fits — semantic to the vector worker, exact computation to the SQL worker, multi-hop/global to the graph worker. Dedicated typed workers outperform a single general-purpose retrieval agent on their respective modalities (a vector-only agent silently approximates `COUNT`/`SUM` and fabricates joins). See the Decision Framework and dual-store routing in `retrieval.md` for the query-shape signals that drive this split.
 
 **When to use:** Knowledge-intensive question answering, document search with quality requirements, any system where retrieval quality directly determines output quality.
 **When NOT to use:** All required information is already in the context window, corpus is small enough for full inclusion, tasks requiring reasoning over structured data (use Data Analysis instead).
