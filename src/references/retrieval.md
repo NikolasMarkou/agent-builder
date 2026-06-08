@@ -1,4 +1,4 @@
-<!-- benchmarks-as-of: 2026-04 -->
+<!-- benchmarks-as-of: 2026-06 -->
 # Text Retrieval for Agentic AI
 
 Production retrieval patterns for agents that need to search, rank, and synthesize from knowledge bases. Covers sparse retrieval (BM25), dense retrieval (bi-encoders), hybrid fusion, reranking, query transformation, corrective loops, GraphRAG, and agentic RAG architectures.
@@ -15,20 +15,21 @@ pip install langchain langgraph
 ## Table of Contents
 
 1. [When RAG vs. When Not](#when-rag-vs-when-not)
-2. [The Retrieval Stack](#the-retrieval-stack)
-3. [Sparse Retrieval](#sparse-retrieval)
-4. [Dense Retrieval](#dense-retrieval)
-5. [Late Interaction and Cross-Encoders](#late-interaction-and-cross-encoders)
-6. [Hybrid Search](#hybrid-search)
-7. [Pre-Retrieval: Query Transformation](#pre-retrieval-query-transformation)
-8. [Post-Retrieval: Corrective Loops](#post-retrieval-corrective-loops)
-9. [GraphRAG and Multi-Hop Retrieval](#graphrag-and-multi-hop-retrieval)
-10. [Agentic RAG Architectures](#agentic-rag-architectures)
-11. [Chunking Strategies](#chunking-strategies)
-12. [Production Tooling](#production-tooling)
-13. [Retrieval Evaluation](#retrieval-evaluation)
-14. [Decision Framework](#decision-framework)
-15. [Failure Modes](#failure-modes)
+2. [Local RAG vs Global RAG](#local-rag-vs-global-rag)
+3. [The Retrieval Stack](#the-retrieval-stack)
+4. [Sparse Retrieval](#sparse-retrieval)
+5. [Dense Retrieval](#dense-retrieval)
+6. [Late Interaction and Cross-Encoders](#late-interaction-and-cross-encoders)
+7. [Hybrid Search](#hybrid-search)
+8. [Pre-Retrieval: Query Transformation](#pre-retrieval-query-transformation)
+9. [Post-Retrieval: Corrective Loops](#post-retrieval-corrective-loops)
+10. [GraphRAG and Multi-Hop Retrieval](#graphrag-and-multi-hop-retrieval)
+11. [Agentic RAG Architectures](#agentic-rag-architectures)
+12. [Chunking Strategies](#chunking-strategies)
+13. [Production Tooling](#production-tooling)
+14. [Retrieval Evaluation](#retrieval-evaluation)
+15. [Decision Framework](#decision-framework)
+16. [Failure Modes](#failure-modes)
 
 ---
 
@@ -48,6 +49,24 @@ Before building a retrieval pipeline, determine whether you actually need one.
 | Queries are keyword-heavy (IDs, codes, exact terms) | BM25 must be in the stack. Dense-only will fail. |
 
 > **Design axiom: Model costs first.** RAG adds embedding cost (one-time indexing + per-query encode), vector DB infrastructure, and reranking latency. Calculate whether the cost is justified vs. simply using a larger context window or fine-tuning.
+
+---
+
+## Local RAG vs Global RAG
+
+Before selecting methods, classify the *question shape*. This is the organizing distinction behind every technique in this reference.
+
+**Local questions** are answerable from a few chunks or documents — "When was X founded?", "What does clause 7 of this contract say?". Critically, this includes multi-hop questions: connecting a handful of documents to chain evidence (HotpotQA, 2WikiMultiHopQA) is still *local*. Top-k retrieval is the right tool — the answer lives in a bounded, locatable set of passages.
+
+**Global questions** require aggregating across the *entire* corpus — "What are the main themes?", "Which are the top 10 most-cited papers?", "How many filings mention sanctions?". Counting, sorting, extremum, and top-k-over-everything are all global: no fixed set of k chunks contains the answer, because the answer is a property of the whole collection.
+
+**Dense retrieval fails catastrophically on global queries.** A dense retriever ranks all documents by similarity and returns only the top k — but a global answer needs information scattered across *all* of them. On the GlobalQA benchmark, the strongest naive retrieval baseline scored only **1.51 F1** (Luo & Li et al. 2025). Three causes are diagnosed:
+
+1. **Fixed-granularity chunking disrupts document integrity.** Splitting at arbitrary token boundaries separates an entity from its attributes, producing double-counting or omissions when the agent tries to aggregate.
+2. **Dense retrieval returns relevant-but-not-useful noise.** Semantically similar passages crowd out the factually required ones and consume the context window, so the genuinely needed evidence never reaches the generator.
+3. **LLMs are poor at numerical computation.** Even handed every relevant fact, models count, compare, and rank unreliably — global answers demand exactly these operations.
+
+**This framing organizes the methods that follow.** Metadata filtering and self-query sharpen *local* precision by narrowing the candidate set before retrieval. Dual-store routing delegates exact aggregation to SQL, sidestepping cause (3) entirely. Graph RAG and RAPTOR pre-compute corpus-level structure (community summaries, hierarchical trees) so *global* sensemaking reads from a prepared index rather than re-aggregating at query time. See `multi-hop-rag.md`, which names GraphRAG's local-search and global-search modes explicitly.
 
 ---
 
