@@ -273,6 +273,27 @@ results = [hybrid_retrieve(sq) for sq in sub_queries]
 
 Add synonyms, related terms, or LLM-generated variants before retrieval. Simpler and cheaper than HyDE. Meaningful recall improvement for niche corpora where the embedding model lacks domain coverage.
 
+### Metadata Filtering (Pre-Retrieval Gate)
+
+Metadata filtering is a **pre-retrieval gate, not a search method**. Each chunk stores a dense embedding *and* a structured metadata payload — source ID, section, page, author, date, category, numeric attributes. At query time you constrain the ANN search to points whose metadata satisfies stated conditions (e.g., `category = "news" AND date > 2024-01-01`). This is the foundation of multi-tenant, faceted, and time-scoped retrieval, and is the cheapest way to improve local precision: it shrinks the candidate set to the rows that are *eligible* before semantic ranking even runs.
+
+**Keep metadata separate from the embedding.** Do NOT serialize structured fields into the chunk text before embedding. Doing so dilutes the semantic vector into a noisy "semantic average," and you *still* cannot do exact range filtering (`year > 2020`) on a blurred vector. A separate structured field preserves a clean vector AND enables exact boolean / range / set operations the embedding space cannot express.
+
+**Pre-filter vs. post-filter trade-off:**
+
+| Strategy | How it works | Guarantee | Cost |
+|----------|--------------|-----------|------|
+| **Pre-filter** | Filter first, then search within the eligible subset | Returns k results that all satisfy the filter | Hard to do efficiently on graph ANN indexes — an HNSW graph is built over the whole dataset, so an arbitrary filtered subset disrupts traversal; very low cardinality can disconnect the graph |
+| **Post-filter** | Search first, then drop results that fail the filter | Works on any index, trivially simple | May return far fewer than k (or zero) on selective filters; mitigate by over-fetching (large `top_k`) |
+
+Many systems combine both, and some vector DBs add filterable-index links so filtered search stays efficient regardless of order.
+
+**Works well:** low-cardinality categorical fields, date ranges, numeric attributes with exact comparators (eq / gt / lt / in). **Works poorly:** free-form text as metadata, very high-cardinality fields, anything needing fuzzy or semantic match (that belongs in the embedding).
+
+**Schema-as-contract.** You can only filter on what you tagged at index time — changing the schema means re-indexing. Failure modes: schema gaps (a facet was never tagged), inconsistent tagging (`"Sci-Fi"` vs `"Science Fiction"`, or mismatched date formats that silently miss documents), and filter over-specificity (too many `AND`s or a low-cardinality field collapsing to a near-empty result set).
+
+Hand-written filters are the manual baseline; **self-query** automates them by translating a natural-language query into this structured filter (covered next under Self-Query / text-to-filter).
+
 ---
 
 ## Post-Retrieval: Corrective Loops
@@ -450,7 +471,7 @@ Use 10-20% token overlap between adjacent chunks to avoid splitting relevant con
 
 ### Metadata
 
-Always store metadata with chunks: source document, page/section number, timestamp, and any relevant category tags. This enables filtered retrieval (search only within a specific document or date range) and proper citation in generated responses.
+Always store metadata with chunks: source document, page/section number, timestamp, and any relevant category tags. This enables filtered retrieval (search only within a specific document or date range) and proper citation in generated responses. The metadata you tag here is exactly what the pre-retrieval gate can later filter on — see [Metadata Filtering (Pre-Retrieval Gate)](#metadata-filtering-pre-retrieval-gate).
 
 ---
 
@@ -554,7 +575,7 @@ Is the system agentic (multi-step reasoning)?
 | **Over-retrieval** | Too many docs stuffed into context; LLM ignores or confuses them | Limit to top-k (3-5); compress retrieved context; use adaptive retrieval to skip when unnecessary |
 | **Infinite retry loop** | Agentic loop rewrites query indefinitely | Hard cap at 3 retries; generate with disclaimer after cap |
 | **Cold cache stampede** | All queries miss cache simultaneously under load | Pre-warm cache with common queries; use embedding similarity-based cache (cosine >0.95 = hit) |
-| **Single-vector collapse** | Bi-encoder collapses semantically different queries to same embedding | Use ColBERT (per-token) for fine-grained matching; add metadata filtering |
+| **Single-vector collapse** | Bi-encoder collapses semantically different queries to same embedding | Use ColBERT (per-token) for fine-grained matching; add a [metadata-filtering pre-retrieval gate](#metadata-filtering-pre-retrieval-gate) |
 
 ---
 
